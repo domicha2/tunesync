@@ -1,1 +1,22 @@
-auth component works !
+<div id="page-wrapper" class="column">
+  <div>
+    <h1>Welcome to TuneSync</h1>
+  </div>
+
+  <form class="column">
+    <mat-form-field appearance="outline">
+      <mat-label>Username</mat-label>
+      <input matInput type="text" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Password</mat-label>
+      <input matInput type="password" />
+    </mat-form-field>
+  </form>
+
+  <div class="row">
+    <button mat-raised-button (click)="onSignUp()">Sign Up</button>
+    <button mat-raised-button (click)="onSignIn()">Sign In</button>
+  </div>
+</div>
