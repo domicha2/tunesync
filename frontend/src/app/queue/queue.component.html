@@ -1,1 +1,33 @@
-queue works!
+<div id="queue-wrapper" class="column">
+  <div id="instructions">
+    <h3>Drag the song from the available songs to the queued songs.</h3>
+    <h3>Remove a song from the queue, by dragging it to the songs.</h3>
+    <h3>You may also reorder the songs in the queue</h3>
+  </div>
+
+  <div id="song-lists" class="row" cdkDropListGroup>
+    <div id="queued-songs">
+      <h2>Queued Songs</h2>
+      <div
+        class="song-list"
+        cdkDropList
+        [cdkDropListData]="queuedSongs"
+        (cdkDropListDropped)="drop($event)"
+      >
+        <div *ngFor="let song of queuedSongs" cdkDrag>{{ song }}</div>
+      </div>
+    </div>
+
+    <div id="available-songs">
+      <h2>Available Songs</h2>
+      <div
+        class="song-list"
+        cdkDropList
+        [cdkDropListData]="availableSongs"
+        (cdkDropListDropped)="drop($event)"
+      >
+        <div *ngFor="let song of availableSongs" cdkDrag>{{ song }}</div>
+      </div>
+    </div>
+  </div>
+</div>
