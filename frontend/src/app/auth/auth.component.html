@@ -1,6 +1,7 @@
 <div id="page-wrapper" class="column">
-  <div>
+  <div id="branding">
     <h1>Welcome to TuneSync</h1>
+    <img src="../../assets/logo.png" />
   </div>
 
   <form class="column" [formGroup]="authForm">
@@ -15,7 +16,7 @@
     </mat-form-field>
   </form>
 
-  <div class="row">
+  <div id="buttons" class="row">
     <button mat-raised-button (click)="onSignUp()">Sign Up</button>
     <button mat-raised-button (click)="onSignIn()">Sign In</button>
   </div>

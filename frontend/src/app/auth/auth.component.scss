@@ -1,10 +1,21 @@
 div#page-wrapper {
   width: 50%;
-  height: 100%;
+  height: 95%;
   margin: {
     left: auto;
     right: auto;
   }
 
   justify-content: center;
+
+  div#branding {
+    margin: {
+      left: auto;
+      right: auto;
+    }
+  }
+
+  div#buttons {
+    justify-content: center;
+  }
 }

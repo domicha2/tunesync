@@ -13,7 +13,7 @@ export class AuthComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    document.querySelector('title').innerText = 'Sign Up | Sign In';
+    document.querySelector('title').innerText = 'TuneSync - Auth';
   }
 
   /**

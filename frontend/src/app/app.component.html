@@ -1,1 +1,4 @@
 <router-outlet></router-outlet>
+<div id="credits" class="row" *ngIf="!onCreditsPage()">
+  <a routerLink="/credits">Credits</a>
+</div>

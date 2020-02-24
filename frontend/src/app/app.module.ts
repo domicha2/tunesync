@@ -6,10 +6,12 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AuthModule } from './auth/auth.module';
+import { CreditsModule } from './credits/credits.module';
 
 @NgModule({
   declarations: [AppComponent],
   imports: [
+    CreditsModule,
     AuthModule,
     BrowserModule,
     AppRoutingModule,
