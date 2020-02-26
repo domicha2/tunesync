@@ -5,4 +5,10 @@ import { Component } from '@angular/core';
   templateUrl: './rooms.component.html',
   styleUrls: ['./rooms.component.scss'],
 })
-export class RoomsComponent {}
+export class RoomsComponent {
+  rooms = {
+    admin: ['My awesome room', 'testing room'],
+    dj: ['rap music'],
+    regular: [],
+  };
+}
