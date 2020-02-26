@@ -15,14 +15,12 @@ import { AuthEffects } from './auth/auth.effects';
 import { AuthModule } from './auth/auth.module';
 
 import { CreditsModule } from './credits/credits.module';
-import { QueueModule } from './queue/queue.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 
 @NgModule({
   declarations: [AppComponent],
   imports: [
     DashboardModule,
-    QueueModule,
     CreditsModule,
     AuthModule,
     BrowserModule,
