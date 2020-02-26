@@ -1,7 +1,7 @@
 div#dashboard {
   height: 95%;
 
-  div {
+  > div {
     margin-right: 0 !important;
   }
 
@@ -15,5 +15,21 @@ div#dashboard {
 
   div#middle {
     width: 50%;
+
+    > div {
+      margin-bottom: 0 !important;
+    }
+
+    div#controls {
+      height: 15%;
+    }
+
+    div#main-screen {
+      height: 75%;
+    }
+
+    div#bottom-bar {
+      height: 10%;
+    }
   }
 }
