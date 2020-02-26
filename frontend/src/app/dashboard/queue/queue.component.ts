@@ -12,8 +12,8 @@ import {
 })
 export class QueueComponent {
   // DEMO: remove hardcoded songs
-  queuedSongs = ['song A', 'Song B', 'Lose you to love me - Selena Gomez'];
-  availableSongs = ['Song d', 'my favourite song', 'Senorita'];
+  queuedSongs = ['song A', 'Song B', 'Song c'];
+  availableSongs = ['Song d', 'song d', 'song e'];
 
   drop(event: CdkDragDrop<string[]>): void {
     if (event.previousContainer === event.container) {

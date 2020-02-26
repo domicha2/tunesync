@@ -1,0 +1,41 @@
+<div id="controls-wrapper" class="row">
+  <div id="other-buttons" class="row">
+    <button mat-icon-button>
+      <mat-icon>attach_file</mat-icon>
+    </button>
+    <button mat-icon-button>
+      <mat-icon>queue_music</mat-icon>
+    </button>
+  </div>
+  <div id="current-song" class="column">
+    <audio id="main-song" autoplay src="../../../assets/sample.mp3"></audio>
+    <div id="song-data">Baby Shark</div>
+    <div id="progress-bar">
+      <mat-progress-bar
+        mode="determinate"
+        [value]="getSongProgress()"
+        color="warn"
+      ></mat-progress-bar>
+    </div>
+  </div>
+  <div id="song-buttons" class="row">
+    <button mat-icon-button>
+      <mat-icon>fast_rewind</mat-icon>
+    </button>
+    <button mat-icon-button>
+      <mat-icon>play_arrow</mat-icon>
+    </button>
+    <button mat-icon-button>
+      <mat-icon>pause</mat-icon>
+    </button>
+    <button mat-icon-button>
+      <mat-icon>fast_forward</mat-icon>
+    </button>
+    <button mat-icon-button>
+      <mat-icon>replay_10</mat-icon>
+    </button>
+    <button mat-icon-button>
+      <mat-icon>forward_10</mat-icon>
+    </button>
+  </div>
+</div>

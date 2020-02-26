@@ -3,11 +3,13 @@
     <app-rooms></app-rooms>
   </div>
   <div id="middle" class="column">
-    <div id="controls" class="row">music controls</div>
-    <div id="main-screen">
-      main screen includes chat and create poll and queue
+    <div id="controls">
+      <app-controls></app-controls>
     </div>
-    <div id="bottom-bar">fill the messaging and bottom features here</div>
+    <div id="main-screen">
+      <app-main-screen></app-main-screen>
+    </div>
+    <div id="bottom-bar"><app-messaging></app-messaging></div>
   </div>
   <div id="users">
     <app-users></app-users>

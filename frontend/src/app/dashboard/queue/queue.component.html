@@ -14,7 +14,9 @@
         [cdkDropListData]="queuedSongs"
         (cdkDropListDropped)="drop($event)"
       >
-        <div *ngFor="let song of queuedSongs" cdkDrag>{{ song }}</div>
+        <div class="list-el" *ngFor="let song of queuedSongs" cdkDrag>
+          {{ song }}
+        </div>
       </div>
     </div>
 
@@ -26,7 +28,9 @@
         [cdkDropListData]="availableSongs"
         (cdkDropListDropped)="drop($event)"
       >
-        <div *ngFor="let song of availableSongs" cdkDrag>{{ song }}</div>
+        <div class="list-el" *ngFor="let song of availableSongs" cdkDrag>
+          {{ song }}
+        </div>
       </div>
     </div>
   </div>

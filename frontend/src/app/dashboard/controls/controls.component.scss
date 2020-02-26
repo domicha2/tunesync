@@ -1,0 +1,18 @@
+div#controls-wrapper {
+  justify-content: center;
+
+  div#current-song {
+    width: 35%;
+
+    div#song-data {
+      align-self: center;
+    }
+
+    div#progress-bar {
+      mat-progress-bar {
+        height: 1rem;
+        border-radius: 0.25rem;
+      }
+    }
+  }
+}
