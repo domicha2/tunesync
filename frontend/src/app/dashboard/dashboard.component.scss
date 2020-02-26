@@ -1,0 +1,39 @@
+div#dashboard {
+  height: 97.5%;
+
+  > div {
+    margin-right: 0 !important;
+  }
+
+  div#rooms {
+    width: 17.5%;
+  }
+
+  div#users {
+    width: 17.5%;
+  }
+
+  div#middle {
+    width: 60%;
+    padding: {
+      left: 2.5%;
+      right: 2.5%;
+    }
+
+    > div {
+      margin-bottom: 0 !important;
+    }
+
+    div#controls {
+      height: 15%;
+    }
+
+    div#main-screen {
+      height: 75%;
+    }
+
+    div#bottom-bar {
+      height: 10%;
+    }
+  }
+}

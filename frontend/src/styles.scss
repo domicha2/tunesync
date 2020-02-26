@@ -5,7 +5,10 @@ body {
   height: 100%;
 }
 body {
-  padding: 1rem;
+  padding: {
+    left: 1rem;
+    right: 1rem;
+  }
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
@@ -40,4 +43,9 @@ a {
   > * {
     margin-right: 1rem !important;
   }
+}
+
+.list-el {
+  border: 1px solid white;
+  padding: 0.5rem;
 }

@@ -1,0 +1,44 @@
+<div id="users-wrapper" class="column">
+  <h1>Users</h1>
+  <div class="list-wrapper column" cdkDropListGroup>
+    <h2>Admin</h2>
+    <div
+      id="admin-users"
+      class="column"
+      cdkDropList
+      [cdkDropListData]="users.admin"
+      (cdkDropListDropped)="drop($event)"
+    >
+      <div class="list-el" *ngFor="let user of users.admin" cdkDrag>
+        <h3>{{ user }}</h3>
+      </div>
+    </div>
+    <h2>DJ</h2>
+    <div
+      id="dj-users"
+      class="column"
+      cdkDropList
+      [cdkDropListData]="users.dj"
+      (cdkDropListDropped)="drop($event)"
+    >
+      <div class="list-el" *ngFor="let user of users.dj" cdkDrag>
+        <h3>{{ user }}</h3>
+      </div>
+    </div>
+    <h2>Regular</h2>
+    <div
+      id="regular-users"
+      class="column"
+      cdkDropList
+      [cdkDropListData]="users.regular"
+      (cdkDropListDropped)="drop($event)"
+    >
+      <div class="list-el row" *ngFor="let user of users.regular" cdkDrag>
+        <h3>{{ user }}</h3>
+        <button mat-icon-button>
+          <i class="material-icons">delete_forever</i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
