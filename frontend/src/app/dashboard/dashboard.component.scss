@@ -1,0 +1,19 @@
+div#dashboard {
+  height: 95%;
+
+  div {
+    margin-right: 0 !important;
+  }
+
+  div#rooms {
+    width: 25%;
+  }
+
+  div#users {
+    width: 25%;
+  }
+
+  div#middle {
+    width: 50%;
+  }
+}
