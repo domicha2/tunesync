@@ -12,6 +12,7 @@ import { RoomsComponent } from './rooms/rooms.component';
 import { UsersComponent } from './users/users.component';
 import { MessagingComponent } from './messaging/messaging.component';
 import { ControlsComponent } from './controls/controls.component';
+import { MainScreenComponent } from './main-screen/main-screen.component';
 
 import { QueueModule } from './queue/queue.module';
 
@@ -22,6 +23,7 @@ import { QueueModule } from './queue/queue.module';
     UsersComponent,
     ControlsComponent,
     MessagingComponent,
+    MainScreenComponent,
   ],
   imports: [
     CommonModule,
