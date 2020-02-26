@@ -13,8 +13,7 @@ import { UsersComponent } from './users/users.component';
 import { MessagingComponent } from './messaging/messaging.component';
 import { ControlsComponent } from './controls/controls.component';
 import { MainScreenComponent } from './main-screen/main-screen.component';
-
-import { QueueModule } from './queue/queue.module';
+import { QueueComponent } from './queue/queue.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +23,7 @@ import { QueueModule } from './queue/queue.module';
     ControlsComponent,
     MessagingComponent,
     MainScreenComponent,
+    QueueComponent,
   ],
   imports: [
     CommonModule,
@@ -33,7 +33,6 @@ import { QueueModule } from './queue/queue.module';
     MatProgressBarModule,
     MatButtonModule,
     MatIconModule,
-    QueueModule,
   ],
 })
 export class DashboardModule {}
