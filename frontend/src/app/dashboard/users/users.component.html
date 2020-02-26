@@ -1,17 +1,41 @@
 <div id="users-wrapper" class="column">
   <h1>Users</h1>
-  <div class="list-wrapper column">
-    <div id="admin-users" class="column">
-      <h2>Admin</h2>
-      <div class="list-el" *ngFor="let user of users.admin">{{ user }}</div>
+  <div class="list-wrapper column" cdkDropListGroup>
+    <h2>Admin</h2>
+    <div
+      id="admin-users"
+      class="column"
+      cdkDropList
+      [cdkDropListData]="users.admin"
+      (cdkDropListDropped)="drop($event)"
+    >
+      <div class="list-el" *ngFor="let user of users.admin" cdkDrag>
+        {{ user }}
+      </div>
     </div>
-    <div id="dj-users" class="column">
-      <h2>DJ</h2>
-      <div class="list-el" *ngFor="let user of users.dj">{{ user }}</div>
+    <h2>DJ</h2>
+    <div
+      id="dj-users"
+      class="column"
+      cdkDropList
+      [cdkDropListData]="users.dj"
+      (cdkDropListDropped)="drop($event)"
+    >
+      <div class="list-el" *ngFor="let user of users.dj" cdkDrag>
+        {{ user }}
+      </div>
     </div>
-    <div id="regular-users" class="column">
-      <h2>Regular</h2>
-      <div class="list-el" *ngFor="let user of users.regular">{{ user }}</div>
+    <h2>Regular</h2>
+    <div
+      id="regular-users"
+      class="column"
+      cdkDropList
+      [cdkDropListData]="users.regular"
+      (cdkDropListDropped)="drop($event)"
+    >
+      <div class="list-el" *ngFor="let user of users.regular" cdkDrag>
+        {{ user }}
+      </div>
     </div>
   </div>
 </div>
