@@ -9,9 +9,15 @@ import { RoomsComponent } from './rooms/rooms.component';
 import { UsersComponent } from './users/users.component';
 
 import { QueueModule } from './queue/queue.module';
+import { ControlsComponent } from './controls/controls.component';
 
 @NgModule({
-  declarations: [DashboardComponent, RoomsComponent, UsersComponent],
+  declarations: [
+    DashboardComponent,
+    RoomsComponent,
+    UsersComponent,
+    ControlsComponent,
+  ],
   imports: [
     CommonModule,
     DragDropModule,
