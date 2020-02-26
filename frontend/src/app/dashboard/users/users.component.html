@@ -10,7 +10,7 @@
       (cdkDropListDropped)="drop($event)"
     >
       <div class="list-el" *ngFor="let user of users.admin" cdkDrag>
-        {{ user }}
+        <h3>{{ user }}</h3>
       </div>
     </div>
     <h2>DJ</h2>
@@ -22,7 +22,7 @@
       (cdkDropListDropped)="drop($event)"
     >
       <div class="list-el" *ngFor="let user of users.dj" cdkDrag>
-        {{ user }}
+        <h3>{{ user }}</h3>
       </div>
     </div>
     <h2>Regular</h2>
@@ -33,8 +33,11 @@
       [cdkDropListData]="users.regular"
       (cdkDropListDropped)="drop($event)"
     >
-      <div class="list-el" *ngFor="let user of users.regular" cdkDrag>
-        {{ user }}
+      <div class="list-el row" *ngFor="let user of users.regular" cdkDrag>
+        <h3>{{ user }}</h3>
+        <button mat-icon-button>
+          <i class="material-icons">delete_forever</i>
+        </button>
       </div>
     </div>
   </div>
