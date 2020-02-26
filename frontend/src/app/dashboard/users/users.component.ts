@@ -5,4 +5,10 @@ import { Component } from '@angular/core';
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.scss'],
 })
-export class UsersComponent {}
+export class UsersComponent {
+  users = {
+    admin: ['Jim'],
+    dj: ['Alice'],
+    regular: ['Bob', 'David'],
+  };
+}
