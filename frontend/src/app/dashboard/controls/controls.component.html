@@ -1,10 +1,15 @@
 <div id="controls-wrapper" class="row">
   <div id="other-buttons" class="row">
-    TODO: (upload/change queue buttons)
+    <button mat-icon-button>
+      <mat-icon>attach_file</mat-icon>
+    </button>
+    <button mat-icon-button>
+      <mat-icon>queue_music</mat-icon>
+    </button>
   </div>
   <div id="current-song" class="column">
     <audio id="main-song" autoplay src="../../../assets/sample.mp3"></audio>
-    <div id="song-data">Name: Baby Shark from YouTube</div>
+    <div id="song-data">Baby Shark</div>
     <div id="progress-bar">
       <mat-progress-bar
         mode="determinate"
