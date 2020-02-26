@@ -1,9 +1,17 @@
 <div id="controls-wrapper" class="row">
   <div id="other-buttons" class="row">
-    TODO: put other buttons here (upload/change queue)
+    TODO: (upload/change queue buttons)
   </div>
   <div id="current-song" class="column">
-    TODO: put the current song info (metadata/status)
+    <audio id="main-song" autoplay src="../../../assets/sample.mp3"></audio>
+    <div id="song-data">Name: Baby Shark from YouTube</div>
+    <div id="progress-bar">
+      <mat-progress-bar
+        mode="determinate"
+        [value]="getSongProgress()"
+        color="warn"
+      ></mat-progress-bar>
+    </div>
   </div>
-  <div id="song-buttons" class="row">TODO: put standard audio buttons</div>
+  <div id="song-buttons" class="row">TODO: standard audio buttons</div>
 </div>
