@@ -22,5 +22,13 @@ div#controls-wrapper {
 
   div#other-buttons {
     align-items: center;
+
+    label[for='upload-music']:hover {
+      cursor: pointer;
+    }
+
+    input#upload-music {
+      display: none;
+    }
   }
 }
