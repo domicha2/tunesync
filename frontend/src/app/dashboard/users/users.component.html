@@ -35,7 +35,11 @@
     >
       <div class="list-el row" *ngFor="let user of users.regular" cdkDrag>
         <h3>{{ user }}</h3>
-        <button mat-icon-button matTooltip="Kick user">
+        <button
+          mat-icon-button
+          matTooltip="Kick user"
+          (click)="onKickUser(user)"
+        >
           <mat-icon>delete_forever</mat-icon>
         </button>
       </div>
