@@ -1,9 +1,9 @@
 <div id="controls-wrapper" class="row">
   <div id="other-buttons" class="row">
-    <button mat-icon-button>
+    <button mat-icon-button matTooltip="Upload music">
       <mat-icon>attach_file</mat-icon>
     </button>
-    <button mat-icon-button>
+    <button mat-icon-button matTooltip="View/change queue">
       <mat-icon>queue_music</mat-icon>
     </button>
   </div>
@@ -19,22 +19,32 @@
     </div>
   </div>
   <div id="song-buttons" class="row">
-    <button mat-icon-button>
+    <button mat-icon-button matTooltip="Previous song" (click)="onPrevious()">
       <mat-icon>fast_rewind</mat-icon>
     </button>
-    <button mat-icon-button>
+    <button
+      *ngIf="song.paused"
+      mat-icon-button
+      matTooltip="Play"
+      (click)="onPlay()"
+    >
       <mat-icon>play_arrow</mat-icon>
     </button>
-    <button mat-icon-button>
+    <button
+      *ngIf="!song.paused"
+      mat-icon-button
+      matTooltip="Pause"
+      (click)="onPause()"
+    >
       <mat-icon>pause</mat-icon>
     </button>
-    <button mat-icon-button>
+    <button mat-icon-button matTooltip="Next song" (click)="onNext()">
       <mat-icon>fast_forward</mat-icon>
     </button>
-    <button mat-icon-button>
+    <button mat-icon-button matTooltip="Rewind 10 seconds" (click)="onReplay()">
       <mat-icon>replay_10</mat-icon>
     </button>
-    <button mat-icon-button>
+    <button mat-icon-button matTooltip="Skip 10 seconds" (click)="onForward()">
       <mat-icon>forward_10</mat-icon>
     </button>
   </div>
