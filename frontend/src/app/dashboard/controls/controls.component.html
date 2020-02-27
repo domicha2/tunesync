@@ -22,10 +22,20 @@
     <button mat-icon-button matTooltip="Previous song">
       <mat-icon>fast_rewind</mat-icon>
     </button>
-    <button mat-icon-button matTooltip="Play">
+    <button
+      *ngIf="song.paused"
+      mat-icon-button
+      matTooltip="Play"
+      (click)="onPlay()"
+    >
       <mat-icon>play_arrow</mat-icon>
     </button>
-    <button mat-icon-button matTooltip="Pause">
+    <button
+      *ngIf="!song.paused"
+      mat-icon-button
+      matTooltip="Pause"
+      (click)="onPause()"
+    >
       <mat-icon>pause</mat-icon>
     </button>
     <button mat-icon-button matTooltip="Next song">

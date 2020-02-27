@@ -19,4 +19,12 @@ export class ControlsComponent implements OnInit {
       return 0;
     }
   }
+
+  onPlay(): void {
+    this.song.play();
+  }
+
+  onPause(): void {
+    this.song.pause();
+  }
 }
