@@ -11,7 +11,7 @@ setup(
     url="",
     packages=find_packages(),
     install_requires=[
-        "django",
+        "Django",
         "django-bootstrap3",
         "django-classbasedsettings",
         "django-simple-captcha",
