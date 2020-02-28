@@ -1,0 +1,22 @@
+<div id="rooms-wrapper" class="column">
+  <div class="top-bar row">
+    <h1>Rooms</h1>
+    <button mat-icon-button matTooltip="Add room">
+      <mat-icon>add_circle</mat-icon>
+    </button>
+  </div>
+  <div class="list-wrapper column">
+    <div id="admin-rooms" class="column">
+      <h2>Admin</h2>
+      <div class="list-el" *ngFor="let room of rooms.admin">{{ room }}</div>
+    </div>
+    <div id="dj-rooms" class="column">
+      <h2>DJ</h2>
+      <div class="list-el" *ngFor="let room of rooms.dj">{{ room }}</div>
+    </div>
+    <div id="regular-rooms" class="column">
+      <h2>Regular</h2>
+      <div class="list-el" *ngFor="let room of rooms.regular">{{ room }}</div>
+    </div>
+  </div>
+</div>
