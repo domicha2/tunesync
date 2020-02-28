@@ -15,4 +15,20 @@ div#controls-wrapper {
       }
     }
   }
+
+  div#song-buttons {
+    align-items: center;
+  }
+
+  div#other-buttons {
+    align-items: center;
+
+    label[for='upload-music']:hover {
+      cursor: pointer;
+    }
+
+    input#upload-music {
+      display: none;
+    }
+  }
 }

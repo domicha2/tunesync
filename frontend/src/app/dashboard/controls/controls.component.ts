@@ -19,4 +19,40 @@ export class ControlsComponent implements OnInit {
       return 0;
     }
   }
+
+  onReplay(): void {
+    if (this.song) {
+      if (this.song.currentTime >= 10) {
+        this.song.currentTime -= 10;
+      } else {
+        this.song.currentTime = 0;
+      }
+    }
+  }
+
+  onForward(): void {
+    if (this.song) {
+      if (this.song.duration - this.song.currentTime >= 10) {
+        this.song.currentTime += 10;
+      } else {
+        this.song.currentTime = this.song.duration;
+      }
+    }
+  }
+
+  onPlay(): void {
+    if (this.song) {
+      this.song.play();
+    }
+  }
+
+  onPause(): void {
+    if (this.song) {
+      this.song.pause();
+    }
+  }
+
+  onPrevious(): void {}
+
+  onNext(): void {}
 }

@@ -1,9 +1,12 @@
 import { Component } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import {
   CdkDragDrop,
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
+
+import { KickUserComponent } from './kick-user/kick-user.component';
 
 @Component({
   selector: 'app-users',
@@ -16,6 +19,15 @@ export class UsersComponent {
     dj: ['Alice'],
     regular: ['Bob', 'David'],
   };
+
+  constructor(private dialog: MatDialog) {}
+
+  onKickUser(user): void {
+    this.dialog.open(KickUserComponent, {
+      width: 'fit-content',
+      data: { user },
+    });
+  }
 
   drop(event: CdkDragDrop<string[]>): void {
     if (event.previousContainer === event.container) {
