@@ -1,0 +1,5 @@
+*.pyc
+__pycache__
+tunesync_project/settings/dev.py
+tunesync_project/settings/prod.py
+tmp/
