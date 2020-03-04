@@ -88,6 +88,7 @@ class BaseSettings(DjangoDefaults):
         "django.contrib.sessions",
         "django.contrib.messages",
         "django.contrib.staticfiles",
+        'rest_framework',
         "bootstrap3",
         # "captcha",
     ]
@@ -121,6 +122,14 @@ class BaseSettings(DjangoDefaults):
             },
         }
     ]
+
+    REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
 
     WSGI_APPLICATION = PROJECT_NAME + ".wsgi.application"
 
