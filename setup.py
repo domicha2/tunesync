@@ -16,6 +16,7 @@ setup(
         "django-classbasedsettings",
         "django-simple-captcha",
         "djangorestframework",
+        "django-channels",
     ],
     classifiers=["Programming Language :: Python :: 3 :: Only"],
 )
