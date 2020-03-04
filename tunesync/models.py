@@ -30,7 +30,7 @@ class Event(models.Model):
     ]
     creation_time = models.DateTimeField(auto_now_add=True)
     event_type = models.CharField(max_length=2, choices=EVENT_TYPE, default=MESSAGE)
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     parent_event_id = models.ForeignKey("self", null=True, on_delete=models.CASCADE)
     args = models.CharField(
         max_length=10000
