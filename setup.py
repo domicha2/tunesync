@@ -15,6 +15,7 @@ setup(
         "django-bootstrap3",
         "django-classbasedsettings",
         "django-simple-captcha",
+        "djangorestframework",
     ],
     classifiers=["Programming Language :: Python :: 3 :: Only"],
 )
