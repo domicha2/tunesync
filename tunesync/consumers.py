@@ -7,9 +7,10 @@ from asgiref.sync import async_to_sync
 from tunesync.models import Event
 
 
-class ChatConsumer(WebsocketConsumer):
+class ChatConsumer(JsonWebsocketConsumer):
     def connect(self):
         self.accept()
+        self.send_json({"text": "you connected"})
 
     def disconnect(self, close_code):
         pass
@@ -26,6 +27,6 @@ class ChatConsumer(WebsocketConsumer):
     def event_observer(sender, instance, **kwargs):
         layer = channels.layers.get_channel_layer()
         async_to_sync(layer.send)(
-            "order_offer_group", {"type": "events.alarm", "data": instance}
+            "event_channel", {"type": "events.alarm", "data": instance}
         )
 
