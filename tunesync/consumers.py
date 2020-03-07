@@ -1,32 +1,24 @@
-from channels.generic.websocket import JsonWebsocketConsumer
-import json
-from django.db.models import signals
-from django.dispatch import receiver
+from channels.generic.websocket import AsyncWebsocketConsumer
 import channels.layers
-from asgiref.sync import async_to_sync
 from tunesync.models import Event
 
+class EventConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
 
-class ChatConsumer(JsonWebsocketConsumer):
-    def connect(self):
-        self.accept()
-        self.send_json({"text": "you connected"})
+        user = self.scope["user"]
+
+        self.group_name = 'event-user-{}'.format(user)
+
+        await self.channel_layer.group_add(
+            self.group_name,
+            self.channel_name
+        )
+
+        await self.accept()
+        await self.send("connected")
 
     def disconnect(self, close_code):
         pass
 
     def receive(self, text_data):
         pass
-
-    def events_alarm(self, event):
-        self.send_json(event["data"])
-
-    # checks for every event at this point
-    # https://stackoverflow.com/questions/46614541/using-django-signals-in-channels-consumer-classes
-    @receiver(signals.post_save, sender=Event)
-    def event_observer(sender, instance, **kwargs):
-        layer = channels.layers.get_channel_layer()
-        async_to_sync(layer.send)(
-            "event_channel", {"type": "events.alarm", "data": instance}
-        )
-
