@@ -16,6 +16,11 @@ export const getAvailableSongs = createAction(
   '[Queue Component] Get Available Songs',
 );
 
+export const addAvailableSong = createAction(
+  '[Controls Component] Add Available Song',
+  props<{ song: Song }>(),
+);
+
 export const storeAvailableSongs = createAction(
   '[Queue API] Store Available Songs',
   props<{ availableSongs: Song[] }>(),

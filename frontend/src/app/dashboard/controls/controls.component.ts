@@ -84,9 +84,10 @@ export class ControlsComponent implements OnInit, OnDestroy {
   onNext(): void {
     // check if there even exists a song waiting on the queue
     if (this.queue && this.queue.length > 0) {
+      this.store.dispatch(
+        DashboardActions.addAvailableSong({ song: this.currentSong }),
+      );
       this.currentSong = this.queue[0];
-
-      // TODO: add the discarded song back to list of available songs
       this.queue.splice(0, 1);
       this.store.dispatch(DashboardActions.storeQueue({ queue: this.queue }));
     }
