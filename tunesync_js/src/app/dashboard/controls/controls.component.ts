@@ -1,15 +1,42 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+
+import { Store, select } from '@ngrx/store';
+import { Subscription } from 'rxjs';
+
+import * as DashboardActions from '../store/dashboard.actions';
+import { selectQueuedSongs} from '../store/dashboard.selectors';
+import { AppState } from '../../app.module';
 
 @Component({
   selector: 'app-controls',
   templateUrl: './controls.component.html',
   styleUrls: ['./controls.component.scss'],
 })
-export class ControlsComponent implements OnInit {
+export class ControlsComponent implements OnInit, OnDestroy {
+  subscription = new Subscription();
+
   song: HTMLAudioElement;
 
+  queue: DashboardActions.Song[];
+
+  constructor(private store: Store<AppState>) {}
+
   ngOnInit(): void {
+    this.subscription.add(
+      this.store
+        .pipe(select(selectQueuedSongs))
+        .subscribe((data: DashboardActions.Song[]) => {
+          console.log('data from dashboard store:', data);
+          this.queue = data;
+        }),
+    );
+    this.store.dispatch(DashboardActions.getQueue());
+
     this.song = document.querySelector('audio#main-song');
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   getSongProgress(): number {
