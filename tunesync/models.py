@@ -72,9 +72,10 @@ class Poll(models.Model):
 
 
 class Vote(models.Model):
-    vote = models.ForeignKey(Vote, on_delete=models.CASCADE, primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, primary_key=True)
+    poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     agree = models.BooleanField()
+    unique_together = ["poll", "user"]
 
 
 class Tunes(models.Model):
@@ -85,8 +86,9 @@ class Tunes(models.Model):
 
 
 class Membership(models.Model):
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, primary_key=True)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    unique_together = ["room", "user"]
     ACCEPTED = "A"
     PENDING = "P"
     REJECTED = "R"
