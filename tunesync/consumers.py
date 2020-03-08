@@ -16,7 +16,7 @@ class EventConsumer(WebsocketConsumer):
 
 
         self.accept()
-        self.send("connected")
+        self.send("you are connected")
 
     def disconnect(self, close_code):
         pass
