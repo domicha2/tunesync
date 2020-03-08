@@ -16,7 +16,7 @@ export class DashboardEffects {
         this.queueService.getQueue().pipe(
           map((queuedSongs: DashboardActions.Song[]) => ({
             type: DashboardActions.storeQueue.type,
-            payload: queuedSongs,
+            queue: queuedSongs,
           })),
           catchError(() => EMPTY),
         ),

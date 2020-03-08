@@ -4,7 +4,7 @@ import { Store, select } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 
 import * as DashboardActions from '../store/dashboard.actions';
-import { selectQueuedSongs} from '../store/dashboard.selectors';
+import { selectQueuedSongs } from '../store/dashboard.selectors';
 import { AppState } from '../../app.module';
 
 @Component({
@@ -17,6 +17,7 @@ export class ControlsComponent implements OnInit, OnDestroy {
 
   song: HTMLAudioElement;
 
+  currentSong: DashboardActions.Song = { name: 'sample-0.mp3' };
   queue: DashboardActions.Song[];
 
   constructor(private store: Store<AppState>) {}
@@ -25,9 +26,9 @@ export class ControlsComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.store
         .pipe(select(selectQueuedSongs))
-        .subscribe((data: DashboardActions.Song[]) => {
-          console.log('data from dashboard store:', data);
-          this.queue = data;
+        .subscribe((queuedSongs: DashboardActions.Song[]) => {
+          console.log('queued songs from store:', queuedSongs);
+          this.queue = queuedSongs;
         }),
     );
     this.store.dispatch(DashboardActions.getQueue());
@@ -81,5 +82,12 @@ export class ControlsComponent implements OnInit, OnDestroy {
 
   onPrevious(): void {}
 
-  onNext(): void {}
+  onNext(): void {
+    // check if there even exists a song waiting on the queue
+    if (this.queue && this.queue.length > 0) {
+      this.currentSong = this.queue[0];
+      this.queue.splice(0, 1);
+      this.store.dispatch(DashboardActions.storeQueue({ queue: this.queue }));
+    }
+  }
 }

@@ -11,8 +11,12 @@
     </button>
   </div>
   <div id="current-song" class="column">
-    <audio id="main-song" autoplay src="../../../assets/sample.mp3"></audio>
-    <div id="song-data">Baby Shark</div>
+    <audio
+      id="main-song"
+      autoplay
+      [src]="'../../../assets/' + currentSong.name"
+    ></audio>
+    <div id="song-data">{{ currentSong.name }}</div>
     <div id="progress-bar">
       <mat-progress-bar
         mode="determinate"

@@ -6,5 +6,5 @@ import { DashboardState } from './dashboard.reducer';
 export const selectQueuedSongs = createSelector(
   (state: AppState) => state.dashboard,
   (dashboard: DashboardState) =>
-    dashboard ? dashboard.queuedSongs : undefined,
+    dashboard ? dashboard.queuedSongs.slice() : undefined,
 );
