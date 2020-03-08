@@ -30,8 +30,8 @@ class Event(models.Model):
     ]
     creation_time = models.DateTimeField(auto_now_add=True)
     event_type = models.CharField(max_length=2, choices=EVENT_TYPE, default=MESSAGE)
-    author = models.ForeignKey(User)
-    parent_event_id = models.ForeignKey("self", null=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    parent_event_id = models.ForeignKey("self", null=True, on_delete=models.CASCADE)
     args = models.CharField(
         max_length=10000
     )  # this will be a serialized json in a string
@@ -40,7 +40,7 @@ class Event(models.Model):
 class Room(models.Model):
     title = models.CharField(max_length=30)
     subtitle = models.CharField(max_length=30)
-    creator = models.ForeignKey(User)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
 
 
@@ -60,14 +60,14 @@ class Vote(models.Model):
         (PLAY, "Play"),
     ]
     action = models.CharField(max_length=2, choices=ACTIONS)
-    room = models.ForeignKey(Room)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
     args = models.CharField(max_length=10000)
 
 
 class Votes(models.Model):
-    vote_id = models.ForeignKey(Vote)
-    user_id = models.ForeignKey(User)
+    vote_id = models.ForeignKey(Vote, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     agree = models.BooleanField()
 
 
@@ -79,8 +79,8 @@ class Tunes(models.Model):
 
 
 class UserIn(models.Model):
-    room_id = models.ForeignKey(Room)
-    user_id = models.ForeignKey(User)
+    room_id = models.ForeignKey(Room, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     ACCEPTED = "A"
     PENDING = "P"
     REJECTED = "R"
