@@ -25,7 +25,9 @@ class UserViewSet(viewsets.ViewSet):
 
     # POST
     def create(self, request):
-        pass
+        u = User.objects.create_user(username=request.data.username, password=request.data.password)
+        u.save()
+        return Response(u)
 
     # GET BY PK
     def retrieve(self, request, pk=None):
