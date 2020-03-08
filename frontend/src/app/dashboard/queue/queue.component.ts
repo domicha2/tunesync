@@ -23,8 +23,8 @@ export class QueueComponent implements OnInit, OnDestroy {
 
   queuedSongs: DashboardActions.Song[];
   availableSongs: DashboardActions.Song[] = [
-    { name: "Alice's song" },
-    { name: "Jim's song" },
+    { name: 'sample-0.mp3' },
+    { name: 'sample-1.mp3' },
     { name: 'Who put this song here?' },
   ];
 
@@ -60,5 +60,10 @@ export class QueueComponent implements OnInit, OnDestroy {
         event.currentIndex,
       );
     }
+
+    // the queue has changed, need to store the updated queue
+    this.store.dispatch(
+      DashboardActions.storeQueue({ queue: this.queuedSongs }),
+    );
   }
 }
