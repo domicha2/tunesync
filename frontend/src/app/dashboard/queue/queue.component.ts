@@ -1,19 +1,48 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import {
   CdkDragDrop,
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
 
+import { Store } from '@ngrx/store';
+import { Subscription } from 'rxjs';
+
+import { AppState } from '../../app.module';
+
+import { selectQueuedSongs } from '../store/dashboard.selectors';
+import * as DashboardActions from '../store/dashboard.actions';
+
 @Component({
   selector: 'app-queue',
   templateUrl: './queue.component.html',
   styleUrls: ['./queue.component.scss'],
 })
-export class QueueComponent {
-  // DEMO: remove hardcoded songs
-  queuedSongs = ['song A', 'Song B', 'Song c'];
-  availableSongs = ['Song d', 'song d', 'song e'];
+export class QueueComponent implements OnInit, OnDestroy {
+  subscription = new Subscription();
+
+  queuedSongs: DashboardActions.Song[];
+  availableSongs: DashboardActions.Song[] = [
+    { name: "Alice's song" },
+    { name: "Jim's song" },
+    { name: 'Who put this song here?' },
+  ];
+
+  constructor(private store: Store<AppState>) {}
+
+  ngOnInit(): void {
+    this.subscription.add(
+      this.store
+        .select(selectQueuedSongs)
+        .subscribe((queuedSongs: DashboardActions.Song[]) => {
+          this.queuedSongs = queuedSongs;
+        }),
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
 
   drop(event: CdkDragDrop<string[]>): void {
     if (event.previousContainer === event.container) {
