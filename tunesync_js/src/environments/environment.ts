@@ -4,7 +4,7 @@
 
 export const environment = {
   //url: 'https://97e0063b-e25a-4f13-923e-35a2f1579cc1.mock.pstmn.io',
-  url: "http://localhost:4200",
+  url: "http://localhost:8000",
   production: false,
 };
 
