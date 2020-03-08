@@ -23,9 +23,9 @@ export class QueueComponent implements OnInit, OnDestroy {
 
   queuedSongs: DashboardActions.Song[];
   availableSongs: DashboardActions.Song[] = [
-    { name: 'sample-0.mp3' },
-    { name: 'sample-1.mp3' },
-    { name: 'Who put this song here?' },
+    { name: 'alices-fav.mp3' },
+    { name: 'bobs-fav.mp3' },
+    { name: 'who-put-this-here.mp3' },
   ];
 
   constructor(private store: Store<AppState>) {}
