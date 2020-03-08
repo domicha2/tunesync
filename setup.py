@@ -17,6 +17,7 @@ setup(
         "django-simple-captcha",
         "djangorestframework",
         "django-channels",
+        "django-cors-headers"
     ],
     classifiers=["Programming Language :: Python :: 3 :: Only"],
 )
