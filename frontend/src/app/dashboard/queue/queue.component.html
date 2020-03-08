@@ -21,7 +21,7 @@
           *ngFor="let song of queuedSongs"
           cdkDrag
         >
-          {{ song }}
+          {{ song.name }}
         </mat-list-item>
       </mat-list>
     </div>
@@ -41,7 +41,7 @@
           *ngFor="let song of availableSongs"
           cdkDrag
         >
-          {{ song }}
+          {{ song.name }}
         </mat-list-item>
       </mat-list>
     </div>

@@ -6,6 +6,8 @@ import { Subscription } from 'rxjs';
 
 import * as AuthActions from './auth.actions';
 
+import { AppState } from '../app.module';
+
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.component.html',
@@ -19,7 +21,7 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   subscription = new Subscription();
 
-  constructor(private store: Store<{ auth: any }>) {}
+  constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
     this.subscription.add(

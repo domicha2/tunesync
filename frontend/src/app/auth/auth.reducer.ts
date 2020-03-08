@@ -2,11 +2,11 @@ import { createReducer, on, Action } from '@ngrx/store';
 
 import * as AuthActions from './auth.actions';
 
-export interface State {
+export interface AuthState {
   username: string;
 }
 
-export const initialState: State = undefined;
+export const initialState: AuthState = undefined;
 
 const reducer = createReducer(
   initialState,
@@ -15,6 +15,6 @@ const reducer = createReducer(
   })),
 );
 
-export function authReducer(state: State | undefined, action: Action) {
+export function authReducer(state: AuthState | undefined, action: Action) {
   return reducer(state, action);
 }
