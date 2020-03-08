@@ -12,22 +12,24 @@ class Event(models.Model):
     JOIN = "J"
     LEAVE = "L"
     MODIFY_QUEUE = "MQ"
-    SKIP = "SP"
-    PAUSE = "P"
-    SEEK = "SK"
     PLAY = "PL"
+    INVITE = "IN"
+    POLL = "PO"
+    USER_CHANGE = "U"
     EVENT_TYPE = [
+        (POLL, "Poll"),
+        (USER_CHANGE, "User Change"),
         (MESSAGE, "Message"),
         (VOTE, "Vote"),
         (KICK, "Kick"),
         (JOIN, "Join"),
+        (INVITE, "Invite"),
         (LEAVE, "Leave"),
         (MODIFY_QUEUE, "Modify Queue"),
-        (SKIP, "Skip"),
-        (PAUSE, "Pause"),
-        (SEEK, "Seek"),
-        (PLAY, "Play"),
+        (PLAY, "Play"), # this event takes takes in current time stamp, isPlaying, songId
     ]
+    #
+    room_id = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
     event_type = models.CharField(max_length=2, choices=EVENT_TYPE, default=MESSAGE)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -44,7 +46,7 @@ class Room(models.Model):
     creation_time = models.DateTimeField(auto_now_add=True)
 
 
-class Vote(models.Model):
+class Poll(models.Model):
     KICK = "K"
     MODIFY_QUEUE = "MQ"
     SKIP = "SP"
@@ -59,15 +61,17 @@ class Vote(models.Model):
         (SEEK, "Seek"),
         (PLAY, "Play"),
     ]
+    #TODO:
+    id = models.ForeignKey(Event, on_delete=models.CASCADE, primary_key=True)
     action = models.CharField(max_length=2, choices=ACTIONS)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
     args = models.CharField(max_length=10000)
 
 
-class Votes(models.Model):
-    vote_id = models.ForeignKey(Vote, on_delete=models.CASCADE)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+class Vote(models.Model):
+    event_id = models.ForeignKey(Event, on_delete=models.CASCADE, primary_key=True) # This is the parent event
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, primary_key=True)
     agree = models.BooleanField()
 
 
@@ -78,9 +82,9 @@ class Tunes(models.Model):
     # need to add the file meta data stuff later
 
 
-class UserIn(models.Model):
-    room_id = models.ForeignKey(Room, on_delete=models.CASCADE)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+class Membership(models.Model):
+    room_id = models.ForeignKey(Room, on_delete=models.CASCADE, primary_key=True)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, primary_key=True)
     ACCEPTED = "A"
     PENDING = "P"
     REJECTED = "R"
