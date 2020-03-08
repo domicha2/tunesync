@@ -5,6 +5,13 @@ from django.contrib.auth.models import User
 # using default user class
 
 
+class Room(models.Model):
+    title = models.CharField(max_length=30, unique=True)
+    subtitle = models.CharField(max_length=30)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
+    creation_time = models.DateTimeField(auto_now_add=True)
+
+
 class Event(models.Model):
     MESSAGE = "M"
     VOTE = "V"
@@ -28,6 +35,7 @@ class Event(models.Model):
         (SEEK, "Seek"),
         (PLAY, "Play"),
     ]
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
     event_type = models.CharField(max_length=2, choices=EVENT_TYPE, default=MESSAGE)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -35,13 +43,6 @@ class Event(models.Model):
     args = models.CharField(
         max_length=10000
     )  # this will be a serialized json in a string
-
-
-class Room(models.Model):
-    title = models.CharField(max_length=30)
-    subtitle = models.CharField(max_length=30)
-    creator = models.ForeignKey(User, on_delete=models.CASCADE)
-    creation_time = models.DateTimeField(auto_now_add=True)
 
 
 class Vote(models.Model):
@@ -66,8 +67,8 @@ class Vote(models.Model):
 
 
 class Votes(models.Model):
-    vote_id = models.ForeignKey(Vote, on_delete=models.CASCADE)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    vote = models.ForeignKey(Vote, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     agree = models.BooleanField()
 
 
@@ -79,8 +80,8 @@ class Tunes(models.Model):
 
 
 class UserIn(models.Model):
-    room_id = models.ForeignKey(Room, on_delete=models.CASCADE)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     ACCEPTED = "A"
     PENDING = "P"
     REJECTED = "R"
