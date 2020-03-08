@@ -10,7 +10,10 @@ import { Subscription } from 'rxjs';
 
 import { AppState } from '../../app.module';
 
-import { selectQueuedSongs } from '../store/dashboard.selectors';
+import {
+  selectQueuedSongs,
+  selectAvailableSongs,
+} from '../store/dashboard.selectors';
 import * as DashboardActions from '../store/dashboard.actions';
 
 @Component({
@@ -22,20 +25,26 @@ export class QueueComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
 
   queuedSongs: DashboardActions.Song[];
-  availableSongs: DashboardActions.Song[] = [
-    { name: 'alices-fav.mp3' },
-    { name: 'bobs-fav.mp3' },
-    { name: 'who-put-this-here.mp3' },
-  ];
+  availableSongs: DashboardActions.Song[];
 
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
+    this.store.dispatch(DashboardActions.getAvailableSongs());
+
     this.subscription.add(
       this.store
         .select(selectQueuedSongs)
         .subscribe((queuedSongs: DashboardActions.Song[]) => {
           this.queuedSongs = queuedSongs;
+        }),
+    );
+
+    this.subscription.add(
+      this.store
+        .select(selectAvailableSongs)
+        .subscribe((availableSongs: DashboardActions.Song[]) => {
+          this.availableSongs = availableSongs;
         }),
     );
   }
@@ -63,7 +72,10 @@ export class QueueComponent implements OnInit, OnDestroy {
 
     // the queue has changed, need to store the updated queue
     this.store.dispatch(
-      DashboardActions.storeQueue({ queue: this.queuedSongs }),
+      DashboardActions.storeSongs({
+        queuedSongs: this.queuedSongs,
+        availableSongs: this.availableSongs,
+      }),
     );
   }
 }

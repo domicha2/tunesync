@@ -27,7 +27,6 @@ export class ControlsComponent implements OnInit, OnDestroy {
       this.store
         .pipe(select(selectQueuedSongs))
         .subscribe((queuedSongs: DashboardActions.Song[]) => {
-          console.log('queued songs from store:', queuedSongs);
           this.queue = queuedSongs;
         }),
     );
@@ -86,6 +85,8 @@ export class ControlsComponent implements OnInit, OnDestroy {
     // check if there even exists a song waiting on the queue
     if (this.queue && this.queue.length > 0) {
       this.currentSong = this.queue[0];
+
+      // TODO: add the discarded song back to list of available songs
       this.queue.splice(0, 1);
       this.store.dispatch(DashboardActions.storeQueue({ queue: this.queue }));
     }

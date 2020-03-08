@@ -24,5 +24,20 @@ export class DashboardEffects {
     ),
   );
 
+  getAvailableSongs$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardActions.getAvailableSongs),
+      switchMap(() =>
+        this.queueService.getAvailableSongs().pipe(
+          map((availableSongs: DashboardActions.Song[]) => ({
+            type: DashboardActions.storeAvailableSongs.type,
+            availableSongs,
+          })),
+          catchError(() => EMPTY),
+        ),
+      ),
+    ),
+  );
+
   constructor(private actions$: Actions, private queueService: QueueService) {}
 }

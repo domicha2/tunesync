@@ -15,6 +15,16 @@ const reducer = createReducer(
   on(DashboardActions.storeQueue, (state, action: any) => {
     return { ...state, queuedSongs: action.queue };
   }),
+  on(DashboardActions.storeAvailableSongs, (state, action: any) => {
+    return { ...state, availableSongs: action.availableSongs };
+  }),
+  on(DashboardActions.storeSongs, (state, action: any) => {
+    return {
+      ...state,
+      availableSongs: action.availableSongs,
+      queuedSongs: action.queuedSongs,
+    };
+  }),
 );
 
 export function dashboardReducer(

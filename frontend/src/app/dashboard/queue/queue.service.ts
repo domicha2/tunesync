@@ -13,4 +13,8 @@ export class QueueService {
   getQueue(): Observable<any> {
     return this.httpWrapperService.get('/queue/');
   }
+
+  getAvailableSongs(): Observable<any> {
+    return this.httpWrapperService.get('/available-songs/');
+  }
 }
