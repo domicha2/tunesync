@@ -15,6 +15,7 @@
       id="main-song"
       autoplay
       [src]="'../../../assets/' + currentSong.name"
+      (ended)="onEnded($event)"
     ></audio>
     <div id="song-data">{{ currentSong.name }}</div>
     <div id="progress-bar">

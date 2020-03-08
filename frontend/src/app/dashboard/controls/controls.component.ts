@@ -90,4 +90,12 @@ export class ControlsComponent implements OnInit, OnDestroy {
       this.store.dispatch(DashboardActions.storeQueue({ queue: this.queue }));
     }
   }
+
+  /**
+   * Auto-click the next song button for the user
+   */
+  onEnded(event: Event): void {
+    console.log(event);
+    this.onNext();
+  }
 }
