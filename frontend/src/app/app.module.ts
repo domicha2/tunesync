@@ -10,12 +10,23 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
-import { authReducer } from './auth/auth.reducer';
+import { authReducer, AuthState } from './auth/auth.reducer';
 import { AuthEffects } from './auth/auth.effects';
 import { AuthModule } from './auth/auth.module';
 
-import { CreditsModule } from './credits/credits.module';
+import {
+  dashboardReducer,
+  DashboardState,
+} from './dashboard/store/dashboard.reducer';
+import { DashboardEffects } from './dashboard/store/dashboard.effects';
 import { DashboardModule } from './dashboard/dashboard.module';
+
+import { CreditsModule } from './credits/credits.module';
+
+export interface AppState {
+  auth: AuthState;
+  dashboard: DashboardState;
+}
 
 @NgModule({
   declarations: [AppComponent],
@@ -27,11 +38,11 @@ import { DashboardModule } from './dashboard/dashboard.module';
     HttpClientModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    StoreModule.forRoot({ auth: authReducer }),
+    StoreModule.forRoot({ auth: authReducer, dashboard: dashboardReducer }),
     StoreDevtoolsModule.instrument({
       maxAge: 50,
     }),
-    EffectsModule.forRoot([AuthEffects]),
+    EffectsModule.forRoot([AuthEffects, DashboardEffects]),
   ],
   providers: [],
   bootstrap: [AppComponent],
