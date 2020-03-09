@@ -7,6 +7,7 @@ export interface DashboardState {
   availableSongs: DashboardActions.Song[];
   playedSongs: DashboardActions.Song[];
   rooms: DashboardActions.Room[];
+  users: DashboardActions.User[];
 }
 
 export const initialState: DashboardState = undefined;
@@ -34,6 +35,12 @@ const reducer = createReducer(
     return {
       ...state,
       rooms: action.rooms,
+    };
+  }),
+  on(DashboardActions.storeUsers, (state, action) => {
+    return {
+      ...state,
+      users: action.users,
     };
   }),
 );

@@ -26,3 +26,9 @@ export const selectRooms = createSelector(
       ? dashboard.rooms.slice()
       : undefined,
 );
+
+export const selectUsers = createSelector(
+  (state: AppState) => state.dashboard,
+  (dashboard: DashboardState) =>
+    dashboard && dashboard.users ? dashboard.users.slice() : undefined,
+);
