@@ -6,6 +6,7 @@ import { map, switchMap, catchError } from 'rxjs/operators';
 
 import * as DashboardActions from './dashboard.actions';
 import { QueueService } from '../queue/queue.service';
+import { RoomsService } from '../rooms/rooms.service';
 
 @Injectable()
 export class DashboardEffects {
@@ -39,5 +40,24 @@ export class DashboardEffects {
     ),
   );
 
-  constructor(private actions$: Actions, private queueService: QueueService) {}
+  getRooms$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardActions.getRooms),
+      switchMap(() =>
+        this.roomsService.getRooms().pipe(
+          map((rooms: DashboardActions.Room[]) => ({
+            type: DashboardActions.storeRooms.type,
+            rooms,
+          })),
+          catchError(() => EMPTY),
+        ),
+      ),
+    ),
+  );
+
+  constructor(
+    private actions$: Actions,
+    private queueService: QueueService,
+    private roomsService: RoomsService,
+  ) {}
 }

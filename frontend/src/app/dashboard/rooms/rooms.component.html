@@ -8,15 +8,15 @@
   <div class="list-wrapper column">
     <div id="admin-rooms" class="column">
       <h2>Admin</h2>
-      <div class="list-el" *ngFor="let room of rooms.admin">{{ room }}</div>
+      <div class="list-el" *ngFor="let room of rooms.admin">{{ room.name }}</div>
     </div>
     <div id="dj-rooms" class="column">
       <h2>DJ</h2>
-      <div class="list-el" *ngFor="let room of rooms.dj">{{ room }}</div>
+      <div class="list-el" *ngFor="let room of rooms.dj">{{ room.name }}</div>
     </div>
     <div id="regular-rooms" class="column">
       <h2>Regular</h2>
-      <div class="list-el" *ngFor="let room of rooms.regular">{{ room }}</div>
+      <div class="list-el" *ngFor="let room of rooms.regular">{{ room.name }}</div>
     </div>
   </div>
 </div>

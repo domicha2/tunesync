@@ -5,6 +5,14 @@ export interface Song {
   // TODO: add other meta data about song
 }
 
+export type Role = 'Admin' | 'DJ' | 'Regular';
+
+export interface Room {
+  id: number;
+  name: string;
+  role: Role;
+}
+
 export const getQueue = createAction('[Controls Component] Get Queue');
 
 export const storeQueue = createAction(
@@ -33,4 +41,10 @@ export const storeSongs = createAction(
     queuedSongs: Song[];
     availableSongs: Song[];
   }>(),
+);
+
+export const getRooms = createAction('[Auth Component] Get Rooms');
+export const storeRooms = createAction(
+  '[Rooms API] Store Rooms',
+  props<{ rooms: Room[] }>(),
 );
