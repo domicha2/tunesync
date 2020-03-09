@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
 import { AppState } from './app.module';
-import { switchMap, tap, first } from 'rxjs/operators';
+import { switchMap, first } from 'rxjs/operators';
 
 @Injectable()
 export class HttpAuthInterceptor implements HttpInterceptor {
