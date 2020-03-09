@@ -17,6 +17,8 @@ export class RoomsComponent implements OnInit, OnDestroy {
 
   rooms: { admin: Room[]; dj: Room[]; regular: Room[] };
 
+  activeRoom: Room;
+
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
@@ -29,7 +31,13 @@ export class RoomsComponent implements OnInit, OnDestroy {
       };
     });
   }
+
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+  }
+
+  onRoomClick(room: Room): void {
+    console.log('clicked: ', room);
+    this.activeRoom = room;
   }
 }
