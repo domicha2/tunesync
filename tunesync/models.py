@@ -4,6 +4,20 @@ from django.contrib.auth.models import User
 # https://docs.djangoproject.com/en/3.0/ref/contrib/auth/#django.contrib.auth.models.User
 # using default user class
 
+import channels.layers
+from asgiref.sync import async_to_sync
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+
+
+class Room(models.Model):
+    title = models.CharField(max_length=30, unique=True)
+    subtitle = models.CharField(max_length=30)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
+    creation_time = models.DateTimeField(auto_now_add=True)
+
 
 class Event(models.Model):
     MESSAGE = "M"
@@ -26,10 +40,12 @@ class Event(models.Model):
         (INVITE, "Invite"),
         (LEAVE, "Leave"),
         (MODIFY_QUEUE, "Modify Queue"),
-        (PLAY, "Play"), # this event takes takes in current time stamp, isPlaying, songId
+        (
+            PLAY,
+            "Play",
+        ),  # this event takes takes in current time stamp, isPlaying, songId
     ]
-    #
-    room_id = models.ForeignKey(Room, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
     event_type = models.CharField(max_length=2, choices=EVENT_TYPE, default=MESSAGE)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -37,13 +53,6 @@ class Event(models.Model):
     args = models.CharField(
         max_length=10000
     )  # this will be a serialized json in a string
-
-
-class Room(models.Model):
-    title = models.CharField(max_length=30)
-    subtitle = models.CharField(max_length=30)
-    creator = models.ForeignKey(User, on_delete=models.CASCADE)
-    creation_time = models.DateTimeField(auto_now_add=True)
 
 
 class Poll(models.Model):
@@ -61,7 +70,7 @@ class Poll(models.Model):
         (SEEK, "Seek"),
         (PLAY, "Play"),
     ]
-    #TODO:
+    # TODO:
     id = models.ForeignKey(Event, on_delete=models.CASCADE, primary_key=True)
     action = models.CharField(max_length=2, choices=ACTIONS)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
@@ -70,9 +79,10 @@ class Poll(models.Model):
 
 
 class Vote(models.Model):
-    event_id = models.ForeignKey(Event, on_delete=models.CASCADE, primary_key=True) # This is the parent event
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, primary_key=True)
+    poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     agree = models.BooleanField()
+    unique_together = ["poll", "user"]
 
 
 class Tunes(models.Model):
@@ -83,8 +93,9 @@ class Tunes(models.Model):
 
 
 class Membership(models.Model):
-    room_id = models.ForeignKey(Room, on_delete=models.CASCADE, primary_key=True)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, primary_key=True)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    unique_together = ["room", "user"]
     ACCEPTED = "A"
     PENDING = "P"
     REJECTED = "R"
@@ -95,3 +106,33 @@ class Membership(models.Model):
     OTHER = "O"
     ROLES = [(DJ, "DJ"), (ADMIN, "Admin"), (OTHER, "Other")]
     role = models.CharField(max_length=1, choices=ROLES)
+
+@receiver(post_save, sender=Event, dispatch_uid='update_event_listeners')
+def update_event_listeners(sender, instance, **kwargs):
+    '''
+    Alerts consumer of new events
+    '''
+    user = instance.author
+    # group_name = 'event-user-{}'.format(user)
+    group_name = 'event-user-AnonymousUser'
+
+    message = {
+        'event_id': instance.id,
+        'event_type': instance.event_type,
+        'author': instance.author,
+        'creation_time': instance.creation_time.isoformat(),
+        'args': instance.args,
+    }
+
+    channel_layer = channels.layers.get_channel_layer()
+
+    async_to_sync(channel_layer.group_send)(
+        group_name,
+        {
+            'type': 'user_notify_event',
+            'text': message,
+        },
+    )
+
+    # need end point for websocket token
+    # signed with hmacs 

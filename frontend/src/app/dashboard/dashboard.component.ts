@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { HttpWrapperService } from '../http-wrapper.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -8,6 +9,8 @@ import { Component } from '@angular/core';
 export class DashboardComponent {
   webSocket = new WebSocket('ws://localhost:8000/test/');
 
+  constructor(private httpWrapperService: HttpWrapperService) {}
+
   ngOnInit() {
     this.setupSocket();
   }
@@ -15,6 +18,15 @@ export class DashboardComponent {
   setupSocket() {
     this.webSocket.onopen = () => {
       console.log('websocket open');
+      this.httpWrapperService
+        .post('/events/', {
+          room_id: 1,
+          author: 3,
+          parent_event_id: null,
+          args: 'asdfasdf',
+          event_type: 'M',
+        })
+        .subscribe();
     };
 
     this.webSocket.onmessage = message => {
