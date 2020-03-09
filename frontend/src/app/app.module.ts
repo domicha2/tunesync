@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -22,6 +22,7 @@ import { DashboardEffects } from './dashboard/store/dashboard.effects';
 import { DashboardModule } from './dashboard/dashboard.module';
 
 import { CreditsModule } from './credits/credits.module';
+import { HttpAuthInterceptor } from './http-auth-interceptor';
 
 export interface AppState {
   auth: AuthState;
@@ -44,7 +45,9 @@ export interface AppState {
     }),
     EffectsModule.forRoot([AuthEffects, DashboardEffects]),
   ],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: HttpAuthInterceptor, multi: true },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

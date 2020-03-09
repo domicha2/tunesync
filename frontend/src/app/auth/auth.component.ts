@@ -28,14 +28,12 @@ export class AuthComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscription.add(
       this.store.pipe(select('auth')).subscribe(data => {
-        console.log('data from auth: ', data);
         if (data) {
           // this gets executed anytime the authentication variables change
           // for now lets check if the mock token exists anyways
           // will probably have to refactor this but this is for testing
           if (data.token) {
             // make a request to get a list of rooms for the user to go into
-            console.log('authenticated');
             this.store.dispatch(DashboardActions.getRooms());
             this.router.navigate(['/dashboard']);
           }
