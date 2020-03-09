@@ -8,6 +8,8 @@ import { environment } from '../../../environments/environment';
   styleUrls: ['./main-screen.component.scss'],
 })
 export class MainScreenComponent implements OnInit {
+  events: any[] = [];
+
   ngOnInit(): void {
     const webSocket = new WebSocket(environment.webSocketUrl);
 
@@ -19,6 +21,7 @@ export class MainScreenComponent implements OnInit {
       console.log('received a message', messageEvent);
       // TODO: take action based on the data from the event
       // TODO: could update the view or not
+      this.events.push(messageEvent.data);
     };
 
     webSocket.onerror = (event: Event) => {
