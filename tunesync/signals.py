@@ -8,8 +8,7 @@ from .models import Event
 
    # checks for every event at this point
     # https://stackoverflow.com/questions/46614541/using-django-signals-in-channels-consumer-classes
-    @receiver(signals.post_save, sender=Event)
-
+@receiver(signals.post_save, sender=Event)
 def send_message(event):
     '''
     Call back function to send message to the browser
@@ -29,7 +28,8 @@ def update_event_listeners(sender, instance, **kwargs):
     '''
 
     user = instance.author
-    group_name = 'event-user-{}'.format(user)
+    # group_name = 'event-user-{}'.format(user)
+    group_name = 'event-user-AnonymousUser'
 
     message = {
         'event_id': instance.id,
