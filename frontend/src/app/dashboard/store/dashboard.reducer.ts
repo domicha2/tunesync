@@ -1,13 +1,14 @@
 import { createReducer, on, Action } from '@ngrx/store';
 
 import * as DashboardActions from './dashboard.actions';
+import { Song, Room, User } from '../dashboard.models';
 
 export interface DashboardState {
-  queuedSongs: DashboardActions.Song[];
-  availableSongs: DashboardActions.Song[];
-  playedSongs: DashboardActions.Song[];
-  rooms: DashboardActions.Room[];
-  users: DashboardActions.User[];
+  queuedSongs: Song[];
+  availableSongs: Song[];
+  playedSongs: Song[];
+  rooms: Room[];
+  users: User[];
 }
 
 export const initialState: DashboardState = undefined;

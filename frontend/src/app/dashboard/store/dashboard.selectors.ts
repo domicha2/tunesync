@@ -22,9 +22,7 @@ export const selectAvailableSongs = createSelector(
 export const selectRooms = createSelector(
   (state: AppState) => state.dashboard,
   (dashboard: DashboardState) =>
-    dashboard && dashboard.rooms
-      ? dashboard.rooms.slice()
-      : undefined,
+    dashboard && dashboard.rooms ? dashboard.rooms.slice() : undefined,
 );
 
 export const selectUsers = createSelector(

@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import * as DashboardActions from '../store/dashboard.actions';
 import { selectQueuedSongs } from '../store/dashboard.selectors';
 import { AppState } from '../../app.module';
+import { Song } from '../dashboard.models';
 
 @Component({
   selector: 'app-controls',
@@ -17,8 +18,8 @@ export class ControlsComponent implements OnInit, OnDestroy {
 
   song: HTMLAudioElement;
 
-  currentSong: DashboardActions.Song = { name: 'sample-0.mp3' };
-  queue: DashboardActions.Song[];
+  currentSong: Song = { name: 'sample-0.mp3' };
+  queue: Song[];
 
   constructor(private store: Store<AppState>) {}
 
@@ -26,7 +27,7 @@ export class ControlsComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.store
         .pipe(select(selectQueuedSongs))
-        .subscribe((queuedSongs: DashboardActions.Song[]) => {
+        .subscribe((queuedSongs: Song[]) => {
           this.queue = queuedSongs;
         }),
     );
