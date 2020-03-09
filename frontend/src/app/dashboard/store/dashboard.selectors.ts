@@ -18,3 +18,11 @@ export const selectAvailableSongs = createSelector(
       ? dashboard.availableSongs.slice()
       : undefined,
 );
+
+export const selectRooms = createSelector(
+  (state: AppState) => state.dashboard,
+  (dashboard: DashboardState) =>
+    dashboard && dashboard.rooms
+      ? dashboard.rooms.slice()
+      : undefined,
+);

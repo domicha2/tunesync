@@ -11,7 +11,7 @@ const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
   { path: 'credits', component: CreditsComponent },
   { path: 'queue', component: QueueComponent },
-  { path: '**', redirectTo: '/dashboard' },
+  { path: '**', redirectTo: '/auth' },
 ];
 
 @NgModule({

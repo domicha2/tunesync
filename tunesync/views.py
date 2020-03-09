@@ -6,6 +6,8 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from .serializers import UserSerializer
 
+from django.db.models import F
+
 
 class IndexPage(TemplateView):
     template_name = "index.html"
@@ -31,7 +33,10 @@ class UserViewSet(viewsets.ViewSet):
             username=request.data["username"], password=request.data["password"]
         )
         u.save()
-        return Response(u.id)
+        return Response({
+            "id": u.id,
+            "token": "testing"
+        })
 
     # GET BY PK
     def retrieve(self, request, pk=None):
@@ -56,7 +61,7 @@ class EventViewSet(viewsets.ViewSet):
 
     # GET
     def list(self, request):
-        response_data = Event.objects.all().filter(is_active=True).values()
+        response_data = Event.objects.all().filter().values()
         return Response(response_data)
 
     # POST
@@ -86,7 +91,10 @@ class RoomViewSet(viewsets.ViewSet):
 
     # GET
     def list(self, request):
-        response_data = Room.objects.all().filter(is_active=True).values()
+        response_data = Room.objects.all().annotate(name=F('title')).values(
+            'name',
+            'id',
+        ).order_by('name')
         return Response(response_data)
 
     # POST
