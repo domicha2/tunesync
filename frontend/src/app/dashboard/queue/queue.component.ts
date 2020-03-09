@@ -15,6 +15,7 @@ import {
   selectAvailableSongs,
 } from '../store/dashboard.selectors';
 import * as DashboardActions from '../store/dashboard.actions';
+import { Song } from '../dashboard.models';
 
 @Component({
   selector: 'app-queue',
@@ -24,8 +25,8 @@ import * as DashboardActions from '../store/dashboard.actions';
 export class QueueComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
 
-  queuedSongs: DashboardActions.Song[];
-  availableSongs: DashboardActions.Song[];
+  queuedSongs: Song[];
+  availableSongs: Song[];
 
   constructor(private store: Store<AppState>) {}
 
@@ -33,17 +34,15 @@ export class QueueComponent implements OnInit, OnDestroy {
     this.store.dispatch(DashboardActions.getAvailableSongs());
 
     this.subscription.add(
-      this.store
-        .select(selectQueuedSongs)
-        .subscribe((queuedSongs: DashboardActions.Song[]) => {
-          this.queuedSongs = queuedSongs;
-        }),
+      this.store.select(selectQueuedSongs).subscribe((queuedSongs: Song[]) => {
+        this.queuedSongs = queuedSongs;
+      }),
     );
 
     this.subscription.add(
       this.store
         .select(selectAvailableSongs)
-        .subscribe((availableSongs: DashboardActions.Song[]) => {
+        .subscribe((availableSongs: Song[]) => {
           this.availableSongs = availableSongs;
         }),
     );

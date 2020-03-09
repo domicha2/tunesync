@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 
 import { AppState } from '../../app.module';
-import { Room } from '../store/dashboard.actions';
+import { Room } from '../dashboard.models';
 import { selectRooms } from '../store/dashboard.selectors';
 import * as DashboardActions from '../store/dashboard.actions';
 

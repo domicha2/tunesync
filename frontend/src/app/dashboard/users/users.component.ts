@@ -12,7 +12,7 @@ import { Store } from '@ngrx/store';
 import { KickUserComponent } from './kick-user/kick-user.component';
 import { AppState } from '../../app.module';
 import { selectUsers } from '../store/dashboard.selectors';
-import * as DashboardActions from '../store/dashboard.actions';
+import { User } from '../dashboard.models';
 
 @Component({
   selector: 'app-users',
@@ -31,11 +31,9 @@ export class UsersComponent implements OnInit, OnDestroy {
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
-    this.store
-      .select(selectUsers)
-      .subscribe((users: DashboardActions.User[]) => {
-        console.log('users: ', users);
-      });
+    this.store.select(selectUsers).subscribe((users: User[]) => {
+      console.log('users: ', users);
+    });
   }
 
   ngOnDestroy(): void {
