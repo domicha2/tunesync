@@ -6,6 +6,7 @@ import { Store } from '@ngrx/store';
 import { AppState } from '../../app.module';
 import { Room } from '../store/dashboard.actions';
 import { selectRooms } from '../store/dashboard.selectors';
+import * as DashboardActions from '../store/dashboard.actions';
 
 @Component({
   selector: 'app-rooms',
@@ -23,7 +24,6 @@ export class RoomsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.store.select(selectRooms).subscribe((rooms: Room[]) => {
-      console.log('rooms:', rooms);
       this.rooms = {
         admin: rooms,
         dj: rooms,
@@ -37,7 +37,7 @@ export class RoomsComponent implements OnInit, OnDestroy {
   }
 
   onRoomClick(room: Room): void {
-    console.log('clicked: ', room);
     this.activeRoom = room;
+    this.store.dispatch(DashboardActions.getUsersByRoom({ roomId: room.id }));
   }
 }

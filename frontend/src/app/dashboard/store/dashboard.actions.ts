@@ -13,6 +13,13 @@ export interface Room {
   role: Role;
 }
 
+export interface User {
+  id: number;
+  name: string;
+  role: Role;
+  // TODO: add more user fields
+}
+
 export const getQueue = createAction('[Controls Component] Get Queue');
 
 export const storeQueue = createAction(
@@ -47,4 +54,13 @@ export const getRooms = createAction('[Auth Component] Get Rooms');
 export const storeRooms = createAction(
   '[Rooms API] Store Rooms',
   props<{ rooms: Room[] }>(),
+);
+
+export const getUsersByRoom = createAction(
+  '[Rooms Component] Get Users By Room',
+  props<{ roomId: number }>(),
+);
+export const storeUsers = createAction(
+  '[Rooms API] Store Users',
+  props<{ users: User[] }>(),
 );
