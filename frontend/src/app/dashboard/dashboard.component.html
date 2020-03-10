@@ -2,6 +2,7 @@
   <div id="rooms">
     <app-rooms></app-rooms>
   </div>
+  <ng-container *ngIf="activeRoom$ | async">
   <div id="middle" class="column">
     <div id="controls">
       <app-controls></app-controls>
@@ -14,4 +15,5 @@
   <div id="users">
     <app-users></app-users>
   </div>
+  </ng-container>
 </div>
