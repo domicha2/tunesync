@@ -18,9 +18,16 @@ export interface User {
   // TODO: add more user fields
 }
 
+export type EventType = 'M';
+
 export interface AppEvent {
+  eventId: number;
   userId: number;
   roomId: number;
+  parentEventId: number;
+  eventType: EventType;
+  args: string;
+  creationTime: string;
 }
 
 export interface Message {

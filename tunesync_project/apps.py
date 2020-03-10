@@ -6,5 +6,5 @@ class TuneSyncProjectAppConfig(AppConfig):
     verbose_name = "TuneSync: play it together"
 
     def ready(self):
-        from . import signals
+        pass
 
