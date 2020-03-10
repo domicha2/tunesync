@@ -2,19 +2,28 @@ from channels.generic.websocket import JsonWebsocketConsumer
 import channels
 from tunesync.models import Event
 from asgiref.sync import async_to_sync
+from urllib import parse
+
+# import urlparse
 
 
 class EventConsumer(JsonWebsocketConsumer):
     def connect(self):
+        # I used the below link to find how to get query parameters for the event room.
+        # Originally we wanted to send through headers but it was difficult from the client side
+        # https://stackoverflow.com/questions/44223458/how-to-get-query-parameters-from-django-channels
 
-        room = self.scope["headers"]["room_id"]
+        params = parse.parse_qs(self.scope["query_string"])
+        room_id = params.get(b"room_id", (None,))[0]
 
-        self.group_name = "event-room-{}".format(room)
+        if not room_id:
+            self.close()
 
+        self.group_name = "event-room-{}".format(room_id)
         async_to_sync(self.channel_layer.group_add)(self.group_name, self.channel_name)
 
         self.accept()
-        self.send("you are connected " + str(user) + " " + self.group_name)
+        self.send("you are connected " + " " + self.group_name)
 
     def disconnect(self, close_code):
         pass
