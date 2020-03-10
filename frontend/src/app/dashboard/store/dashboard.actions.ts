@@ -1,6 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 
-import { Song, User, Room } from '../dashboard.models';
+import { Song, User, Room, AppEvent } from '../dashboard.models';
 
 export const getQueue = createAction('[Controls Component] Get Queue');
 
@@ -32,10 +32,15 @@ export const storeSongs = createAction(
   }>(),
 );
 
+/* Rooms */
 export const getRooms = createAction('[Auth Component] Get Rooms');
 export const storeRooms = createAction(
   '[Rooms API] Store Rooms',
   props<{ rooms: Room[] }>(),
+);
+export const setActiveRoom = createAction(
+  '[Rooms Component] Set Active Room',
+  props<{ activeRoomId: number }>(),
 );
 
 export const getUsersByRoom = createAction(
@@ -45,4 +50,19 @@ export const getUsersByRoom = createAction(
 export const storeUsers = createAction(
   '[Rooms API] Store Users',
   props<{ users: User[] }>(),
+);
+
+/* Messaging */
+export const createMessage = createAction(
+  '[Messaging Component] Create Message',
+  props<{ message: string }>(),
+);
+
+export const getEventsByRoom = createAction(
+  '[Rooms Component] Get Events By Room',
+  props<{ roomId: number }>(),
+);
+export const storeEvents = createAction(
+  '[Events API] Store Events',
+  props<{ events: AppEvent[] }>(),
 );

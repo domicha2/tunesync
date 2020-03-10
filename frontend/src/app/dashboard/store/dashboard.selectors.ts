@@ -30,3 +30,14 @@ export const selectUsers = createSelector(
   (dashboard: DashboardState) =>
     dashboard && dashboard.users ? dashboard.users.slice() : undefined,
 );
+
+export const selectEvents = createSelector(
+  (state: AppState) => state.dashboard,
+  (dashboard: DashboardState) =>
+    dashboard && dashboard.events ? dashboard.events.slice() : undefined,
+);
+
+export const selectActiveRoom = createSelector(
+  (state: AppState) => state.dashboard,
+  (dashboard: DashboardState) => dashboard && dashboard.activeRoomId,
+);

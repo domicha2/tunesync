@@ -9,6 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatListModule } from '@angular/material/list';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { FormsModule } from '@angular/forms';
 
 import { DashboardComponent } from './dashboard.component';
 import { RoomsComponent } from './rooms/rooms.component';
@@ -31,6 +32,7 @@ import { KickUserComponent } from './users/kick-user/kick-user.component';
     KickUserComponent,
   ],
   imports: [
+    FormsModule,
     CommonModule,
     DragDropModule,
     MatDialogModule,

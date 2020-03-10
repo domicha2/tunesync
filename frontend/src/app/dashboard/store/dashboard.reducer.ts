@@ -1,7 +1,7 @@
 import { createReducer, on, Action } from '@ngrx/store';
 
 import * as DashboardActions from './dashboard.actions';
-import { Song, Room, User } from '../dashboard.models';
+import { Song, Room, User, AppEvent } from '../dashboard.models';
 
 export interface DashboardState {
   queuedSongs: Song[];
@@ -9,6 +9,8 @@ export interface DashboardState {
   playedSongs: Song[];
   rooms: Room[];
   users: User[];
+  activeRoomId: number;
+  events: AppEvent[];
 }
 
 export const initialState: DashboardState = undefined;
@@ -42,6 +44,18 @@ const reducer = createReducer(
     return {
       ...state,
       users: action.users,
+    };
+  }),
+  on(DashboardActions.setActiveRoom, (state, action) => {
+    return {
+      ...state,
+      activeRoomId: action.activeRoomId,
+    };
+  }),
+  on(DashboardActions.storeEvents, (state, action) => {
+    return {
+      ...state,
+      events: action.events,
     };
   }),
 );

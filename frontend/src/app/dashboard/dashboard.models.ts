@@ -17,3 +17,21 @@ export interface User {
   role: Role;
   // TODO: add more user fields
 }
+
+export type EventType = 'M';
+
+export interface AppEvent {
+  eventId: number;
+  userId: number;
+  roomId: number;
+  parentEventId: number;
+  eventType: EventType;
+  args: string;
+  creationTime: string;
+}
+
+export interface Message {
+  content: string;
+  userId: number;
+  roomId: number;
+}
