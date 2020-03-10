@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from .serializers import UserSerializer
 
 from django.db.models import F
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 
 
 class IndexPage(TemplateView):
@@ -53,8 +53,8 @@ class UserViewSet(viewsets.ViewSet):
     def destroy(self, request, pk=None):
         pass
 
-    @action(method=["post"])
-    def authenticate(request):
+    @action(detail=True, method=["post"])
+    def auth(self, request):
         """
         This method creates and sets a cookie for authentication and session management
         """
@@ -68,7 +68,7 @@ class UserViewSet(viewsets.ViewSet):
             return Response(status=401)
 
     @action(method=["get"])
-    def whoami(request):
+    def whoami(self, request):
         """
         """
         return Response(request.user.username)
