@@ -1,11 +1,14 @@
 import { createReducer, on, Action } from '@ngrx/store';
 
 import * as DashboardActions from './dashboard.actions';
+import { Song, Room, User } from '../dashboard.models';
 
 export interface DashboardState {
-  queuedSongs: DashboardActions.Song[];
-  availableSongs: DashboardActions.Song[];
-  playedSongs: DashboardActions.Song[];
+  queuedSongs: Song[];
+  availableSongs: Song[];
+  playedSongs: Song[];
+  rooms: Room[];
+  users: User[];
 }
 
 export const initialState: DashboardState = undefined;
@@ -28,6 +31,18 @@ const reducer = createReducer(
   on(DashboardActions.addAvailableSong, (state, action) => {
     state.availableSongs.push(action.song);
     return state;
+  }),
+  on(DashboardActions.storeRooms, (state, action) => {
+    return {
+      ...state,
+      rooms: action.rooms,
+    };
+  }),
+  on(DashboardActions.storeUsers, (state, action) => {
+    return {
+      ...state,
+      users: action.users,
+    };
   }),
 );
 

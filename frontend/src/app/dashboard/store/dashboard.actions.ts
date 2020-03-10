@@ -1,9 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 
-export interface Song {
-  name: string;
-  // TODO: add other meta data about song
-}
+import { Song, User, Room } from '../dashboard.models';
 
 export const getQueue = createAction('[Controls Component] Get Queue');
 
@@ -33,4 +30,19 @@ export const storeSongs = createAction(
     queuedSongs: Song[];
     availableSongs: Song[];
   }>(),
+);
+
+export const getRooms = createAction('[Auth Component] Get Rooms');
+export const storeRooms = createAction(
+  '[Rooms API] Store Rooms',
+  props<{ rooms: Room[] }>(),
+);
+
+export const getUsersByRoom = createAction(
+  '[Rooms Component] Get Users By Room',
+  props<{ roomId: number }>(),
+);
+export const storeUsers = createAction(
+  '[Rooms API] Store Users',
+  props<{ users: User[] }>(),
 );

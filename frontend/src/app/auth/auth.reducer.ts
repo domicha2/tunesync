@@ -3,7 +3,8 @@ import { createReducer, on, Action } from '@ngrx/store';
 import * as AuthActions from './auth.actions';
 
 export interface AuthState {
-  username: string;
+  userId: string;
+  token: string;
 }
 
 export const initialState: AuthState = undefined;
@@ -11,7 +12,8 @@ export const initialState: AuthState = undefined;
 const reducer = createReducer(
   initialState,
   on(AuthActions.storeUser, (state, user: any) => ({
-    username: user.payload.username,
+    userId: user.payload.id,
+    token: user.payload.token,
   })),
 );
 
