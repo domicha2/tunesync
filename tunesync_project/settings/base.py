@@ -130,27 +130,12 @@ class BaseSettings(DjangoDefaults):
 
     CORS_ORIGIN_ALLOW_ALL = True
 
-
     REST_FRAMEWORK = {
-        'DEFAULT_AUTHENTICATION_CLASSES': (
-                'rest_framework.authentication.TokenAuthentication',
+        "DEFAULT_AUTHENTICATION_CLASSES": (
+            "rest_framework.authentication.TokenAuthentication",
         ),
-        'DEFAULT_PERMISSION_CLASSES':(
-                    'rest_framework.permissions.IsAuthenticated',
-        ),
-
+        "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     }
-
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-               'rest_framework.authentication.TokenAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES':(
-                'rest_framework.permissions.IsAuthenticated',
-    ),
-
-}
-
 
     WSGI_APPLICATION = PROJECT_NAME + ".wsgi.application"
     ASGI_APPLICATION = PROJECT_NAME + ".routing.application"
