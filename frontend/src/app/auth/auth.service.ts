@@ -13,7 +13,7 @@ export class AuthService {
   constructor(private httpWrapperService: HttpWrapperService) {}
 
   signIn(credentials: Credentials): Observable<any> {
-    return this.httpWrapperService.post('/auth/', credentials);
+    return this.httpWrapperService.post('/get-token/', credentials);
   }
 
   signUp(credentials: Credentials): Observable<any> {

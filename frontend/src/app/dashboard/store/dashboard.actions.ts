@@ -33,6 +33,10 @@ export const storeSongs = createAction(
 );
 
 /* Rooms */
+export const createRoom = createAction(
+  '[Add Room Component] Add Room',
+  props<{ room: Room }>(),
+);
 export const getRooms = createAction('[Auth Component] Get Rooms');
 export const storeRooms = createAction(
   '[Rooms API] Store Rooms',

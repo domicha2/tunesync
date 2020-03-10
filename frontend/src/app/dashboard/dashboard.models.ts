@@ -6,9 +6,11 @@ export interface Song {
 export type Role = 'Admin' | 'DJ' | 'Regular';
 
 export interface Room {
-  id: number;
+  id?: number;
   name: string;
-  role: Role;
+  subtitle: string;
+  role?: Role;
+  creator?: number;
 }
 
 export interface User {

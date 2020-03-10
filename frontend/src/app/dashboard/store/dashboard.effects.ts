@@ -69,6 +69,20 @@ export class DashboardEffects {
     ),
   );
 
+  addRoom$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(DashboardActions.createRoom),
+        switchMap(action =>
+          this.roomsService.createRoom(action.room).pipe(
+            tap(response => console.log(response)),
+            catchError(() => EMPTY),
+          ),
+        ),
+      ),
+    { dispatch: false },
+  );
+
   getUsersByRoom$ = createEffect(() =>
     this.actions$.pipe(
       ofType(DashboardActions.getUsersByRoom),
