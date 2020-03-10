@@ -15,11 +15,12 @@ import * as DashboardActions from './dashboard.actions';
 import { QueueService } from '../queue/queue.service';
 import { RoomsService } from '../rooms/rooms.service';
 import { UsersService } from '../users/users.service';
-import { Song, Room, User } from '../dashboard.models';
+import { Song, Room, User, AppEvent } from '../dashboard.models';
 import { MessagingService } from '../messaging/messaging.service';
 import { AppState } from '../../app.module';
 import { Store, select } from '@ngrx/store';
 import { selectUserAndRoom } from '../../app.selectors';
+import { MainScreenService } from '../main-screen/main-screen.service';
 
 @Injectable()
 export class DashboardEffects {
@@ -83,6 +84,21 @@ export class DashboardEffects {
     ),
   );
 
+  getEventsByRoom$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardActions.getEventsByRoom),
+      switchMap(action =>
+        this.mainScreenService.getEventsByRoom(action.roomId).pipe(
+          map((events: AppEvent[]) => ({
+            type: DashboardActions.storeEvents.type,
+            events,
+          })),
+          catchError(() => EMPTY),
+        ),
+      ),
+    ),
+  );
+
   createMessage$ = createEffect(
     () =>
       this.actions$.pipe(
@@ -116,5 +132,6 @@ export class DashboardEffects {
     private roomsService: RoomsService,
     private usersService: UsersService,
     private messagingService: MessagingService,
+    private mainScreenService: MainScreenService,
   ) {}
 }

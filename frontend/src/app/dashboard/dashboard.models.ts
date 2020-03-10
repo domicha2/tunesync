@@ -18,6 +18,11 @@ export interface User {
   // TODO: add more user fields
 }
 
+export interface AppEvent {
+  userId: number;
+  roomId: number;
+}
+
 export interface Message {
   content: string;
   userId: number;
