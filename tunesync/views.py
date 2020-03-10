@@ -3,12 +3,35 @@ from tunesync.models import Event, Room
 
 from django.contrib.auth.models import User
 from rest_framework import viewsets
+from rest_framework.permissions import BasePermission
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .serializers import UserSerializer
 
 from django.db.models import F
 from django.contrib.auth import authenticate, login
+
+# https://stackoverflow.com/questions/47122471/how-to-set-a-method-in-django-rest-frameworks-viewset-to-not-require-authentica
+# Can only set permissions for the entire viewset
+# can change permission for a function if its NOT in a viewset
+# have to create brand new permission set. this one seems fine.
+class AnonCreateAndUpdateOwnerOnly(BasePermission):
+    """
+    Custom permission:
+        - allow anonymous POST
+        - allow authenticated GET and PUT on *own* record
+        - allow all actions for staff
+    """
+
+    def has_permission(self, request, view):
+        return view.action == "create" or request.user and request.user.is_authenticated
+
+    def has_object_permission(self, request, view, obj):
+        return (
+            view.action in ["retrieve", "update", "partial_update"]
+            and obj.id == request.user.id
+            or request.user.is_staff
+        )
 
 
 class IndexPage(TemplateView):
@@ -24,6 +47,8 @@ class UserViewSet(viewsets.ViewSet):
     the `format=None` keyword argument for each action.
     """
 
+    permission_classes = [AnonCreateAndUpdateOwnerOnly]
+
     # GET
     def list(self, request):
         response_data = User.objects.all().filter(is_active=True).values()
@@ -35,7 +60,7 @@ class UserViewSet(viewsets.ViewSet):
             username=request.data["username"], password=request.data["password"]
         )
         u.save()
-        return Response({"id": u.id, "token": "testing"})
+        return Response({"id": u.id})
 
     # GET BY PK
     def retrieve(self, request, pk=None):
