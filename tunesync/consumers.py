@@ -13,16 +13,18 @@ class EventConsumer(JsonWebsocketConsumer):
         # Originally we wanted to send through headers but it was difficult from the client side
         # https://stackoverflow.com/questions/44223458/how-to-get-query-parameters-from-django-channels
 
+        self.accept()
+
         params = parse.parse_qs(self.scope["query_string"])
         room_id = params.get(b"room_id", (None,))[0]
 
         if not room_id:
+            self.send("no room_id was sent")
             self.close()
 
-        self.group_name = "event-room-{}".format(room_id)
+        self.group_name = "event-room-{}".format(str(room_id))
         async_to_sync(self.channel_layer.group_add)(self.group_name, self.channel_name)
 
-        self.accept()
         self.send("you are connected " + " " + self.group_name)
 
     def disconnect(self, close_code):
