@@ -124,11 +124,10 @@ class RoomViewSet(viewsets.ViewSet):
 
     # POST
     def create(self, request):
-        creator = User.objects.get(pk=request.data["creator"])
         room = Room(
             title=request.data["title"],
             subtitle=request.data["subtitle"],
-            creator=creator,
+            creator=request.user,
         )
         room.save()
         return Response(room.id)
