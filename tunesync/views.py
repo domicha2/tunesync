@@ -7,6 +7,27 @@ from rest_framework.response import Response
 from .serializers import UserSerializer
 
 from django.db.models import F
+from django.contrib.auth import authenticate
+
+
+def authenticate(request):
+    """
+    This method creates and sets a cookie for authentication and session management
+    """
+    user = authenticate(
+        username=request.data["username"], password=request.data["password"]
+    )
+    if user:
+        login(request, user)
+        return Response()
+    else:
+        return Response(status=401)
+
+
+def whoami(request):
+    """
+    """
+    return Response(request.user.username)
 
 
 class IndexPage(TemplateView):
@@ -33,10 +54,7 @@ class UserViewSet(viewsets.ViewSet):
             username=request.data["username"], password=request.data["password"]
         )
         u.save()
-        return Response({
-            "id": u.id,
-            "token": "testing"
-        })
+        return Response({"id": u.id, "token": "testing"})
 
     # GET BY PK
     def retrieve(self, request, pk=None):
@@ -91,10 +109,12 @@ class RoomViewSet(viewsets.ViewSet):
 
     # GET
     def list(self, request):
-        response_data = Room.objects.all().annotate(name=F('title')).values(
-            'name',
-            'id',
-        ).order_by('name')
+        response_data = (
+            Room.objects.all()
+            .annotate(name=F("title"))
+            .values("name", "id")
+            .order_by("name")
+        )
         return Response(response_data)
 
     # POST

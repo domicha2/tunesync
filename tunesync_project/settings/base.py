@@ -97,7 +97,7 @@ class BaseSettings(DjangoDefaults):
     PROJECT_APPS = ["tunesync_project", "tunesync"]
 
     MIDDLEWARE = (
-        'corsheaders.middleware.CorsMiddleware',
+        "corsheaders.middleware.CorsMiddleware",
         "django.contrib.sessions.middleware.SessionMiddleware",
         "django.middleware.common.CommonMiddleware",
         "django.middleware.csrf.CsrfViewMiddleware",
@@ -105,8 +105,8 @@ class BaseSettings(DjangoDefaults):
         "django.contrib.messages.middleware.MessageMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
         "django.middleware.security.SecurityMiddleware",
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'corsheaders.middleware.CorsPostCsrfMiddleware',
+        "django.middleware.csrf.CsrfViewMiddleware",
+        "corsheaders.middleware.CorsPostCsrfMiddleware",
     )
 
     ROOT_URLCONF = PROJECT_NAME + ".urls"
