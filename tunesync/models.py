@@ -115,13 +115,13 @@ def update_event_listeners(sender, instance, **kwargs):
     Alerts consumer of new events
     """
     room = instance.room
-    group_name = "event-room-{}".format(room)
+    group_name = "event-room-{}".format(room.id)
 
     message = {
-        "room_id": instance.room,
+        "room_id": instance.room.id,
         "event_id": instance.id,
         "event_type": instance.event_type,
-        "author": instance.author,
+        "author": instance.author.id,
         "parent_event_id": instance.parent_event_id,
         "creation_time": instance.creation_time.isoformat(),
         "args": instance.args,
