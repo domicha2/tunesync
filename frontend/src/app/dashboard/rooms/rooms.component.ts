@@ -38,6 +38,9 @@ export class RoomsComponent implements OnInit, OnDestroy {
 
   onRoomClick(room: Room): void {
     this.activeRoom = room;
+    this.store.dispatch(
+      DashboardActions.setActiveRoom({ activeRoomId: room.id }),
+    );
     this.store.dispatch(DashboardActions.getUsersByRoom({ roomId: room.id }));
   }
 }

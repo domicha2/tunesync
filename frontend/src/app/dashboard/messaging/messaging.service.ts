@@ -13,7 +13,7 @@ export class MessagingService {
 
   createMessage(message: Message): Observable<any> {
     return this.httpWrapperService.post('/events/', {
-      room_id: 1,
+      room_id: message.roomId,
       author: message.userId,
       parent_event_id: null,
       args: message.content,

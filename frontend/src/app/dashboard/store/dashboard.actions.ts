@@ -32,10 +32,15 @@ export const storeSongs = createAction(
   }>(),
 );
 
+/* Rooms */
 export const getRooms = createAction('[Auth Component] Get Rooms');
 export const storeRooms = createAction(
   '[Rooms API] Store Rooms',
   props<{ rooms: Room[] }>(),
+);
+export const setActiveRoom = createAction(
+  '[Rooms Component] Set Active Room',
+  props<{ activeRoomId: number }>(),
 );
 
 export const getUsersByRoom = createAction(

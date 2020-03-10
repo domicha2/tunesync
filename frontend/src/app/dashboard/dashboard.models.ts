@@ -21,4 +21,5 @@ export interface User {
 export interface Message {
   content: string;
   userId: number;
+  roomId: number;
 }

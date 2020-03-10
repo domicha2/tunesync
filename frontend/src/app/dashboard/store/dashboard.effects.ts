@@ -19,6 +19,7 @@ import { Song, Room, User } from '../dashboard.models';
 import { MessagingService } from '../messaging/messaging.service';
 import { AppState } from '../../app.module';
 import { Store, select } from '@ngrx/store';
+import { selectUserAndRoom } from '../../app.selectors';
 
 @Injectable()
 export class DashboardEffects {
@@ -88,18 +89,17 @@ export class DashboardEffects {
         ofType(DashboardActions.createMessage),
         concatMap(action =>
           of(action).pipe(
-            withLatestFrom(
-              this.store.pipe(
-                select('auth'),
-                map(user => user.userId),
-              ),
-            ),
+            withLatestFrom(this.store.pipe(select(selectUserAndRoom))),
           ),
         ),
-        tap(([action, userId]) => console.log(action, userId)),
-        switchMap(([action, userId]) =>
+        tap(([action, userAndRoom]) => console.log(action, userAndRoom)),
+        switchMap(([action, userAndRoom]) =>
           this.messagingService
-            .createMessage({ content: action.message, userId })
+            .createMessage({
+              content: action.message,
+              userId: userAndRoom.userId,
+              roomId: userAndRoom.roomId,
+            })
             .pipe(
               tap(response => console.log('message response:' + response)),
               catchError(() => EMPTY),
