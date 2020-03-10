@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 
 import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
@@ -7,6 +8,7 @@ import { AppState } from '../../app.module';
 import { Room } from '../dashboard.models';
 import { selectRooms } from '../store/dashboard.selectors';
 import * as DashboardActions from '../store/dashboard.actions';
+import { AddRoomComponent } from './add-room/add-room.component';
 
 @Component({
   selector: 'app-rooms',
@@ -20,7 +22,7 @@ export class RoomsComponent implements OnInit, OnDestroy {
 
   activeRoom: Room;
 
-  constructor(private store: Store<AppState>) {}
+  constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.store.select(selectRooms).subscribe((rooms: Room[]) => {
@@ -43,5 +45,10 @@ export class RoomsComponent implements OnInit, OnDestroy {
     );
     this.store.dispatch(DashboardActions.getUsersByRoom({ roomId: room.id }));
     this.store.dispatch(DashboardActions.getEventsByRoom({ roomId: room.id }));
+  }
+
+  onAddRoom(): void {
+    // open modal
+    this.dialog.open(AddRoomComponent);
   }
 }
