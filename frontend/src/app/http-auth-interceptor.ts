@@ -25,7 +25,7 @@ export class HttpAuthInterceptor implements HttpInterceptor {
       switchMap(data => {
         if (data && data.token) {
           const authReq = req.clone({
-            headers: req.headers.set('Authorization', data.token),
+            headers: req.headers.set('Authorization', `Token ${data.token}`),
           });
           return next.handle(authReq);
         } else {
