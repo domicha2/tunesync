@@ -26,4 +26,4 @@ class EventConsumer(WebsocketConsumer):
         self.send(repr(text_data))
 
     def user_notify_event(self, event):
-        self.send(event['text']['event_type'])
+        self.send(event['text']['args'])
