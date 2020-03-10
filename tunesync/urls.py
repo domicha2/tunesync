@@ -15,5 +15,5 @@ router.register(r"rooms", mine.RoomViewSet, basename="room")
 urlpatterns = [
     path("", include(router.urls)),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
-    url(r"^api-token-auth/", views.obtain_auth_token),
+    url(r"^get-token/", views.obtain_auth_token),
 ]
