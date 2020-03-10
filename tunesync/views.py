@@ -3,31 +3,12 @@ from tunesync.models import Event, Room
 
 from django.contrib.auth.models import User
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from .serializers import UserSerializer
 
 from django.db.models import F
 from django.contrib.auth import authenticate
-
-
-def authenticate(request):
-    """
-    This method creates and sets a cookie for authentication and session management
-    """
-    user = authenticate(
-        username=request.data["username"], password=request.data["password"]
-    )
-    if user:
-        login(request, user)
-        return Response()
-    else:
-        return Response(status=401)
-
-
-def whoami(request):
-    """
-    """
-    return Response(request.user.username)
 
 
 class IndexPage(TemplateView):
@@ -71,6 +52,26 @@ class UserViewSet(viewsets.ViewSet):
     # DELETE
     def destroy(self, request, pk=None):
         pass
+
+    @action(method=["post"])
+    def authenticate(request):
+        """
+        This method creates and sets a cookie for authentication and session management
+        """
+        user = authenticate(
+            username=request.data["username"], password=request.data["password"]
+        )
+        if user:
+            login(request, user)
+            return Response()
+        else:
+            return Response(status=401)
+
+    @action(method=["get"])
+    def whoami(request):
+        """
+        """
+        return Response(request.user.username)
 
 
 class EventViewSet(viewsets.ViewSet):
