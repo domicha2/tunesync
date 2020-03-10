@@ -133,3 +133,9 @@ class RoomViewSet(viewsets.ViewSet):
         room.save()
         return Response(room.id)
 
+    @action(methods=["get"], detail=True)
+    def events(self, request, pk=None):
+        # get all events at this room
+        events = Event.objects.all().filter(room=pk).values().order_by('-creation_time')[:100]
+        return Response(events)
+
