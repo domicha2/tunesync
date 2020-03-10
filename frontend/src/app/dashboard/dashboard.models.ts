@@ -17,3 +17,8 @@ export interface User {
   role: Role;
   // TODO: add more user fields
 }
+
+export interface Message {
+  content: string;
+  userId: number;
+}

@@ -46,3 +46,9 @@ export const storeUsers = createAction(
   '[Rooms API] Store Users',
   props<{ users: User[] }>(),
 );
+
+/* Messaging */
+export const createMessage = createAction(
+  '[Messaging Component] Create Message',
+  props<{ message: string }>(),
+);

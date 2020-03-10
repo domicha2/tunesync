@@ -1,14 +1,24 @@
 import { Injectable } from '@angular/core';
 
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { EMPTY } from 'rxjs';
-import { map, switchMap, catchError } from 'rxjs/operators';
+import { EMPTY, of } from 'rxjs';
+import {
+  map,
+  switchMap,
+  catchError,
+  tap,
+  withLatestFrom,
+  concatMap,
+} from 'rxjs/operators';
 
 import * as DashboardActions from './dashboard.actions';
 import { QueueService } from '../queue/queue.service';
 import { RoomsService } from '../rooms/rooms.service';
 import { UsersService } from '../users/users.service';
 import { Song, Room, User } from '../dashboard.models';
+import { MessagingService } from '../messaging/messaging.service';
+import { AppState } from '../../app.module';
+import { Store, select } from '@ngrx/store';
 
 @Injectable()
 export class DashboardEffects {
@@ -72,10 +82,39 @@ export class DashboardEffects {
     ),
   );
 
+  createMessage$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(DashboardActions.createMessage),
+        concatMap(action =>
+          of(action).pipe(
+            withLatestFrom(
+              this.store.pipe(
+                select('auth'),
+                map(user => user.userId),
+              ),
+            ),
+          ),
+        ),
+        tap(([action, userId]) => console.log(action, userId)),
+        switchMap(([action, userId]) =>
+          this.messagingService
+            .createMessage({ content: action.message, userId })
+            .pipe(
+              tap(response => console.log('message response:' + response)),
+              catchError(() => EMPTY),
+            ),
+        ),
+      ),
+    { dispatch: false },
+  );
+
   constructor(
     private actions$: Actions,
+    private store: Store<AppState>,
     private queueService: QueueService,
     private roomsService: RoomsService,
     private usersService: UsersService,
+    private messagingService: MessagingService,
   ) {}
 }
