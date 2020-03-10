@@ -9,7 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatListModule } from '@angular/material/list';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { DashboardComponent } from './dashboard.component';
 import { RoomsComponent } from './rooms/rooms.component';
@@ -19,6 +19,7 @@ import { ControlsComponent } from './controls/controls.component';
 import { MainScreenComponent } from './main-screen/main-screen.component';
 import { QueueComponent } from './queue/queue.component';
 import { KickUserComponent } from './users/kick-user/kick-user.component';
+import { AddRoomComponent } from './rooms/add-room/add-room.component';
 
 @NgModule({
   declarations: [
@@ -30,8 +31,10 @@ import { KickUserComponent } from './users/kick-user/kick-user.component';
     MainScreenComponent,
     QueueComponent,
     KickUserComponent,
+    AddRoomComponent,
   ],
   imports: [
+    ReactiveFormsModule,
     FormsModule,
     CommonModule,
     DragDropModule,
