@@ -1,11 +1,13 @@
 from django.urls import include, path
+from django.conf.urls import url
 from rest_framework import routers
-from . import views
+from . import views as mine
+from rest_framework.authtoken import views
 
 router = routers.DefaultRouter()
-router.register(r"users", views.UserViewSet, basename="user")
-router.register(r"events", views.EventViewSet, basename="event")
-router.register(r"rooms", views.RoomViewSet, basename="room")
+router.register(r"users", mine.UserViewSet, basename="user")
+router.register(r"events", mine.EventViewSet, basename="event")
+router.register(r"rooms", mine.RoomViewSet, basename="room")
 
 
 # Wire up our API using automatic URL routing.
@@ -13,4 +15,5 @@ router.register(r"rooms", views.RoomViewSet, basename="room")
 urlpatterns = [
     path("", include(router.urls)),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
+    url(r"^api-token-auth/", views.obtain_auth_token),
 ]

@@ -53,7 +53,7 @@ class UserViewSet(viewsets.ViewSet):
     def destroy(self, request, pk=None):
         pass
 
-    @action(detail=True, method=["post"])
+    @action(detail=False, methods=["post"])
     def auth(self, request):
         """
         This method creates and sets a cookie for authentication and session management
@@ -63,15 +63,19 @@ class UserViewSet(viewsets.ViewSet):
         )
         if user:
             login(request, user)
-            return Response()
+            return Response("")
         else:
-            return Response(status=401)
+            return Response("", status=401)
 
-    @action(method=["get"])
+    @action(methods=["get"], detail=False)
     def whoami(self, request):
         """
         """
-        return Response(request.user.username)
+        return Response({"username": request.user.username})
+
+    @action(detail=False, methods=["get"])
+    def set_password(self, request, pk=None):
+        return Response({"status": "password set"})
 
 
 class EventViewSet(viewsets.ViewSet):

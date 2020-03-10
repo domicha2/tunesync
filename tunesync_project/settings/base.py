@@ -90,7 +90,8 @@ class BaseSettings(DjangoDefaults):
         "django.contrib.staticfiles",
         "rest_framework",
         "corsheaders",
-        "channels"
+        "channels",
+        "rest_framework.authtoken"
         # "captcha",
     ]
 
