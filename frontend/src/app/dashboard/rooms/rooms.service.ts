@@ -15,7 +15,6 @@ export class RoomsService {
 
   createRoom(room: Room): Observable<any> {
     return this.httpWrapperService.post('/rooms/', {
-      creator: 1,
       title: room.name,
       subtitle: room.subtitle,
     });
