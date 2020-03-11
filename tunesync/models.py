@@ -13,11 +13,10 @@ from django.dispatch import receiver
 
 class Room(models.Model):
     title = models.CharField(max_length=30, unique=True)
-    subtitle = models.CharField(max_length=30)
-    creator = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="creator")
+    subtitle = models.CharField(max_length=30, blank=True)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="creator")
     creation_time = models.DateTimeField(auto_now_add=True)
-    members = models.ManyToManyField(User, through='Membership')
+    members = models.ManyToManyField(User, through="Membership")
 
 
 class Event(models.Model):
@@ -48,8 +47,7 @@ class Event(models.Model):
     ]
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
-    event_type = models.CharField(
-        max_length=2, choices=EVENT_TYPE, default=MESSAGE)
+    event_type = models.CharField(max_length=2, choices=EVENT_TYPE, default=MESSAGE)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     parent_event_id = models.ForeignKey(
         "self", null=True, blank=True, on_delete=models.CASCADE, default=None
@@ -103,8 +101,7 @@ class Membership(models.Model):
     ACCEPTED = "A"
     PENDING = "P"
     REJECTED = "R"
-    STATES = [(ACCEPTED, "Accepted"), (PENDING, "Pending"),
-              (REJECTED, "Rejected")]
+    STATES = [(ACCEPTED, "Accepted"), (PENDING, "Pending"), (REJECTED, "Rejected")]
     state = models.CharField(max_length=1, choices=STATES, default=PENDING)
     DJ = "D"
     ADMIN = "A"

@@ -82,8 +82,8 @@ class BaseSettings(DjangoDefaults):
     # Application definition
 
     PREREQ_APPS = [
-        "django.contrib.admin",
         "django.contrib.auth",
+        "django.contrib.admin",
         "django.contrib.contenttypes",
         "django.contrib.sessions",
         "django.contrib.messages",
@@ -91,7 +91,8 @@ class BaseSettings(DjangoDefaults):
         "rest_framework",
         "corsheaders",
         "channels",
-        "rest_framework.authtoken"
+        "rest_framework.authtoken",
+        "django.contrib.sites"
         # "captcha",
     ]
 
@@ -142,15 +143,6 @@ class BaseSettings(DjangoDefaults):
 
     # Database
     # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
-    @property
-    def DATABASES(self):
-        return {
-            "default": {
-                "ENGINE": "django.db.backends.sqlite3",
-                "NAME": os.path.join(self.BASE_DIR, "tmp/db.sqlite3"),
-            }
-        }
 
     # Internationalization
     # https://docs.djangoproject.com/en/1.8/topics/i18n/

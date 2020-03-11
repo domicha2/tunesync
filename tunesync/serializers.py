@@ -1,15 +1,19 @@
 from django.contrib.auth.models import User
-from .models import Membership
+from .models import Membership, Room
 from rest_framework import serializers
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['url', 'username', 'email', 'groups']
+        fields = ["url", "username", "email", "groups"]
 
 
 class MembershipSerializer(serializers.ModelSerializer):
     class Meta:
         model = Membership
-        fields = ['room', 'user', 'role']
+        fields = ["room", "user", "role"]
+
+
+# class RoomSerializer(serializers.ModelSerializer)
+

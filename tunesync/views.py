@@ -3,7 +3,7 @@ from tunesync.models import Event, Room, Membership
 
 from django.contrib.auth.models import User
 from rest_framework import viewsets
-from rest_framework.permissions import BasePermission
+from .permissions import AnonCreateAndUpdateOwnerOnly
 from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -11,30 +11,6 @@ from .serializers import UserSerializer, MembershipSerializer
 
 from django.db.models import F, Q, Subquery, Value, CharField
 from django.contrib.auth import authenticate, login
-
-# https://stackoverflow.com/questions/47122471/how-to-set-a-method-in-django-rest-frameworks-viewset-to-not-require-authentica
-# Can only set permissions for the entire viewset
-# can change permission for a function if its NOT in a viewset
-# have to create brand new permission set. this one seems fine.
-
-
-class AnonCreateAndUpdateOwnerOnly(BasePermission):
-    """
-    Custom permission:
-        - allow anonymous POST
-        - allow authenticated GET and PUT on *own* record
-        - allow all actions for staff
-    """
-
-    def has_permission(self, request, view):
-        return view.action in ["create", "auth"] or request.user and request.user.is_authenticated
-
-    def has_object_permission(self, request, view, obj):
-        return (
-            view.action in ["retrieve", "update", "partial_update"]
-            and obj.id == request.user.id
-            or request.user.is_staff
-        )
 
 
 class IndexPage(TemplateView):
@@ -183,8 +159,12 @@ class RoomViewSet(viewsets.ViewSet):
     @action(methods=["get"], detail=True)
     def events(self, request, pk=None):
         # get all events at this room
-        events = Event.objects.all().filter(
-            room=pk).values().order_by('-creation_time')[:100]
+        events = (
+            Event.objects.all()
+            .filter(room=pk)
+            .values()
+            .order_by("-creation_time")[:100]
+        )
         return Response(events)
 
 
@@ -193,5 +173,6 @@ class MembershipViewSet(viewsets.ModelViewSet):
     Proof of concept viewset using ModelViewSet implementation
     Also, we need a membership viewset anyways
     """
+
     queryset = Membership.objects.all()
     serializer_class = MembershipSerializer

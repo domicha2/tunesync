@@ -11,3 +11,15 @@ class DevSettings(BaseSettings):
 
     CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 
+    @property
+    def DATABASES(self):
+        return {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": "django",
+                "USER": "user",
+                "PASSWORD": "green123",
+                "HOST": "127.0.0.1",
+                "PORT": "5432",
+            }
+        }
