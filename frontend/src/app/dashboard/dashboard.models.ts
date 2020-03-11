@@ -3,14 +3,25 @@ export interface Song {
   // TODO: add other meta data about song
 }
 
-export type Role = 'Admin' | 'DJ' | 'Regular';
+export enum Role {
+  Admin = 'A',
+  DJ = 'D',
+  Regular = 'R',
+}
+
+export enum State {
+  Accepted = 'A',
+  Pending = 'P',
+  Rejected = 'R',
+}
 
 export interface Room {
   id?: number;
-  name: string;
+  title: string;
   subtitle: string;
   role?: Role;
   creator?: number;
+  state?: State;
 }
 
 export interface User {

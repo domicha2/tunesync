@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework.permissions import BasePermission
 from rest_framework.decorators import action
+from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from .serializers import UserSerializer, MembershipSerializer
 
@@ -26,7 +27,7 @@ class AnonCreateAndUpdateOwnerOnly(BasePermission):
     """
 
     def has_permission(self, request, view):
-        return view.action == "create" or request.user and request.user.is_authenticated
+        return view.action in ["create", "auth"] or request.user and request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):
         return (
@@ -89,10 +90,14 @@ class UserViewSet(viewsets.ViewSet):
             username=request.data["username"], password=request.data["password"]
         )
         if user:
-            login(request, user)
-            return Response("")
+            # get or create a token
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({
+                "token": token.key,
+                "user_id": user.pk
+            })
         else:
-            return Response("", status=401)
+            return Response("invalid credentials", status=401)
 
     @action(methods=["get"], detail=False)
     def whoami(self, request):
@@ -106,26 +111,18 @@ class UserViewSet(viewsets.ViewSet):
 
     @action(detail=True, methods=["get"])
     def rooms(self, request, pk=None):
-        # get a list of rooms that the user is in
-        member_rooms = Room.objects.filter(
-            members__id=pk
-        ).annotate(
-            role=F('members__membership__role'),
-            state=F('members__membership__state'),
-        ).values('id', 'title', 'subtitle', 'role', 'state')
-
-        # get a list of rooms that the user is not in
-        remaining_rooms = Room.objects.exclude(
-            id__in=Subquery(member_rooms.values('id'))
-        ).annotate(
-            role=Value('R', output_field=CharField()), state=Value('None', output_field=CharField())
+        rooms = Membership.objects.filter(user=pk).annotate(
+            title=F('room__title'),
+            subtitle=F('room__subtitle'),
         ).values(
-            'id', 'title', 'subtitle', 'role', 'state'
-        )
-
-        rooms = member_rooms.union(remaining_rooms).order_by(
-            'role', 'state', 'title', 'subtitle'
-        )
+            'room_id',
+            'role',
+            'state',
+            'title',
+            'subtitle'
+        ).annotate(id=F('room_id')).values(
+            'id', 'role', 'state', 'title', 'subtitle'
+        ).order_by('role', 'state', 'title', 'subtitle')
         return Response(rooms)
 
 

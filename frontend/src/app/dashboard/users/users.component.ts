@@ -12,7 +12,7 @@ import { Store } from '@ngrx/store';
 import { KickUserComponent } from './kick-user/kick-user.component';
 import { AppState } from '../../app.module';
 import { selectUsers } from '../store/dashboard.selectors';
-import { User } from '../dashboard.models';
+import { User, Role } from '../dashboard.models';
 
 @Component({
   selector: 'app-users',
@@ -23,11 +23,11 @@ export class UsersComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
 
   users = {
-    admin: [{ id: 1, name: 'Jim', role: 'Admin' }] as User[],
-    dj: [{ id: 2, name: 'Alice', role: 'DJ' }] as User[],
+    admin: [{ id: 1, name: 'Jim', role: Role.Admin }] as User[],
+    dj: [{ id: 2, name: 'Alice', role: Role.DJ }] as User[],
     regular: [
-      { id: 3, name: 'Bob', role: 'Regular' },
-      { id: 4, name: 'David', role: 'Regular' },
+      { id: 3, name: 'Bob', role: Role.Regular },
+      { id: 4, name: 'David', role: Role.Regular },
     ] as User[],
   };
 

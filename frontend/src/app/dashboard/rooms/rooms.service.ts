@@ -9,14 +9,11 @@ import { Room } from '../dashboard.models';
 export class RoomsService {
   constructor(private httpWrapperService: HttpWrapperService) {}
 
-  getRooms(): Observable<any> {
-    return this.httpWrapperService.get('/rooms/');
+  getRooms(userId: number): Observable<any> {
+    return this.httpWrapperService.get(`/users/${userId}/rooms/`);
   }
 
   createRoom(room: Room): Observable<any> {
-    return this.httpWrapperService.post('/rooms/', {
-      title: room.name,
-      subtitle: room.subtitle,
-    });
+    return this.httpWrapperService.post('/rooms/', room);
   }
 }
