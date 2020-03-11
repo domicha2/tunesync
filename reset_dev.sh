@@ -23,6 +23,7 @@ EOF
 
 M showmigrations
 M makemigrations
+M makemigrations tunesync
 M migrate auth
 M migrate
 M shell -c "from django.contrib.auth.models import User; User.objects.create_superuser('aaa', 'admin@example.com', '.')"

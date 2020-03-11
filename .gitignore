@@ -6,3 +6,4 @@ tmp/
 tunesync.egg-info/
 build/
 dist/
+migrations/
