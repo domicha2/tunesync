@@ -8,7 +8,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from .serializers import UserSerializer, MembershipSerializer
 
-from django.db.models import F
+from django.db.models import F, Q, Subquery, Value, CharField
 from django.contrib.auth import authenticate, login
 
 # https://stackoverflow.com/questions/47122471/how-to-set-a-method-in-django-rest-frameworks-viewset-to-not-require-authentica
@@ -103,6 +103,30 @@ class UserViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["get"])
     def set_password(self, request, pk=None):
         return Response({"status": "password set"})
+
+    @action(detail=True, methods=["get"])
+    def rooms(self, request, pk=None):
+        # get a list of rooms that the user is in
+        member_rooms = Room.objects.filter(
+            members__id=pk
+        ).annotate(
+            role=F('members__membership__role'),
+            state=F('members__membership__state'),
+        ).values('id', 'title', 'subtitle', 'role', 'state')
+
+        # get a list of rooms that the user is not in
+        remaining_rooms = Room.objects.exclude(
+            id__in=Subquery(member_rooms.values('id'))
+        ).annotate(
+            role=Value('R', output_field=CharField()), state=Value('None', output_field=CharField())
+        ).values(
+            'id', 'title', 'subtitle', 'role', 'state'
+        )
+
+        rooms = member_rooms.union(remaining_rooms).order_by(
+            'role', 'state', 'title', 'subtitle'
+        )
+        return Response(rooms)
 
 
 class EventViewSet(viewsets.ViewSet):
