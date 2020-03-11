@@ -1,12 +1,12 @@
 from django.views.generic import TemplateView
-from tunesync.models import Event, Room
+from tunesync.models import Event, Room, Membership
 
 from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework.permissions import BasePermission
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .serializers import UserSerializer
+from .serializers import UserSerializer, MembershipSerializer
 
 from django.db.models import F
 from django.contrib.auth import authenticate, login
@@ -165,3 +165,12 @@ class RoomViewSet(viewsets.ViewSet):
         events = Event.objects.all().filter(
             room=pk).values().order_by('-creation_time')[:100]
         return Response(events)
+
+
+class MembershipViewSet(viewsets.ModelViewSet):
+    """
+    Proof of concept viewset using ModelViewSet implementation
+    Also, we need a membership viewset anyways
+    """
+    queryset = Membership.objects.all()
+    serializer_class = MembershipSerializer
