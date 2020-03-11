@@ -22,3 +22,10 @@
 		- subtitle: room subtitle
 - response: 200
 	- body: room id
+
+### Delete
+- description: delete a room and the memberships attached to it
+- request: `DELETE /rooms/:id/`
+- response: 200
+ - body: room id
+
