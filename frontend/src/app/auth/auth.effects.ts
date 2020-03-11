@@ -19,7 +19,14 @@ export class AuthEffects {
             password: credentials.password,
           })
           .pipe(
-            map(user => ({ type: AuthActions.storeUser.type, payload: user })),
+            map(user => ({
+              type: AuthActions.storeUser.type,
+              user: {
+                userId: user.user_id,
+                token: user.token,
+                username: credentials.username,
+              },
+            })),
             catchError(() => EMPTY),
           ),
       ),
@@ -36,6 +43,7 @@ export class AuthEffects {
             password: credentials.password,
           })
           .pipe(
+            // TODO: ideally should just dispatch an action to signify successful sign up
             map(user => ({ type: AuthActions.storeUser.type, payload: user })),
             catchError(() => EMPTY),
           ),

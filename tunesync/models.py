@@ -105,8 +105,8 @@ class Membership(models.Model):
     state = models.CharField(max_length=1, choices=STATES, default=PENDING)
     DJ = "D"
     ADMIN = "A"
-    OTHER = "O"
-    ROLES = [(DJ, "DJ"), (ADMIN, "Admin"), (OTHER, "Other")]
+    REGULAR = "R"
+    ROLES = [(DJ, "DJ"), (ADMIN, "Admin"), (REGULAR, "Regular")]
     role = models.CharField(max_length=1, choices=ROLES)
 
 

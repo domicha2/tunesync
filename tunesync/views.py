@@ -5,10 +5,11 @@ from django.contrib.auth.models import User
 from rest_framework import viewsets
 from .permissions import AnonCreateAndUpdateOwnerOnly
 from rest_framework.decorators import action
+from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from .serializers import UserSerializer, MembershipSerializer
 
-from django.db.models import F
+from django.db.models import F, Q, Subquery, Value, CharField
 from django.contrib.auth import authenticate, login
 
 
@@ -65,10 +66,14 @@ class UserViewSet(viewsets.ViewSet):
             username=request.data["username"], password=request.data["password"]
         )
         if user:
-            login(request, user)
-            return Response("")
+            # get or create a token
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({
+                "token": token.key,
+                "user_id": user.pk
+            })
         else:
-            return Response("", status=401)
+            return Response("invalid credentials", status=401)
 
     @action(methods=["get"], detail=False)
     def whoami(self, request):
@@ -79,6 +84,22 @@ class UserViewSet(viewsets.ViewSet):
     @action(detail=False, methods=["get"])
     def set_password(self, request, pk=None):
         return Response({"status": "password set"})
+
+    @action(detail=True, methods=["get"])
+    def rooms(self, request, pk=None):
+        rooms = Membership.objects.filter(user=pk).annotate(
+            title=F('room__title'),
+            subtitle=F('room__subtitle'),
+        ).values(
+            'room_id',
+            'role',
+            'state',
+            'title',
+            'subtitle'
+        ).annotate(id=F('room_id')).values(
+            'id', 'role', 'state', 'title', 'subtitle'
+        ).order_by('role', 'state', 'title', 'subtitle')
+        return Response(rooms)
 
 
 class EventViewSet(viewsets.ViewSet):
