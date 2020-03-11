@@ -21,6 +21,7 @@ import { AppState } from '../../app.module';
 import { Store, select } from '@ngrx/store';
 import { selectUserAndRoom } from '../../app.selectors';
 import { MainScreenService } from '../main-screen/main-screen.service';
+import { selectActiveRoom } from './dashboard.selectors';
 
 @Injectable()
 export class DashboardEffects {
@@ -96,6 +97,25 @@ export class DashboardEffects {
         ),
       ),
     ),
+  );
+
+  removeUserFromRoom$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(DashboardActions.removeUserFromRoom),
+        concatMap(action =>
+          of(action).pipe(
+            withLatestFrom(this.store.pipe(select(selectActiveRoom))),
+          ),
+        ),
+        switchMap(([action, roomId]) =>
+          this.usersService.removeUserFromRoom(roomId, action.userId).pipe(
+            tap(response => console.log(response)),
+            catchError(() => EMPTY),
+          ),
+        ),
+      ),
+    { dispatch: false },
   );
 
   getEventsByRoom$ = createEffect(() =>

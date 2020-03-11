@@ -23,9 +23,12 @@ export class UsersComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
 
   users = {
-    admin: ['Jim'],
-    dj: ['Alice'],
-    regular: ['Bob', 'David'],
+    admin: [{ id: 1, name: 'Jim', role: 'Admin' }] as User[],
+    dj: [{ id: 2, name: 'Alice', role: 'DJ' }] as User[],
+    regular: [
+      { id: 3, name: 'Bob', role: 'Regular' },
+      { id: 4, name: 'David', role: 'Regular' },
+    ] as User[],
   };
 
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
@@ -40,10 +43,10 @@ export class UsersComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  onKickUser(user): void {
+  onKickUser(user: User): void {
     this.dialog.open(KickUserComponent, {
       width: 'fit-content',
-      data: { user },
+      data: user,
     });
   }
 
