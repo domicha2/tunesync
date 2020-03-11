@@ -14,7 +14,7 @@
         [ngClass]="{ active: activeRoom === room }"
         (click)="onRoomClick(room)"
       >
-        {{ room.name }}
+        {{ room.title }}
       </div>
     </div>
     <div id="dj-rooms" class="column">
@@ -25,7 +25,7 @@
         [ngClass]="{ active: activeRoom === room }"
         (click)="onRoomClick(room)"
       >
-        {{ room.name }}
+        {{ room.title }}
       </div>
     </div>
     <div id="regular-rooms" class="column">
@@ -36,7 +36,7 @@
         [ngClass]="{ active: activeRoom === room }"
         (click)="onRoomClick(room)"
       >
-        {{ room.name }}
+        {{ room.title }}
       </div>
     </div>
   </div>

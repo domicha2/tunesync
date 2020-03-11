@@ -22,6 +22,7 @@ import { Store, select } from '@ngrx/store';
 import { selectUserAndRoom } from '../../app.selectors';
 import { MainScreenService } from '../main-screen/main-screen.service';
 import { selectActiveRoom } from './dashboard.selectors';
+import { selectUserId } from '../../auth/auth.selectors';
 
 @Injectable()
 export class DashboardEffects {
@@ -58,8 +59,11 @@ export class DashboardEffects {
   getRooms$ = createEffect(() =>
     this.actions$.pipe(
       ofType(DashboardActions.getRooms),
-      switchMap(() =>
-        this.roomsService.getRooms().pipe(
+      concatMap(action =>
+        of(action).pipe(withLatestFrom(this.store.pipe(select(selectUserId)))),
+      ),
+      switchMap(([action, userId]) =>
+        this.roomsService.getRooms(userId).pipe(
           map((rooms: Room[]) => ({
             type: DashboardActions.storeRooms.type,
             rooms,

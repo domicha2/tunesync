@@ -9,6 +9,7 @@ import * as AuthActions from './auth.actions';
 import * as DashboardActions from '../dashboard/store/dashboard.actions';
 
 import { AppState } from '../app.module';
+import { selectToken } from './auth.selectors';
 
 @Component({
   selector: 'app-auth',
@@ -27,16 +28,15 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscription.add(
-      this.store.pipe(select('auth')).subscribe(data => {
-        if (data) {
+      this.store.pipe(select(selectToken)).subscribe(token => {
+        if (token) {
           // this gets executed anytime the authentication variables change
           // for now lets check if the mock token exists anyways
           // will probably have to refactor this but this is for testing
-          if (data.token) {
-            // make a request to get a list of rooms for the user to go into
-            this.store.dispatch(DashboardActions.getRooms());
-            this.router.navigate(['/dashboard']);
-          }
+
+          // make a request to get a list of rooms for the user to go into
+          this.store.dispatch(DashboardActions.getRooms());
+          this.router.navigate(['/dashboard']);
         }
       }),
     );

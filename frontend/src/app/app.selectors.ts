@@ -1,10 +1,10 @@
 import { createSelector } from '@ngrx/store';
 
-import { AppState } from './app.module';
+import { selectUserId } from './auth/auth.selectors';
+import { selectActiveRoom } from './dashboard/store/dashboard.selectors';
 
 export const selectUserAndRoom = createSelector(
-  (state: AppState) => (state && state.auth ? state.auth.userId : undefined),
-  (state: AppState) =>
-    state && state.dashboard ? state.dashboard.activeRoomId : undefined,
+  selectUserId,
+  selectActiveRoom,
   (userId, roomId) => ({ userId, roomId }),
 );

@@ -11,6 +11,7 @@ import { Store } from '@ngrx/store';
 
 import { AppState } from './app.module';
 import { switchMap, first } from 'rxjs/operators';
+import { selectToken } from './auth/auth.selectors';
 
 @Injectable()
 export class HttpAuthInterceptor implements HttpInterceptor {
@@ -20,12 +21,12 @@ export class HttpAuthInterceptor implements HttpInterceptor {
     req: HttpRequest<any>,
     next: HttpHandler,
   ): Observable<HttpEvent<any>> {
-    return this.store.select('auth').pipe(
+    return this.store.select(selectToken).pipe(
       first(),
-      switchMap(data => {
-        if (data && data.token) {
+      switchMap(token => {
+        if (token) {
           const authReq = req.clone({
-            headers: req.headers.set('Authorization', `Token ${data.token}`),
+            headers: req.headers.set('Authorization', `Token ${token}`),
           });
           return next.handle(authReq);
         } else {
