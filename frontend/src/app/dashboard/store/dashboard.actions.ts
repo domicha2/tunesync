@@ -55,6 +55,10 @@ export const storeUsers = createAction(
   '[Rooms API] Store Users',
   props<{ users: User[] }>(),
 );
+export const removeUserFromRoom = createAction(
+  '[Kick User Component] Remove User From Room',
+  props<{ userId: number }>(),
+);
 
 /* Messaging */
 export const createMessage = createAction(

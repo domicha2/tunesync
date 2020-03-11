@@ -1,12 +1,12 @@
 from django.views.generic import TemplateView
-from tunesync.models import Event, Room
+from tunesync.models import Event, Room, Membership
 
 from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework.permissions import BasePermission
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .serializers import UserSerializer
+from .serializers import UserSerializer, MembershipSerializer
 
 from django.db.models import F
 from django.contrib.auth import authenticate, login
@@ -15,6 +15,8 @@ from django.contrib.auth import authenticate, login
 # Can only set permissions for the entire viewset
 # can change permission for a function if its NOT in a viewset
 # have to create brand new permission set. this one seems fine.
+
+
 class AnonCreateAndUpdateOwnerOnly(BasePermission):
     """
     Custom permission:
@@ -163,3 +165,12 @@ class RoomViewSet(viewsets.ViewSet):
         events = Event.objects.all().filter(
             room=pk).values().order_by('-creation_time')[:100]
         return Response(events)
+
+
+class MembershipViewSet(viewsets.ModelViewSet):
+    """
+    Proof of concept viewset using ModelViewSet implementation
+    Also, we need a membership viewset anyways
+    """
+    queryset = Membership.objects.all()
+    serializer_class = MembershipSerializer

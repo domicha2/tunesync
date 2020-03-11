@@ -11,4 +11,8 @@ export class UsersService {
   getUsersByRoom(roomId: number): Observable<any> {
     return this.httpWrapperService.get(`/rooms/${roomId}/users/`);
   }
+
+  removeUserFromRoom(roomId: number, userId: number): Observable<any> {
+    return this.httpWrapperService.delete(`/rooms/${roomId}/users/${userId}/`);
+  }
 }
