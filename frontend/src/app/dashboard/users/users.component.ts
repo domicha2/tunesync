@@ -23,19 +23,37 @@ export class UsersComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
 
   users = {
-    admin: [{ id: 1, name: 'Jim', role: Role.Admin }] as User[],
-    dj: [{ id: 2, name: 'Alice', role: Role.DJ }] as User[],
-    regular: [
-      { id: 3, name: 'Bob', role: Role.Regular },
-      { id: 4, name: 'David', role: Role.Regular },
-    ] as User[],
+    admin: [] as User[],
+    dj: [] as User[],
+    regular: [] as User[],
   };
 
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.store.select(selectUsers).subscribe((users: User[]) => {
-      console.log('users: ', users);
+      // clear existing list of users
+      this.users = {
+        admin: [],
+        dj: [],
+        regular: [],
+      };
+      if (users) {
+        // add users to their appropriate group
+        users.forEach(user => {
+          switch (user.role) {
+            case Role.Admin:
+              this.users.admin.push(user);
+              break;
+            case Role.DJ:
+              this.users.dj.push(user);
+              break;
+            case Role.Regular:
+              this.users.regular.push(user);
+              break;
+          }
+        });
+      }
     });
   }
 

@@ -172,8 +172,8 @@ class RoomViewSet(viewsets.ViewSet):
         # get all user in this room
         users = Membership.objects.filter(room=pk).values('role', 'state').annotate(
             id=F('user'),
-            username=F('user__username'),
-        ).order_by('role', 'state', 'username')
+            name=F('user__username'),
+        ).order_by('role', 'state', 'name')
         return Response(users)
 
 

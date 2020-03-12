@@ -28,7 +28,7 @@ export interface User {
   id: number;
   name: string;
   role: Role;
-  // TODO: add more user fields
+  state: State;
 }
 
 export type EventType = 'M';
