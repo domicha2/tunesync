@@ -167,6 +167,16 @@ class RoomViewSet(viewsets.ViewSet):
         )
         return Response(events)
 
+    @action(methods=["get"], detail=True)
+    def users(self, request, pk=None):
+        # get all user in this room
+        users = Membership.objects.filter(room=pk).values('role', 'state').annotate(
+            membershipId=F('id'),
+            userId=F('user'),
+            name=F('user__username'),
+        ).order_by('role', 'state', 'name')
+        return Response(users)
+
 
 class MembershipViewSet(viewsets.ModelViewSet):
     """

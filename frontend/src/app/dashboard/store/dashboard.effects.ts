@@ -107,13 +107,8 @@ export class DashboardEffects {
     () =>
       this.actions$.pipe(
         ofType(DashboardActions.removeUserFromRoom),
-        concatMap(action =>
-          of(action).pipe(
-            withLatestFrom(this.store.pipe(select(selectActiveRoom))),
-          ),
-        ),
-        switchMap(([action, roomId]) =>
-          this.usersService.removeUserFromRoom(roomId, action.userId).pipe(
+        switchMap(action =>
+          this.usersService.removeUserFromRoom(action.membershipId).pipe(
             tap(response => console.log(response)),
             catchError(() => EMPTY),
           ),

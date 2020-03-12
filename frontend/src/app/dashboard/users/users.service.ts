@@ -12,7 +12,7 @@ export class UsersService {
     return this.httpWrapperService.get(`/rooms/${roomId}/users/`);
   }
 
-  removeUserFromRoom(roomId: number, userId: number): Observable<any> {
-    return this.httpWrapperService.delete(`/rooms/${roomId}/users/${userId}/`);
+  removeUserFromRoom(membershipId: number): Observable<any> {
+    return this.httpWrapperService.delete(`/memberships/${membershipId}/`);
   }
 }

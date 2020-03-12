@@ -25,10 +25,11 @@ export interface Room {
 }
 
 export interface User {
-  id: number;
+  userId: number;
   name: string;
   role: Role;
-  // TODO: add more user fields
+  state: State;
+  membershipId: number;
 }
 
 export type EventType = 'M';
