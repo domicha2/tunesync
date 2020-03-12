@@ -56,6 +56,9 @@ class Event(models.Model):
         max_length=10000
     )  # this will be a serialized json in a string
 
+    class Meta:
+        indexes = [models.Index(fields=["room", "event_type", "creation_time"])]
+
 
 class Poll(models.Model):
     KICK = "K"
@@ -73,11 +76,12 @@ class Poll(models.Model):
         (PLAY, "Play"),
     ]
     # TODO:
-    id = models.ForeignKey(Event, on_delete=models.CASCADE, primary_key=True)
+    id = models.OneToOneField(Event, on_delete=models.CASCADE, primary_key=True)
     action = models.CharField(max_length=2, choices=ACTIONS)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
     args = models.CharField(max_length=10000)
+    indexes = [models.Index(fields=["room", "action", "creation_time"])]
 
 
 class Vote(models.Model):
@@ -85,6 +89,9 @@ class Vote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     agree = models.BooleanField()
     unique_together = ["poll", "user"]
+
+    class Meta:
+        indexes = [models.Index(fields=["poll", "user"])]
 
 
 class Tunes(models.Model):
@@ -108,6 +115,9 @@ class Membership(models.Model):
     REGULAR = "R"
     ROLES = [(DJ, "DJ"), (ADMIN, "Admin"), (REGULAR, "Regular")]
     role = models.CharField(max_length=1, choices=ROLES)
+
+    class Meta:
+        indexes = [models.Index(fields=["room", "user"])]
 
 
 @receiver(post_save, sender=Event, dispatch_uid="update_event_listeners")

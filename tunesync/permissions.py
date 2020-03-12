@@ -15,7 +15,11 @@ class AnonCreateAndUpdateOwnerOnly(BasePermission):
     """
 
     def has_permission(self, request, view):
-        return view.action in ["create", "auth"] or request.user and request.user.is_authenticated
+        return (
+            view.action in ["create", "auth"]
+            or request.user
+            and request.user.is_authenticated
+        )
 
     def has_object_permission(self, request, view, obj):
         return (
