@@ -142,15 +142,14 @@ class RoomViewSet(viewsets.ViewSet):
 
     # POST
     def create(self, request):
-        room = Room(
-            title=request.data["title"],
-            subtitle=request.data["subtitle"],
-            creator=request.user,
-        )
+        room = Room(title=request.data["title"], creator=request.user)
+        if "subtitle" in request.data:
+            room.subtitle = request.data["subtitle"]
         room.save()
+        member = Membership(user=request.user, room=room, role="A", state="A")
+        member.save()
         serialzer = RoomSerializer(room)
-        content = JSONRenderer().render(serializer.data)
-        return Response(content)
+        return Response(serialzer.data)
 
     @action(methods=["get"], detail=True)
     def events(self, request, pk=None):
