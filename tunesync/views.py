@@ -7,12 +7,8 @@ from .permissions import AnonCreateAndUpdateOwnerOnly
 from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-<<<<<<< Updated upstream
 from .serializers import *  # we literally need everything
-=======
-from .serializers import UserSerializer, MembershipSerializer
 from rest_framework.renderers import JSONRenderer
->>>>>>> Stashed changes
 
 from django.db.models import F, Q, Subquery, Value, CharField
 from django.contrib.auth import authenticate, login
@@ -73,10 +69,7 @@ class UserViewSet(viewsets.ViewSet):
         if user:
             # get or create a token
             token, created = Token.objects.get_or_create(user=user)
-            return Response({
-                "token": token.key,
-                "user_id": user.pk
-            })
+            return Response({"token": token.key, "user_id": user.pk})
         else:
             return Response("invalid credentials", status=401)
 
@@ -92,18 +85,14 @@ class UserViewSet(viewsets.ViewSet):
 
     @action(detail=True, methods=["get"])
     def rooms(self, request, pk=None):
-        rooms = Membership.objects.filter(user=pk).annotate(
-            title=F('room__title'),
-            subtitle=F('room__subtitle'),
-        ).values(
-            'room_id',
-            'role',
-            'state',
-            'title',
-            'subtitle'
-        ).annotate(id=F('room_id')).values(
-            'id', 'role', 'state', 'title', 'subtitle'
-        ).order_by('role', 'state', 'title', 'subtitle')
+        rooms = (
+            Membership.objects.filter(user=pk)
+            .annotate(title=F("room__title"), subtitle=F("room__subtitle"))
+            .values("room_id", "role", "state", "title", "subtitle")
+            .annotate(id=F("room_id"))
+            .values("id", "role", "state", "title", "subtitle")
+            .order_by("role", "state", "title", "subtitle")
+        )
         return Response(rooms)
 
 
@@ -159,8 +148,9 @@ class RoomViewSet(viewsets.ViewSet):
             creator=request.user,
         )
         room.save()
-        content = 
-        return Response(room.id)
+        serialzer = RoomSerializer(room)
+        content = JSONRenderer().render(serializer.data)
+        return Response(content)
 
     @action(methods=["get"], detail=True)
     def events(self, request, pk=None):

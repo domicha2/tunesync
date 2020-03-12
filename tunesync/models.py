@@ -79,12 +79,8 @@ class Poll(models.Model):
     action = models.CharField(max_length=2, choices=ACTIONS)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
-<<<<<<< Updated upstream
     args = JSONField()
     indexes = [models.Index(fields=["room", "action", "creation_time"])]
-=======
-    args = JSONField()
->>>>>>> Stashed changes
 
 
 class Vote(models.Model):
