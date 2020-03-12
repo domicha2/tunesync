@@ -7,7 +7,12 @@ from .permissions import AnonCreateAndUpdateOwnerOnly
 from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
+<<<<<<< Updated upstream
 from .serializers import *  # we literally need everything
+=======
+from .serializers import UserSerializer, MembershipSerializer
+from rest_framework.renderers import JSONRenderer
+>>>>>>> Stashed changes
 
 from django.db.models import F, Q, Subquery, Value, CharField
 from django.contrib.auth import authenticate, login
@@ -154,6 +159,7 @@ class RoomViewSet(viewsets.ViewSet):
             creator=request.user,
         )
         room.save()
+        content = 
         return Response(room.id)
 
     @action(methods=["get"], detail=True)
