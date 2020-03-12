@@ -7,3 +7,5 @@ tunesync.egg-info/
 build/
 dist/
 migrations/
+.vscode/
+test.py
