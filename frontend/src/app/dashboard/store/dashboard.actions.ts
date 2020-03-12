@@ -57,7 +57,7 @@ export const storeUsers = createAction(
 );
 export const removeUserFromRoom = createAction(
   '[Kick User Component] Remove User From Room',
-  props<{ userId: number }>(),
+  props<{ membershipId: number }>(),
 );
 
 /* Messaging */
