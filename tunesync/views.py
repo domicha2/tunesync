@@ -7,7 +7,7 @@ from .permissions import AnonCreateAndUpdateOwnerOnly
 from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-from .serializers import UserSerializer, MembershipSerializer
+from .serializers import *  # we literally need everything
 
 from django.db.models import F, Q, Subquery, Value, CharField
 from django.contrib.auth import authenticate, login
