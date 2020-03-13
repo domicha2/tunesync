@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView
-from tunesync.models import Event, Room, Membership
+from tunesync.models import Event, Room, Membership, Poll, Tune
 from json import loads
 
 from django.contrib.auth.models import User
@@ -108,11 +108,6 @@ class EventViewSet(viewsets.ViewSet):
 
     # POST
     def create(self, request):
-        if "parent_event_id" in request.data:
-            parent_event_id = request.data["parent_event_id"]
-        else:
-            parent_event_id = None
-
         room = Room.objects.get(pk=request.data["room_id"])
         author = User.objects.get(pk=request.data["author"])
 
@@ -122,7 +117,13 @@ class EventViewSet(viewsets.ViewSet):
             args=request.data["args"],
             event_type=request.data["event_type"],
         )
+        if "parent_event_id" in request.data:
+            event = Event.objects.get(pk=request.data["parent_event_id"])
         event.save()
+
+        if request.data["event_type"] == "PO":
+            poll = Poll(id=event, action=event.event_type, room=event.room)
+
         serialzer = EventSerializer(event)
         return Response(serialzer.data)
 
@@ -162,6 +163,11 @@ class RoomViewSet(viewsets.ViewSet):
             .order_by("-creation_time")[:100]
         )
         return Response(events)
+
+class TuneViewSet(viewsets.ViewSet):
+    #post
+    def create(self, request):
+        
 
 
 class MembershipViewSet(viewsets.ModelViewSet):

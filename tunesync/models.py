@@ -23,12 +23,8 @@ class Room(models.Model):
 class Event(models.Model):
     MESSAGE = "M"
     VOTE = "V"
-    KICK = "K"
-    JOIN = "J"
-    LEAVE = "L"
     MODIFY_QUEUE = "MQ"
     PLAY = "PL"
-    INVITE = "IN"
     POLL = "PO"
     USER_CHANGE = "U"
     EVENT_TYPE = [
@@ -36,10 +32,6 @@ class Event(models.Model):
         (USER_CHANGE, "User Change"),
         (MESSAGE, "Message"),
         (VOTE, "Vote"),
-        (KICK, "Kick"),
-        (JOIN, "Join"),
-        (INVITE, "Invite"),
-        (LEAVE, "Leave"),
         (MODIFY_QUEUE, "Modify Queue"),
         (
             PLAY,
@@ -62,18 +54,8 @@ class Event(models.Model):
 class Poll(models.Model):
     KICK = "K"
     MODIFY_QUEUE = "MQ"
-    SKIP = "SP"
-    PAUSE = "P"
-    SEEK = "SK"
     PLAY = "PL"
-    ACTIONS = [
-        (KICK, "Kick"),
-        (MODIFY_QUEUE, "Modify Queue"),
-        (SKIP, "Skip"),
-        (PAUSE, "Pause"),
-        (SEEK, "Seek"),
-        (PLAY, "Play"),
-    ]
+    ACTIONS = [(KICK, "Kick"), (MODIFY_QUEUE, "Modify Queue"), (PLAY, "Play")]
     # TODO:
     id = models.OneToOneField(Event, on_delete=models.CASCADE, primary_key=True)
     action = models.CharField(max_length=2, choices=ACTIONS)
