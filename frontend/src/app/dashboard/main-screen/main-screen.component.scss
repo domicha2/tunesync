@@ -1,3 +1,7 @@
 div#main-screen-wrapper {
   height: 100%;
+
+  ::ng-deep mat-list-item.current-user > div.mat-list-item-content {
+    justify-content: flex-end;
+  }
 }

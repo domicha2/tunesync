@@ -35,13 +35,14 @@ export interface User {
 export type EventType = 'M';
 
 export interface AppEvent {
-  eventId: number;
-  userId: number;
-  roomId: number;
-  parentEventId: number;
-  eventType: EventType;
-  args: string;
-  creationTime: string;
+  event_id: number;
+  user_id: number;
+  room_id: number;
+  parent_event_id: number;
+  event_type: EventType;
+  args: any;
+  creation_time: string;
+  username: string;
 }
 
 export interface Message {

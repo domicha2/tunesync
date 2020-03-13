@@ -159,12 +159,14 @@ class RoomViewSet(viewsets.ViewSet):
     @action(methods=["get"], detail=True)
     def events(self, request, pk=None):
         # get all events at this room
-        events = (
-            Event.objects.all()
-            .filter(room=pk)
-            .values()
-            .order_by("-creation_time")[:100]
-        )
+        events = Event.objects.filter(room=pk).values(
+            'args', 'parent_event_id', 'creation_time', 'event_type'
+        ).annotate(
+            username=F('author__username'),
+            event_id=F('id'),
+            user_id=F('author'),
+            room_id=F('room'),
+        ).order_by("-creation_time")[:100]
         return Response(events)
 
     @action(methods=["get"], detail=True)
