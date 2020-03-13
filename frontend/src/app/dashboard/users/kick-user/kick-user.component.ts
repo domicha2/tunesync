@@ -20,7 +20,7 @@ export class KickUserComponent {
 
   onKick(): void {
     this.store.dispatch(
-      DashboardActions.removeUserFromRoom({ userId: this.user.id }),
+      DashboardActions.removeUserFromRoom({ membershipId: this.user.membershipId }),
     );
     // call backend to remove user from this room
     console.log('kicked user' + this.user.name);

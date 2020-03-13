@@ -16,6 +16,7 @@ div#dashboard {
   }
 
   div#middle {
+    height: 100%;
     width: 65%;
     padding: {
       left: 2.5%;
@@ -32,6 +33,7 @@ div#dashboard {
 
     div#main-screen {
       height: 80%;
+      overflow-y: scroll;
     }
 
     div#bottom-bar {
