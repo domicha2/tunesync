@@ -8,6 +8,7 @@ router = routers.DefaultRouter()
 router.register(r"users", mine.UserViewSet, basename="user")
 router.register(r"events", mine.EventViewSet, basename="event")
 router.register(r"rooms", mine.RoomViewSet, basename="room")
+router.register(r"tunes", mine.TuneViewSet, basename="tune")
 router.register(r"memberships", mine.MembershipViewSet, basename="membership")
 
 

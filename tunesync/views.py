@@ -1,5 +1,6 @@
 from django.views.generic import TemplateView
-from tunesync.models import Event, Room, Membership
+from tunesync.models import Event, Room, Membership, Poll, Tune
+from json import loads
 
 from django.contrib.auth.models import User
 from rest_framework import viewsets
@@ -7,7 +8,8 @@ from .permissions import AnonCreateAndUpdateOwnerOnly
 from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-from .serializers import UserSerializer, MembershipSerializer
+from .serializers import *  # we literally need everything
+from rest_framework.renderers import JSONRenderer
 
 from django.db.models import F, Q, Subquery, Value, CharField
 from django.contrib.auth import authenticate, login
@@ -68,10 +70,7 @@ class UserViewSet(viewsets.ViewSet):
         if user:
             # get or create a token
             token, created = Token.objects.get_or_create(user=user)
-            return Response({
-                "token": token.key,
-                "user_id": user.pk
-            })
+            return Response({"token": token.key, "user_id": user.pk})
         else:
             return Response("invalid credentials", status=401)
 
@@ -87,18 +86,14 @@ class UserViewSet(viewsets.ViewSet):
 
     @action(detail=True, methods=["get"])
     def rooms(self, request, pk=None):
-        rooms = Membership.objects.filter(user=pk).annotate(
-            title=F('room__title'),
-            subtitle=F('room__subtitle'),
-        ).values(
-            'room_id',
-            'role',
-            'state',
-            'title',
-            'subtitle'
-        ).annotate(id=F('room_id')).values(
-            'id', 'role', 'state', 'title', 'subtitle'
-        ).order_by('role', 'state', 'title', 'subtitle')
+        rooms = (
+            Membership.objects.filter(user=pk)
+            .annotate(title=F("room__title"), subtitle=F("room__subtitle"))
+            .values("room_id", "role", "state", "title", "subtitle")
+            .annotate(id=F("room_id"))
+            .values("id", "role", "state", "title", "subtitle")
+            .order_by("role", "state", "title", "subtitle")
+        )
         return Response(rooms)
 
 
@@ -108,28 +103,36 @@ class EventViewSet(viewsets.ViewSet):
 
     # GET
     def list(self, request):
-        response_data = Event.objects.all().filter().values()
+        room_id = int(request.query_params["room"][0])
+        event_type = request.query_params["event_type"]
+        skip = int(request.query_params["skip"][0])
+        limit = int(request.query_params["limit"][0])
+        response_data = (
+            Event.objects.filter(room__pk=room_id, event_type=event_type)
+            .order_by("-creation_time")
+            .values()[skip:limit]
+        )
         return Response(response_data)
 
     # POST
     def create(self, request):
-        if "parent_event_id" in request.data:
-            parent_event_id = request.data["parent_event_id"]
-        else:
-            parent_event_id = None
+        # deserialize
+        deserializer = EventSerializer(data=request.data)
 
-        room = Room.objects.get(pk=request.data["room_id"])
-        author = User.objects.get(pk=request.data["author"])
-
-        event = Event(
-            room=room,
-            author=author,
-            parent_event_id=parent_event_id,
-            args=request.data["args"],
-            event_type=request.data["event_type"],
-        )
+        # TODO: check to see why author isnt mandatory
+        if not deserializer.is_valid():
+            Response(status=404)
+            print(deserializer.errors)
+        # deserializer.create()
+        event = deserializer.save(author=request.user)
+        # save into database
         event.save()
-        return Response(event.id)
+        # if request.data["event_type"] == "PO":
+        #    poll = Poll(id=event, action=event.event_type, room=event.room)
+        # serialize
+
+        serialzer = EventSerializer(event)
+        return Response(serialzer.data)
 
 
 class RoomViewSet(viewsets.ViewSet):
@@ -148,13 +151,16 @@ class RoomViewSet(viewsets.ViewSet):
 
     # POST
     def create(self, request):
-        room = Room(
-            title=request.data["title"],
-            subtitle=request.data["subtitle"],
-            creator=request.user,
-        )
+        deserializer = RoomSerializer(data=request.data)
+        if not deserializer.is_valid():
+            return Response(status=404)
+        room = deserializer.save(creator=request.user)
+        # TODO: Variable scoping with try/catch blocks
         room.save()
-        return Response(room.id)
+        member = Membership(user=request.user, room=room, role="A", state="A")
+        member.save()
+        serialzer = RoomSerializer(room)
+        return Response(serialzer.data)
 
     @action(methods=["get"], detail=True)
     def events(self, request, pk=None):
@@ -178,6 +184,20 @@ class RoomViewSet(viewsets.ViewSet):
             name=F('user__username'),
         ).order_by('role', 'state', 'name')
         return Response(users)
+
+
+class TuneViewSet(viewsets.ViewSet):
+    # post
+    def create(self, request):
+        deserializer = TuneSerializer(data=request.data)
+
+        if not deserializer.is_valid():
+            print(deserializer.errors)
+            return Response(status=404)
+        tune = deserializer.save(uploader=request.user)
+        tune.save()
+        serializer = TuneSerializer(tune)
+        return Response(serializer.data)
 
 
 class MembershipViewSet(viewsets.ModelViewSet):
