@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView
-from tunesync.models import Event, Room, Membership, Poll, Tune, TuneData
+from tunesync.models import Event, Room, Membership, Poll, Tune
 from json import loads
 
 from django.contrib.auth.models import User
@@ -10,6 +10,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from .serializers import *  # we literally need everything
 from rest_framework.parsers import MultiPartParser
+from django.http import HttpResponse
 
 from django.db.models import F, Q, Subquery, Value, CharField
 from django.contrib.auth import authenticate, login
@@ -196,6 +197,19 @@ class TuneViewSet(viewsets.ViewSet):
 
     parser_classes = [MultiPartParser]
 
+    @action(url_path="meta", methods=["get"], detail=True)
+    def get_meta(self, request, pk=None):
+        tune = Tune.objects.get(pk=pk)
+        serializer = TuneSerializer(tune)
+        return Response(serializer.data)
+
+    @action(url_path="data", methods=["get"], detail=True)
+    def get_data(self, request, pk=None):
+        tune = Tune.objects.get(pk=pk)
+        with open(tune.audio_file.path, "rb") as f:
+            file_data = f.read()
+        return HttpResponse(file_data, content_type=tune.mime)
+
     # post
     def create(self, request):
         audio = mutagen.File(request.FILES["file"], easy=True)
@@ -206,10 +220,9 @@ class TuneViewSet(viewsets.ViewSet):
             uploader=request.user,
             length=audio.info.length,
             mime=audio.mime[0],
+            audio_file=request.FILES["file"],
         )
         tune.save()
-        tune_data = TuneData(id=tune, data=request.FILES["file"].read())
-        tune_data.save()
         serializer = TuneSerializer(tune)
         return Response(serializer.data)
 

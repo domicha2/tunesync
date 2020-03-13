@@ -81,12 +81,8 @@ class Tune(models.Model):
     uploader = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
     length = models.FloatField(blank=True, null=True)  # seconds
     mime = models.CharField(max_length=300, blank=True, null=True)
+    audio_file = models.FileField(upload_to="tunes/", null=True)
     # need to add the file meta data stuff later
-
-
-class TuneData(models.Model):
-    id = models.OneToOneField(Tune, on_delete=models.CASCADE, primary_key=True)
-    data = models.BinaryField()
 
 
 class Membership(models.Model):
