@@ -122,10 +122,11 @@ def update_event_listeners(sender, instance, **kwargs):
         "room_id": instance.room.id,
         "event_id": instance.id,
         "event_type": instance.event_type,
-        "author": instance.author.id,
+        "user_id": instance.author.id,
         "parent_event_id": instance.parent_event_id,
         "creation_time": instance.creation_time.isoformat(),
         "args": instance.args,
+        "username": instance.author.username,
     }
 
     channel_layer = channels.layers.get_channel_layer()

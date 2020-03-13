@@ -7,6 +7,7 @@ import { environment } from '../../../environments/environment';
 import { AppState } from '../../app.module';
 import { selectEvents, selectActiveRoom } from '../store/dashboard.selectors';
 import { AppEvent } from '../dashboard.models';
+import { selectUserId } from '../../auth/auth.selectors';
 
 @Component({
   selector: 'app-main-screen',
@@ -17,10 +18,17 @@ export class MainScreenComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
   events: AppEvent[] = [];
   webSocket: WebSocket;
+  userId: number;
 
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
+    this.subscription.add(
+      this.store.select(selectUserId).subscribe((userId: number) => {
+        this.userId = userId;
+      }),
+    );
+
     this.subscription.add(
       this.store.select(selectActiveRoom).subscribe((roomId: number) => {
         this.createWebSocket(roomId);
@@ -30,7 +38,21 @@ export class MainScreenComponent implements OnInit, OnDestroy {
     // get a list of events
     this.subscription.add(
       this.store.select(selectEvents).subscribe((events: AppEvent[]) => {
-        console.log(events);
+        if (events) {
+          this.events = events.sort((eventA, eventB) =>
+            new Date(eventA.creation_time) > new Date(eventB.creation_time)
+              ? 1
+              : -1,
+          );
+          setTimeout(() => {
+            const el = document.querySelector('mat-list-item:last-child');
+            if (el) {
+              el.scrollIntoView();
+            }
+          }, 500);
+        } else {
+          this.events = [];
+        }
       }),
     );
   }
@@ -60,17 +82,17 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         console.log('received a message', messageEvent);
         // TODO: take action based on the data from the event
         // TODO: could update the view or not
-        const data = JSON.parse(messageEvent.data);
-        const event: AppEvent = {
-          eventId: data.event_id,
-          userId: data.author,
-          roomId: data.room_id,
-          parentEventId: data.parent_event_id,
-          eventType: data.event_type,
-          args: data.args,
-          creationTime: data.creation_time,
-        };
-        if (event.eventId) this.events.push(event);
+        const event: AppEvent = JSON.parse(messageEvent.data);
+        if (event.event_id) {
+          this.events.push(event);
+          setTimeout(
+            () =>
+              document
+                .querySelector('mat-list-item:last-child')
+                .scrollIntoView(),
+            500,
+          );
+        }
       };
 
       this.webSocket.onerror = (event: Event) => {

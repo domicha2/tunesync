@@ -1,7 +1,12 @@
 <div id="main-screen-wrapper">
   <mat-list class="column">
-    <mat-list-item *ngFor="let event of events">
-      <div class="list-el">{{ event.userId + ': ' + event.args }}</div>
+    <mat-list-item
+      *ngFor="let event of events"
+      [ngClass]="{ 'current-user': userId === event.user_id }"
+    >
+      <div class="list-el">
+        {{ event.username + ': ' + event.args }}
+      </div>
     </mat-list-item>
   </mat-list>
 </div>
