@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView
-from tunesync.models import Event, Room, Membership, Poll, Tune
+from tunesync.models import Event, Room, Membership, Poll, Tune, TuneData
 from json import loads
 
 from django.contrib.auth.models import User
@@ -9,10 +9,11 @@ from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from .serializers import *  # we literally need everything
-from rest_framework.renderers import JSONRenderer
+from rest_framework.parsers import MultiPartParser
 
 from django.db.models import F, Q, Subquery, Value, CharField
 from django.contrib.auth import authenticate, login
+import mutagen
 
 
 class IndexPage(TemplateView):
@@ -103,8 +104,9 @@ class EventViewSet(viewsets.ViewSet):
 
     # GET
     def list(self, request):
+        if "event_type" in request.query_params:
+            event_type = request.query_params["event_type"]
         room_id = int(request.query_params["room"][0])
-        event_type = request.query_params["event_type"]
         skip = int(request.query_params["skip"][0])
         limit = int(request.query_params["limit"][0])
         response_data = (
@@ -165,37 +167,49 @@ class RoomViewSet(viewsets.ViewSet):
     @action(methods=["get"], detail=True)
     def events(self, request, pk=None):
         # get all events at this room
-        events = Event.objects.filter(room=pk).values(
-            'args', 'parent_event_id', 'creation_time', 'event_type'
-        ).annotate(
-            username=F('author__username'),
-            event_id=F('id'),
-            user_id=F('author'),
-            room_id=F('room'),
-        ).order_by("-creation_time")[:100]
+        events = (
+            Event.objects.filter(room=pk)
+            .values("args", "parent_event_id", "creation_time", "event_type")
+            .annotate(
+                username=F("author__username"),
+                event_id=F("id"),
+                user_id=F("author"),
+                room_id=F("room"),
+            )
+            .order_by("-creation_time")[:100]
+        )
         return Response(events)
 
     @action(methods=["get"], detail=True)
     def users(self, request, pk=None):
         # get all user in this room
-        users = Membership.objects.filter(room=pk).values('role', 'state').annotate(
-            membershipId=F('id'),
-            userId=F('user'),
-            name=F('user__username'),
-        ).order_by('role', 'state', 'name')
+        users = (
+            Membership.objects.filter(room=pk)
+            .values("role", "state")
+            .annotate(membershipId=F("id"), userId=F("user"), name=F("user__username"))
+            .order_by("role", "state", "name")
+        )
         return Response(users)
 
 
 class TuneViewSet(viewsets.ViewSet):
+
+    parser_classes = [MultiPartParser]
+
     # post
     def create(self, request):
-        deserializer = TuneSerializer(data=request.data)
-
-        if not deserializer.is_valid():
-            print(deserializer.errors)
-            return Response(status=404)
-        tune = deserializer.save(uploader=request.user)
+        audio = mutagen.File(request.FILES["file"], easy=True)
+        tune = Tune(
+            name=audio["title"],
+            artist=audio["artist"],
+            album=audio["album"],
+            uploader=request.user,
+            length=audio.info.length,
+            mime=audio.mime[0],
+        )
         tune.save()
+        tune_data = TuneData(id=tune, data=request.FILES["file"].read())
+        tune_data.save()
         serializer = TuneSerializer(tune)
         return Response(serializer.data)
 

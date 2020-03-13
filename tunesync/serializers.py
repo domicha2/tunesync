@@ -6,7 +6,7 @@ from rest_framework import serializers
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ["url", "username", "email", "groups"]
+        fields = ["id", "url", "username", "email", "groups"]
 
 
 class MembershipSerializer(serializers.ModelSerializer):
@@ -38,7 +38,7 @@ class EventSerializer(serializers.ModelSerializer):
 class VoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vote
-        fields = ["user", "agree"]
+        fields = ["id", "user", "agree"]
 
 
 class PollSerializer(serializers.ModelSerializer):
@@ -50,4 +50,4 @@ class PollSerializer(serializers.ModelSerializer):
 class TuneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tune
-        fields = ["uploader", "name", "artist", "album"]
+        fields = ["id", "uploader", "name", "artist", "album", "mime", "length"]

@@ -35,10 +35,7 @@ class Event(models.Model):
         (MESSAGE, "Message"),
         (VOTE, "Vote"),
         (MODIFY_QUEUE, "Modify Queue"),
-        (
-            PLAY,
-            "Play",
-        ),  # this event takes takes in current time stamp, isPlaying, songId
+        (PLAY, "Play"),
     ]
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
@@ -78,11 +75,18 @@ class Vote(models.Model):
 
 
 class Tune(models.Model):
-    name = models.CharField(max_length=30)
-    artist = models.CharField(max_length=30)
-    album = models.CharField(max_length=30)
+    name = models.CharField(max_length=300)
+    artist = models.CharField(max_length=300, blank=True)
+    album = models.CharField(max_length=300, blank=True)
     uploader = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
+    length = models.FloatField(blank=True, null=True)  # seconds
+    mime = models.CharField(max_length=300, blank=True, null=True)
     # need to add the file meta data stuff later
+
+
+class TuneData(models.Model):
+    id = models.OneToOneField(Tune, on_delete=models.CASCADE, primary_key=True)
+    data = models.BinaryField()
 
 
 class Membership(models.Model):
