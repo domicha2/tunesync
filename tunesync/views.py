@@ -1,5 +1,6 @@
 from django.views.generic import TemplateView
 from tunesync.models import Event, Room, Membership
+from json import loads
 
 from django.contrib.auth.models import User
 from rest_framework import viewsets
@@ -118,12 +119,12 @@ class EventViewSet(viewsets.ViewSet):
         event = Event(
             room=room,
             author=author,
-            parent_event_id=parent_event_id,
             args=request.data["args"],
             event_type=request.data["event_type"],
         )
         event.save()
-        return Response(event.id)
+        serialzer = EventSerializer(event)
+        return Response(serialzer.data)
 
 
 class RoomViewSet(viewsets.ViewSet):

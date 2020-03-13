@@ -18,7 +18,7 @@ class MembershipSerializer(serializers.ModelSerializer):
 class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
-        fields = ["title", "subtitle", "creator", "members"]
+        fields = ["id", "title", "subtitle", "creator", "members"]
 
 
 class EventSerializer(serializers.ModelSerializer):
