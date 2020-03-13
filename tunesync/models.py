@@ -15,7 +15,9 @@ from django.dispatch import receiver
 class Room(models.Model):
     title = models.CharField(max_length=30, unique=True)
     subtitle = models.CharField(max_length=30, blank=True)
-    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="creator")
+    creator = models.ForeignKey(
+        User, on_delete=models.CASCADE, blank=True, related_name="creator"
+    )
     creation_time = models.DateTimeField(auto_now_add=True)
     members = models.ManyToManyField(User, through="Membership")
 
@@ -79,6 +81,7 @@ class Tune(models.Model):
     name = models.CharField(max_length=30)
     artist = models.CharField(max_length=30)
     album = models.CharField(max_length=30)
+    uploader = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
     # need to add the file meta data stuff later
 
 

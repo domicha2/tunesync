@@ -50,4 +50,4 @@ class PollSerializer(serializers.ModelSerializer):
 class TuneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tune
-        fields = ["name", "artist", "album"]
+        fields = ["uploader", "name", "artist", "album"]

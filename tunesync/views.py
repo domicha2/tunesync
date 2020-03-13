@@ -103,26 +103,33 @@ class EventViewSet(viewsets.ViewSet):
 
     # GET
     def list(self, request):
-        response_data = Event.objects.all().filter().values()
+        room_id = int(request.query_params["room"][0])
+        event_type = request.query_params["event_type"]
+        skip = int(request.query_params["skip"][0])
+        limit = int(request.query_params["limit"][0])
+        response_data = (
+            Event.objects.filter(room__pk=room_id, event_type=event_type)
+            .order_by("-creation_time")
+            .values()[skip:limit]
+        )
         return Response(response_data)
 
     # POST
     def create(self, request):
-        room = Room.objects.get(pk=request.data["room_id"])
-        author = User.objects.get(pk=request.data["author"])
+        # deserialize
+        deserializer = EventSerializer(data=request.data)
 
-        event = Event(
-            room=room,
-            author=author,
-            args=request.data["args"],
-            event_type=request.data["event_type"],
-        )
-        if "parent_event_id" in request.data:
-            event = Event.objects.get(pk=request.data["parent_event_id"])
+        # TODO: check to see why author isnt mandatory
+        if not deserializer.is_valid():
+            Response(status=404)
+            print(deserializer.errors)
+        # deserializer.create()
+        event = deserializer.save(author=request.user)
+        # save into database
         event.save()
-
-        if request.data["event_type"] == "PO":
-            poll = Poll(id=event, action=event.event_type, room=event.room)
+        # if request.data["event_type"] == "PO":
+        #    poll = Poll(id=event, action=event.event_type, room=event.room)
+        # serialize
 
         serialzer = EventSerializer(event)
         return Response(serialzer.data)
@@ -144,9 +151,11 @@ class RoomViewSet(viewsets.ViewSet):
 
     # POST
     def create(self, request):
-        room = Room(title=request.data["title"], creator=request.user)
-        if "subtitle" in request.data:
-            room.subtitle = request.data["subtitle"]
+        deserializer = RoomSerializer(data=request.data)
+        if not deserializer.is_valid():
+            return Response(status=404)
+        room = deserializer.save(creator=request.user)
+        # TODO: Variable scoping with try/catch blocks
         room.save()
         member = Membership(user=request.user, room=room, role="A", state="A")
         member.save()
@@ -164,10 +173,19 @@ class RoomViewSet(viewsets.ViewSet):
         )
         return Response(events)
 
+
 class TuneViewSet(viewsets.ViewSet):
-    #post
+    # post
     def create(self, request):
-        
+        deserializer = TuneSerializer(data=request.data)
+
+        if not deserializer.is_valid():
+            print(deserializer.errors)
+            return Response(status=404)
+        tune = deserializer.save(uploader=request.user)
+        tune.save()
+        serializer = TuneSerializer(tune)
+        return Response(serializer.data)
 
 
 class MembershipViewSet(viewsets.ModelViewSet):
