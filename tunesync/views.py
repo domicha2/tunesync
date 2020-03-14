@@ -57,8 +57,10 @@ class UserViewSet(viewsets.ViewSet):
         u = User.objects.create_user(
             username=request.data["username"], password=request.data["password"]
         )
-        u.save()
-        return Response({"id": u.id})
+        serializer = UserSerializer(u)
+        room = Room(creator=u, system_user=u)
+        room.save()
+        return Response(serializer.data)
 
     # GET BY PK
     def retrieve(self, request, pk=None):
@@ -138,15 +140,16 @@ class EventViewSet(viewsets.ViewSet):
     def create(self, request):
         # deserialize
         deserializer = EventSerializer(data=request.data)
-
-        # TODO: check to see why author isnt mandatory
         if not deserializer.is_valid():
             Response(status=404)
             print(deserializer.errors)
-        # deserializer.create()
         event = deserializer.save(author=request.user)
-        # save into database
-        # if request.data["event_type"] == "PO":
+        args = request.data["args"]
+        # if request.data["event_type"] == "U":
+        # if self.validate_U:
+        # if args["type"] == "I":
+        # for user in args["user"]:
+
         #    poll = Poll(id=event, action=event.event_type, room=event.room)
         # serialize
 
