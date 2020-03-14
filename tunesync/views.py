@@ -150,7 +150,7 @@ class EventViewSet(viewsets.ViewSet):
             if args["type"] == "I":
                 for user in args["users"]:
                     system_room = Room.objects.get(system_user__id=user)
-                    u_obj = User.objects.get(pk=user)
+                    u_obj = request.user
                     invite_event = Event(
                         room=system_room,
                         author=u_obj,
