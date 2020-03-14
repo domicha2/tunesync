@@ -1,4 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
 import { Store, select } from '@ngrx/store';
@@ -18,9 +24,9 @@ import { QueueComponent } from '../queue/queue.component';
 export class ControlsComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
 
-  song: HTMLAudioElement;
+  @ViewChild('songElement') songElement: ElementRef;
 
-  currentSong: Song = { name: 'sample-0.mp3' };
+  currentSong: Song;
   queue: Song[];
 
   constructor(private store: Store<AppState>, private matDialog: MatDialog) {}
@@ -30,54 +36,80 @@ export class ControlsComponent implements OnInit, OnDestroy {
       this.store
         .pipe(select(selectQueuedSongs))
         .subscribe((queuedSongs: Song[]) => {
+          console.count('sub');
           this.queue = queuedSongs;
+          // TODO: if we have a list of songs ready in the queue
+          // TODO: and no song already playing then autoplay the next song on queue
+          if (
+            this.queue &&
+            this.queue[0] &&
+            (this.currentSong === undefined ||
+              (this.getAudioElement() && this.getAudioElement().ended))
+          ) {
+            console.log('updating the current song');
+            this.currentSong = this.queue[0];
+            setTimeout(() => {
+              this.getAudioElement().play();
+            }, 200);
+          }
         }),
     );
-
-    this.song = document.querySelector('audio#main-song');
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
 
+  getAudioElement(): HTMLAudioElement | undefined {
+    if (this.songElement) {
+      return this.songElement.nativeElement;
+    } else {
+      return undefined;
+    }
+  }
+
   getSongProgress(): number {
-    if (this.song) {
-      return (this.song.currentTime / this.song.duration) * 100;
+    const song = this.getAudioElement();
+    if (song) {
+      return (song.currentTime / song.duration) * 100;
     } else {
       return 0;
     }
   }
 
   onReplay(): void {
-    if (this.song) {
-      if (this.song.currentTime >= 10) {
-        this.song.currentTime -= 10;
+    const song = this.getAudioElement();
+    if (song) {
+      if (song.currentTime >= 10) {
+        song.currentTime -= 10;
       } else {
-        this.song.currentTime = 0;
+        song.currentTime = 0;
       }
     }
   }
 
   onForward(): void {
-    if (this.song) {
-      if (this.song.duration - this.song.currentTime >= 10) {
-        this.song.currentTime += 10;
+    const song = this.getAudioElement();
+    if (song) {
+      if (song.duration - song.currentTime >= 10) {
+        song.currentTime += 10;
       } else {
-        this.song.currentTime = this.song.duration;
+        song.currentTime = song.duration;
       }
     }
   }
 
   onPlay(): void {
-    if (this.song) {
-      this.song.play();
+    const song = this.getAudioElement();
+    if (song) {
+      song.play();
     }
   }
 
   onPause(): void {
-    if (this.song) {
-      this.song.pause();
+    const song = this.getAudioElement();
+    if (song) {
+      song.pause();
     }
   }
 
@@ -86,9 +118,9 @@ export class ControlsComponent implements OnInit, OnDestroy {
   onNext(): void {
     // check if there even exists a song waiting on the queue
     if (this.queue && this.queue.length > 0) {
-      this.store.dispatch(
-        DashboardActions.addAvailableSong({ song: this.currentSong }),
-      );
+      // this.store.dispatch(
+      //   DashboardActions.addAvailableSong({ song: this.currentSong }),
+      // );
       this.currentSong = this.queue[0];
       this.queue.splice(0, 1);
       this.store.dispatch(DashboardActions.storeQueue({ queue: this.queue }));
