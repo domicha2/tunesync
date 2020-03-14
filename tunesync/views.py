@@ -194,7 +194,7 @@ class RoomViewSet(viewsets.ViewSet):
 
 
 class TuneViewSet(viewsets.ViewSet):
-
+    permission_classes = [AnonCreateAndUpdateOwnerOnly]
     parser_classes = [MultiPartParser]
 
     @action(url_path="meta", methods=["get"], detail=True)
@@ -225,6 +225,11 @@ class TuneViewSet(viewsets.ViewSet):
         tune.save()
         serializer = TuneSerializer(tune)
         return Response(serializer.data)
+
+    # READ
+    def list(self, request):
+        tunes = Tune.objects.values('id', 'name').order_by('name')
+        return Response(tunes)
 
 
 class MembershipViewSet(viewsets.ModelViewSet):

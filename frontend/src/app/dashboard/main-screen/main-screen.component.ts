@@ -6,8 +6,10 @@ import { Store } from '@ngrx/store';
 import { environment } from '../../../environments/environment';
 import { AppState } from '../../app.module';
 import { selectEvents, selectActiveRoom } from '../store/dashboard.selectors';
-import { AppEvent } from '../dashboard.models';
+import { AppEvent, EventType, ModifyQueueEvent } from '../dashboard.models';
 import { selectUserId } from '../../auth/auth.selectors';
+import * as DashboardActions from '../store/dashboard.actions';
+import { distinctUntilChanged, filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-main-screen',
@@ -37,28 +39,43 @@ export class MainScreenComponent implements OnInit, OnDestroy {
 
     // get a list of events
     this.subscription.add(
-      this.store.select(selectEvents).subscribe((events: AppEvent[]) => {
-        if (events) {
-          this.events = events.sort((eventA, eventB) =>
-            new Date(eventA.creation_time) > new Date(eventB.creation_time)
-              ? 1
-              : -1,
-          );
-          setTimeout(() => {
-            const el = document.querySelector('mat-list-item:last-child');
-            if (el) {
-              el.scrollIntoView();
-            }
-          }, 500);
-        } else {
-          this.events = [];
-        }
-      }),
+      this.store
+        .select(selectEvents)
+        .pipe(
+          filter(events => events !== undefined && events !== null),
+          distinctUntilChanged(
+            (prev, curr) =>
+              prev[0] && curr[0] && prev[0].room_id === curr[0].room_id,
+          ),
+        )
+        .subscribe((events: AppEvent[]) => {
+          this.handleEventsResponse(events);
+        }),
     );
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+  }
+
+  handleEventsResponse(events: AppEvent[]): void {
+    const modifyQueueEvent = events.find(
+      event => event.event_type === EventType.ModifyQueue,
+    );
+    if (modifyQueueEvent) {
+      const queue: ModifyQueueEvent = modifyQueueEvent.args;
+      this.store.dispatch(DashboardActions.storeQueue(queue));
+    }
+
+    this.events = events.sort((eventA, eventB) =>
+      new Date(eventA.creation_time) > new Date(eventB.creation_time) ? 1 : -1,
+    );
+    setTimeout(() => {
+      const el = document.querySelector('mat-list-item:last-child');
+      if (el) {
+        el.scrollIntoView();
+      }
+    }, 500);
   }
 
   createWebSocket(roomId: number): void {
@@ -84,6 +101,17 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         // TODO: could update the view or not
         const event: AppEvent = JSON.parse(messageEvent.data);
         if (event.event_id) {
+          switch (event.event_type) {
+            case EventType.ModifyQueue:
+              const queue: ModifyQueueEvent = event.args;
+              this.store.dispatch(DashboardActions.storeQueue(queue));
+              break;
+            case EventType.Messaging:
+              break;
+            default:
+              console.error('bad event type');
+              break;
+          }
           this.events.push(event);
           setTimeout(
             () =>

@@ -1,23 +1,35 @@
 <div id="controls-wrapper" class="row">
   <div id="other-buttons" class="row">
-    <input id="upload-music" type="file" accept="audio/*" />
+    <input
+      id="upload-music"
+      type="file"
+      accept="audio/*"
+      (change)="onUploadChange($event)"
+    />
     <button mat-icon-button matTooltip="Upload music">
       <label for="upload-music">
         <mat-icon>attach_file</mat-icon>
       </label>
     </button>
-    <button mat-icon-button matTooltip="View/change queue">
+    <button
+      mat-icon-button
+      matTooltip="View/change queue"
+      (click)="onQueueClick()"
+    >
       <mat-icon>queue_music</mat-icon>
     </button>
   </div>
   <div id="current-song" class="column">
-    <audio
-      id="main-song"
-      autoplay
-      [src]="'../../../assets/' + currentSong.name"
-      (ended)="onEnded($event)"
-    ></audio>
-    <div id="song-data">{{ currentSong.name }}</div>
+    <ng-container *ngIf="currentSong">
+      <audio
+        #songElement
+        id="main-song"
+        autoplay
+        [src]="'http://localhost:8000/tunes/' + currentSong.id + '/data/'"
+        (ended)="onEnded($event)"
+      ></audio>
+      <div id="song-data">{{ currentSong.name }}</div>
+    </ng-container>
     <div id="progress-bar">
       <mat-progress-bar
         mode="determinate"
@@ -31,7 +43,7 @@
       <mat-icon>fast_rewind</mat-icon>
     </button>
     <button
-      *ngIf="song.paused"
+      *ngIf="songElement && songElement.nativeElement.paused"
       mat-icon-button
       matTooltip="Play"
       (click)="onPlay()"
@@ -39,7 +51,7 @@
       <mat-icon>play_arrow</mat-icon>
     </button>
     <button
-      *ngIf="!song.paused"
+      *ngIf="songElement && !songElement.nativeElement.paused"
       mat-icon-button
       matTooltip="Pause"
       (click)="onPause()"

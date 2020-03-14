@@ -13,7 +13,7 @@
         class="song-list"
         cdkDropList
         [cdkDropListData]="queuedSongs"
-        (cdkDropListDropped)="drop($event)"
+        (cdkDropListDropped)="drop($event, 'queue')"
       >
         <mat-list-item
           role="listitem"
@@ -33,7 +33,7 @@
         role="list"
         cdkDropList
         [cdkDropListData]="availableSongs"
-        (cdkDropListDropped)="drop($event)"
+        (cdkDropListDropped)="drop($event, 'available')"
       >
         <mat-list-item
           role="listitem"
