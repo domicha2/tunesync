@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { environment } from '../../../environments/environment';
 import { AppState } from '../../app.module';
 import { selectEvents, selectActiveRoom } from '../store/dashboard.selectors';
-import { AppEvent, EventType } from '../dashboard.models';
+import { AppEvent, EventType, ModifyQueueEvent } from '../dashboard.models';
 import { selectUserId } from '../../auth/auth.selectors';
 import * as DashboardActions from '../store/dashboard.actions';
 
@@ -87,9 +87,8 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         if (event.event_id) {
           switch (event.event_type) {
             case EventType.ModifyQueue:
-              this.store.dispatch(
-                DashboardActions.storeQueue({ queue: event.args['queue'] }),
-              );
+              const queue: ModifyQueueEvent = event.args;
+              this.store.dispatch(DashboardActions.storeQueue(queue));
               break;
             case EventType.Messaging:
               break;
