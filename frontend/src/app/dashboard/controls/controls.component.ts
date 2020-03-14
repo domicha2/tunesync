@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 
 import { Store, select } from '@ngrx/store';
 import { Subscription } from 'rxjs';
@@ -7,6 +8,7 @@ import * as DashboardActions from '../store/dashboard.actions';
 import { selectQueuedSongs } from '../store/dashboard.selectors';
 import { AppState } from '../../app.module';
 import { Song } from '../dashboard.models';
+import { QueueComponent } from '../queue/queue.component';
 
 @Component({
   selector: 'app-controls',
@@ -21,7 +23,7 @@ export class ControlsComponent implements OnInit, OnDestroy {
   currentSong: Song = { name: 'sample-0.mp3' };
   queue: Song[];
 
-  constructor(private store: Store<AppState>) {}
+  constructor(private store: Store<AppState>, private matDialog: MatDialog) {}
 
   ngOnInit(): void {
     this.subscription.add(
@@ -106,5 +108,9 @@ export class ControlsComponent implements OnInit, OnDestroy {
     // tslint:disable-next-line: no-string-literal
     const tune: File = event.target['files'][0];
     this.store.dispatch(DashboardActions.createTune({ tune }));
+  }
+
+  onQueueClick(): void {
+    this.matDialog.open(QueueComponent, {});
   }
 }
