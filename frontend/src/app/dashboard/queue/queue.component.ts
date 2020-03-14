@@ -71,6 +71,12 @@ export class QueueComponent implements OnInit, OnDestroy {
         event.previousIndex,
         event.currentIndex,
       );
+      if (container === 'available') {
+        // queue lost an item, need to update
+        this.store.dispatch(
+          DashboardActions.createModifyQueueEvent({ queue: this.queuedSongs }),
+        );
+      }
     }
 
     if (container === 'queue') {
