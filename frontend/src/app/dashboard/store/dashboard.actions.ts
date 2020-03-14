@@ -13,8 +13,6 @@ export const createModifyQueueEvent = createAction(
   props<{ queue: Song[] }>(),
 );
 
-export const getQueue = createAction('[Controls Component] Get Queue');
-
 export const storeQueue = createAction(
   '[Queue API] Store Queue',
   props<{ queue: Song[] }>(),

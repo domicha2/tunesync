@@ -11,10 +11,6 @@ import { Song, EventType } from '../dashboard.models';
 export class QueueService {
   constructor(private httpWrapperService: HttpWrapperService) {}
 
-  getQueue(): Observable<any> {
-    return this.httpWrapperService.get('/queue/');
-  }
-
   getAvailableSongs(): Observable<any> {
     return this.httpWrapperService.get('/tunes/');
   }

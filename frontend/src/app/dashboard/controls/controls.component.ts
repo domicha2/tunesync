@@ -33,7 +33,6 @@ export class ControlsComponent implements OnInit, OnDestroy {
           this.queue = queuedSongs;
         }),
     );
-    this.store.dispatch(DashboardActions.getQueue());
 
     this.song = document.querySelector('audio#main-song');
   }

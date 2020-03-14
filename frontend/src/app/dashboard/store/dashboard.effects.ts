@@ -45,21 +45,6 @@ export class DashboardEffects {
     { dispatch: false },
   );
 
-  getQueue$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(DashboardActions.getQueue),
-      switchMap(() =>
-        this.queueService.getQueue().pipe(
-          map((queuedSongs: Song[]) => ({
-            type: DashboardActions.storeQueue.type,
-            queue: queuedSongs,
-          })),
-          catchError(() => EMPTY),
-        ),
-      ),
-    ),
-  );
-
   getAvailableSongs$ = createEffect(() =>
     this.actions$.pipe(
       ofType(DashboardActions.getAvailableSongs),
