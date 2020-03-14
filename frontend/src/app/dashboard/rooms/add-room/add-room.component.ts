@@ -31,7 +31,10 @@ export class AddRoomComponent implements OnInit {
 
   onAddRoom(): void {
     this.store.dispatch(
-      DashboardActions.createRoom({ room: this.roomForm.value }),
+      DashboardActions.createRoom({
+        room: this.roomForm.value,
+        users: this.users.value,
+      }),
     );
   }
 }

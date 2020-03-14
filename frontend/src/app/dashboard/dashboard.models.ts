@@ -4,9 +4,14 @@ export interface Song {
   // TODO: add other meta data about song
 }
 
+export enum UserChangeAction {
+  Invite = 'I',
+}
+
 export enum EventType {
   ModifyQueue = 'MQ',
   Messaging = 'M',
+  UserChange = 'U',
 }
 
 export enum Role {

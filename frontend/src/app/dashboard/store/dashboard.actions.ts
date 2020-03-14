@@ -45,7 +45,7 @@ export const storeSongs = createAction(
 /* Rooms */
 export const createRoom = createAction(
   '[Add Room Component] Add Room',
-  props<{ room: Room }>(),
+  props<{ room: Room; users: number[] }>(),
 );
 export const getRooms = createAction('[Auth Component] Get Rooms');
 export const storeRooms = createAction(
@@ -90,4 +90,8 @@ export const getAllUsers = createAction('[Rooms Component] Get All Users');
 export const storeAllUsers = createAction(
   '[Users API] Store All Users',
   props<{ allUsers: AuthUser[] }>(),
+);
+export const createInviteUsersEvent = createAction(
+  '[Dashboard Effect] Create Invite Users Event',
+  props<{ users: number[]; roomId: number }>(),
 );
