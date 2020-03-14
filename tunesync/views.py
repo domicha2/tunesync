@@ -226,6 +226,11 @@ class TuneViewSet(viewsets.ViewSet):
         serializer = TuneSerializer(tune)
         return Response(serializer.data)
 
+    # READ
+    def list(self, request):
+        tunes = Tune.objects.values('id', 'name').order_by('name')
+        return Response(tunes)
+
 
 class MembershipViewSet(viewsets.ModelViewSet):
     """

@@ -15,6 +15,6 @@ export class QueueService {
   }
 
   getAvailableSongs(): Observable<any> {
-    return this.httpWrapperService.get('/available-songs/');
+    return this.httpWrapperService.get('/tunes/');
   }
 }
