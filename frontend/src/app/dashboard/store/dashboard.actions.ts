@@ -2,6 +2,12 @@ import { createAction, props } from '@ngrx/store';
 
 import { Song, User, Room, AppEvent } from '../dashboard.models';
 
+/* Tunes */
+export const createTune = createAction(
+  '[Controls Component] Create Tune',
+  props<{ tune: File }>(),
+);
+
 export const getQueue = createAction('[Controls Component] Get Queue');
 
 export const storeQueue = createAction(

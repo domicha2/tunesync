@@ -9,3 +9,4 @@ dist/
 migrations/
 .vscode/
 test.py
+*.mp3

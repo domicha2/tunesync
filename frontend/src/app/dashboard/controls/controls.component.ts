@@ -101,4 +101,10 @@ export class ControlsComponent implements OnInit, OnDestroy {
     console.log(event);
     this.onNext();
   }
+
+  onUploadChange(event: Event): void {
+    // tslint:disable-next-line: no-string-literal
+    const tune: File = event.target['files'][0];
+    this.store.dispatch(DashboardActions.createTune({ tune }));
+  }
 }

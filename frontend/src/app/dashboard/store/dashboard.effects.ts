@@ -23,6 +23,7 @@ import { selectUserAndRoom } from '../../app.selectors';
 import { MainScreenService } from '../main-screen/main-screen.service';
 import { selectActiveRoom } from './dashboard.selectors';
 import { selectUserId } from '../../auth/auth.selectors';
+import { ControlsService } from '../controls/controls.service';
 
 @Injectable()
 export class DashboardEffects {
@@ -132,6 +133,21 @@ export class DashboardEffects {
     ),
   );
 
+  createTune$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(DashboardActions.createTune),
+        switchMap(action =>
+          this.controlsService
+            .createTune(action.tune)
+            .pipe(
+              tap(response => console.log('create tune response: ', response)),
+            ),
+        ),
+      ),
+    { dispatch: false },
+  );
+
   createMessage$ = createEffect(
     () =>
       this.actions$.pipe(
@@ -166,5 +182,6 @@ export class DashboardEffects {
     private usersService: UsersService,
     private messagingService: MessagingService,
     private mainScreenService: MainScreenService,
+    private controlsService: ControlsService,
   ) {}
 }

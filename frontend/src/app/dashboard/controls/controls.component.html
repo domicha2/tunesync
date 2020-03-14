@@ -1,6 +1,11 @@
 <div id="controls-wrapper" class="row">
   <div id="other-buttons" class="row">
-    <input id="upload-music" type="file" accept="audio/*" />
+    <input
+      id="upload-music"
+      type="file"
+      accept="audio/*"
+      (change)="onUploadChange($event)"
+    />
     <button mat-icon-button matTooltip="Upload music">
       <label for="upload-music">
         <mat-icon>attach_file</mat-icon>
