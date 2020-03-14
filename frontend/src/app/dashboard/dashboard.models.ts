@@ -3,6 +3,11 @@ export interface Song {
   // TODO: add other meta data about song
 }
 
+export enum EventType {
+  ModifyQueue = 'MQ',
+  Messaging = 'M',
+}
+
 export enum Role {
   Admin = 'A',
   DJ = 'D',
@@ -31,8 +36,6 @@ export interface User {
   state: State;
   membershipId: number;
 }
-
-export type EventType = 'M';
 
 export interface AppEvent {
   event_id: number;
