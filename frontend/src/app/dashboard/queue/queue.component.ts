@@ -64,17 +64,18 @@ export class QueueComponent implements OnInit, OnDestroy {
         event.previousIndex,
         event.currentIndex,
       );
-      if (container === 'queue') {
-        this.store.dispatch(
-          DashboardActions.createModifyQueueEvent({ queue: this.queuedSongs }),
-        );
-      }
     } else {
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,
         event.previousIndex,
         event.currentIndex,
+      );
+    }
+
+    if (container === 'queue') {
+      this.store.dispatch(
+        DashboardActions.createModifyQueueEvent({ queue: this.queuedSongs }),
       );
     }
 
