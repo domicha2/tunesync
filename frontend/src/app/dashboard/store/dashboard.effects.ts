@@ -16,6 +16,7 @@ import { QueueService } from '../queue/queue.service';
 import { RoomsService } from '../rooms/rooms.service';
 import { UsersService } from '../users/users.service';
 import { Song, Room, User, AppEvent } from '../dashboard.models';
+import { User as AuthUser } from '../../auth/auth.models';
 import { MessagingService } from '../messaging/messaging.service';
 import { AppState } from '../../app.module';
 import { Store, select } from '@ngrx/store';
@@ -76,20 +77,6 @@ export class DashboardEffects {
         ),
       ),
     ),
-  );
-
-  addRoom$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(DashboardActions.createRoom),
-        switchMap(action =>
-          this.roomsService.createRoom(action.room).pipe(
-            tap(response => console.log(response)),
-            catchError(() => EMPTY),
-          ),
-        ),
-      ),
-    { dispatch: false },
   );
 
   getUsersByRoom$ = createEffect(() =>
@@ -172,6 +159,51 @@ export class DashboardEffects {
               tap(response => console.log('message response:' + response)),
               catchError(() => EMPTY),
             ),
+        ),
+      ),
+    { dispatch: false },
+  );
+
+  getAllUsers$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardActions.getAllUsers),
+      switchMap(() =>
+        this.usersService.getAllUsers().pipe(
+          map((users: any[]) => ({
+            type: DashboardActions.storeAllUsers.type,
+            allUsers: users.map(user => ({
+              username: user.username,
+              userId: user.id,
+            })),
+          })),
+        ),
+      ),
+    ),
+  );
+
+  addRoom$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardActions.createRoom),
+      switchMap(action =>
+        this.roomsService.createRoom(action.room).pipe(
+          map(response => ({
+            type: DashboardActions.createInviteUsersEvent.type,
+            roomId: response.id,
+            users: action.users,
+          })),
+        ),
+      ),
+    ),
+  );
+
+  createInviteUsersEvent$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(DashboardActions.createInviteUsersEvent),
+        switchMap(action =>
+          this.usersService
+            .createInviteUsersEvent(action.users, action.roomId)
+            .pipe(tap(response => console.log(response))),
         ),
       ),
     { dispatch: false },

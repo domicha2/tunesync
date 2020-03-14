@@ -64,6 +64,7 @@ export class RoomsComponent implements OnInit, OnDestroy {
   }
 
   onAddRoom(): void {
+    this.store.dispatch(DashboardActions.getAllUsers());
     // open modal
     this.dialog.open(AddRoomComponent);
   }

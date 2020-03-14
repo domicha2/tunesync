@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatListModule } from '@angular/material/list';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatSelectModule } from '@angular/material/select';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -46,6 +47,7 @@ import { AddRoomComponent } from './rooms/add-room/add-room.component';
     MatProgressBarModule,
     MatButtonModule,
     MatIconModule,
+    MatSelectModule,
   ],
 })
 export class DashboardModule {}
