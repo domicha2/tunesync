@@ -13,13 +13,26 @@ from django.dispatch import receiver
 
 
 class Room(models.Model):
-    title = models.CharField(max_length=30, unique=True)
-    subtitle = models.CharField(max_length=30, blank=True)
+    title = models.CharField(
+        max_length=30, unique=True, blank=True
+    )  # need this for system room
+    subtitle = models.CharField(max_length=30, blank=True, null=True)
     creator = models.ForeignKey(
         User, on_delete=models.CASCADE, blank=True, related_name="creator"
     )
     creation_time = models.DateTimeField(auto_now_add=True)
     members = models.ManyToManyField(User, through="Membership")
+    system_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        default=None,
+        related_name="system_user",
+    )
+
+    class Meta:
+        indexes = [models.Index(fields=["system_user"])]
 
 
 class Event(models.Model):
@@ -62,7 +75,9 @@ class Poll(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
     args = JSONField()
-    indexes = [models.Index(fields=["room", "action", "creation_time"])]
+
+    class Meta:
+        indexes = [models.Index(fields=["room", "action", "creation_time"])]
 
 
 class Vote(models.Model):
