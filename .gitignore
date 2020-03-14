@@ -10,3 +10,6 @@ migrations/
 .vscode/
 test.py
 *.mp3
+# Jason's files
+donotcommit
+event.md
