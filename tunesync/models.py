@@ -16,7 +16,7 @@ class Room(models.Model):
     title = models.CharField(
         max_length=30, unique=True, blank=True
     )  # need this for system room
-    subtitle = models.CharField(max_length=30, blank=True)
+    subtitle = models.CharField(max_length=30, blank=True, null=True)
     creator = models.ForeignKey(
         User, on_delete=models.CASCADE, blank=True, related_name="creator"
     )
