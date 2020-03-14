@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView
 from tunesync.models import Event, Room, Membership, Poll, Tune
-from json import loads
+from json import loads, dumps
 
 from django.contrib.auth.models import User
 from rest_framework import viewsets
@@ -144,12 +144,20 @@ class EventViewSet(viewsets.ViewSet):
             Response(status=404)
             print(deserializer.errors)
         event = deserializer.save(author=request.user)
-        args = request.data["args"]
-        # if request.data["event_type"] == "U":
-        # if self.validate_U:
-        # if args["type"] == "I":
-        # for user in args["user"]:
-
+        args = event.args
+        if request.data["event_type"] == "U":
+            # if self.validate_U:
+            if args["type"] == "I":
+                for user in args["users"]:
+                    system_room = Room.objects.get(system_user__id=user)
+                    u_obj = User.objects.get(pk=user)
+                    invite_event = Event(
+                        room=system_room,
+                        author=u_obj,
+                        event_type="U",
+                        args={"type": "I", "room": event.room.id},
+                    )
+                    invite_event.save()
         #    poll = Poll(id=event, action=event.event_type, room=event.room)
         # serialize
 
