@@ -150,14 +150,32 @@ class EventViewSet(viewsets.ViewSet):
             if args["type"] == "I":
                 for user in args["users"]:
                     system_room = Room.objects.get(system_user__id=user)
-                    u_obj = request.user
+                    u_obj = User.objects.get(pk=user)
+                    membership = Membership(
+                        room=event.room, user=u_obj, state="P", role="R"
+                    )
+                    membership.save()
                     invite_event = Event(
                         room=system_room,
-                        author=u_obj,
+                        author=request.user,
                         event_type="U",
                         args={"type": "I", "room": event.room.id},
                     )
                     invite_event.save()
+            elif args["type"] == "J":
+                # validate here
+                if args["isAccepted"]:
+                    membership = Membership.objects.get(
+                        room=event.room, user=request.user
+                    )
+                    membership.state = "A"
+                    membership.save()
+                else:
+                    membership = Membership.objects.get(
+                        room=event.room, user=request.user
+                    )
+                    membership.state = "R"
+                    membership.save()
         #    poll = Poll(id=event, action=event.event_type, room=event.room)
         # serialize
 
