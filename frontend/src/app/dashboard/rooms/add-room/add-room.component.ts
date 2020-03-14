@@ -15,7 +15,7 @@ export class AddRoomComponent {
   constructor(private store: Store<AppState>) {}
 
   roomForm = new FormGroup({
-    name: new FormControl(),
+    title: new FormControl(),
     subtitle: new FormControl(),
   });
 
