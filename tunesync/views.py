@@ -194,7 +194,7 @@ class RoomViewSet(viewsets.ViewSet):
 
 
 class TuneViewSet(viewsets.ViewSet):
-
+    permission_classes = [AnonCreateAndUpdateOwnerOnly]
     parser_classes = [MultiPartParser]
 
     @action(url_path="meta", methods=["get"], detail=True)
