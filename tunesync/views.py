@@ -108,7 +108,7 @@ class UserViewSet(viewsets.ViewSet):
     @action(detail=True, methods=["get"])
     def rooms(self, request, pk=None):
         rooms = (
-            Membership.objects.filter(user=pk)
+            Membership.objects.filter(user=pk, state="A")
             .annotate(title=F("room__title"), subtitle=F("room__subtitle"))
             .values("room_id", "role", "state", "title", "subtitle")
             .annotate(id=F("room_id"))
