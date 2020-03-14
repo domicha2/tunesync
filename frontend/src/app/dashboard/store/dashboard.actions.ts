@@ -8,6 +8,11 @@ export const createTune = createAction(
   props<{ tune: File }>(),
 );
 
+export const createModifyQueueEvent = createAction(
+  '[Queue Component] Create Modify Queue Event',
+  props<{ queue: Song[] }>(),
+);
+
 export const getQueue = createAction('[Controls Component] Get Queue');
 
 export const storeQueue = createAction(

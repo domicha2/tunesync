@@ -56,7 +56,7 @@ export class QueueComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  drop(event: CdkDragDrop<string[]>): void {
+  drop(event: CdkDragDrop<string[]>, container: 'queue' | 'available'): void {
     if (event.previousContainer === event.container) {
       // reorder list
       moveItemInArray(
@@ -64,6 +64,11 @@ export class QueueComponent implements OnInit, OnDestroy {
         event.previousIndex,
         event.currentIndex,
       );
+      if (container === 'queue') {
+        this.store.dispatch(
+          DashboardActions.createModifyQueueEvent({ queue: this.queuedSongs }),
+        );
+      }
     } else {
       transferArrayItem(
         event.previousContainer.data,

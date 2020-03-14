@@ -6,8 +6,9 @@ import { Store } from '@ngrx/store';
 import { environment } from '../../../environments/environment';
 import { AppState } from '../../app.module';
 import { selectEvents, selectActiveRoom } from '../store/dashboard.selectors';
-import { AppEvent } from '../dashboard.models';
+import { AppEvent, EventType } from '../dashboard.models';
 import { selectUserId } from '../../auth/auth.selectors';
+import * as DashboardActions from '../store/dashboard.actions';
 
 @Component({
   selector: 'app-main-screen',
@@ -84,6 +85,18 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         // TODO: could update the view or not
         const event: AppEvent = JSON.parse(messageEvent.data);
         if (event.event_id) {
+          switch (event.event_type) {
+            case EventType.ModifyQueue:
+              this.store.dispatch(
+                DashboardActions.storeQueue({ queue: event.args['queue'] }),
+              );
+              break;
+            case EventType.Messaging:
+              break;
+            default:
+              console.error('bad event type');
+              break;
+          }
           this.events.push(event);
           setTimeout(
             () =>

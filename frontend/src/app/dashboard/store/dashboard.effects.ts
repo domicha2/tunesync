@@ -27,6 +27,24 @@ import { ControlsService } from '../controls/controls.service';
 
 @Injectable()
 export class DashboardEffects {
+  createModifyQueueEvent$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(DashboardActions.createModifyQueueEvent),
+        concatMap(action =>
+          of(action).pipe(
+            withLatestFrom(this.store.pipe(select(selectActiveRoom))),
+          ),
+        ),
+        switchMap(([action, roomId]) =>
+          this.queueService
+            .createModifyQueueEvent(action.queue, roomId)
+            .pipe(tap(response => console.log(response))),
+        ),
+      ),
+    { dispatch: false },
+  );
+
   getQueue$ = createEffect(() =>
     this.actions$.pipe(
       ofType(DashboardActions.getQueue),
