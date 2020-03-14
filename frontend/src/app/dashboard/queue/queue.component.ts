@@ -59,11 +59,14 @@ export class QueueComponent implements OnInit, OnDestroy {
   drop(event: CdkDragDrop<string[]>, container: 'queue' | 'available'): void {
     if (event.previousContainer === event.container) {
       // reorder list
-      moveItemInArray(
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex,
-      );
+      // only queue can be reordered
+      if (container === 'queue') {
+        moveItemInArray(
+          event.container.data,
+          event.previousIndex,
+          event.currentIndex,
+        );
+      }
     } else {
       transferArrayItem(
         event.previousContainer.data,
