@@ -61,11 +61,21 @@ export class QueueComponent implements OnInit, OnDestroy {
       // reorder list
       // only queue can be reordered
       if (container === 'queue') {
-        moveItemInArray(
-          event.container.data,
-          event.previousIndex,
-          event.currentIndex,
-        );
+        // only update if element is actually going to a new index
+        if (event.previousIndex !== event.currentIndex) {
+          moveItemInArray(
+            event.container.data,
+            event.previousIndex,
+            event.currentIndex,
+          );
+
+          // update everyone because queue got reordered
+          this.store.dispatch(
+            DashboardActions.createModifyQueueEvent({
+              queue: this.queuedSongs,
+            }),
+          );
+        }
       }
     } else {
       transferArrayItem(
@@ -74,26 +84,19 @@ export class QueueComponent implements OnInit, OnDestroy {
         event.previousIndex,
         event.currentIndex,
       );
-      if (container === 'available') {
-        // queue lost an item, need to update
-        this.store.dispatch(
-          DashboardActions.createModifyQueueEvent({ queue: this.queuedSongs }),
-        );
-      }
-    }
 
-    if (container === 'queue') {
+      // queue lost or gained an item, need to update websocket
       this.store.dispatch(
         DashboardActions.createModifyQueueEvent({ queue: this.queuedSongs }),
       );
     }
 
     // the queue has changed, need to store the updated queue
-    this.store.dispatch(
-      DashboardActions.storeSongs({
-        queuedSongs: this.queuedSongs,
-        availableSongs: this.availableSongs,
-      }),
-    );
+    // this.store.dispatch(
+    //   DashboardActions.storeSongs({
+    //     queuedSongs: this.queuedSongs,
+    //     availableSongs: this.availableSongs,
+    //   }),
+    // );
   }
 }
