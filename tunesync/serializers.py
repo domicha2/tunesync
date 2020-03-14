@@ -32,6 +32,7 @@ class EventSerializer(serializers.ModelSerializer):
             "author",
             "parent_event_id",
             "args",
+            "isDeleted",
         ]
 
 

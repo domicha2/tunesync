@@ -37,6 +37,7 @@ class Event(models.Model):
         (MODIFY_QUEUE, "Modify Queue"),
         (PLAY, "Play"),
     ]
+    isDeleted = models.BooleanField(default=False)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
     event_type = models.CharField(max_length=2, choices=EVENT_TYPE, default=MESSAGE)
