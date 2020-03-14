@@ -34,8 +34,23 @@ class UserViewSet(viewsets.ViewSet):
 
     # GET
     def list(self, request):
-        response_data = User.objects.all().filter(is_active=True).values()
-        return Response(response_data)
+        if "skip" not in request.query_params:
+            skip = 0
+        else:
+            skip = int(request.query_params["skip"][0])
+
+        if "limit" not in request.query_params:
+            limit = 5
+        else:
+            limit = int(request.query_params["limit"][0])
+        users = User.objects.exclude(pk=request.user.id).order_by("-username")[
+            skip:limit
+        ]
+        result = []
+        for user in users:
+            serializer = UserSerializer(user)
+            result.append(serializer.data)
+        return Response(result)
 
     # POST
     def create(self, request):
@@ -103,6 +118,8 @@ class EventViewSet(viewsets.ViewSet):
     """
     """
 
+    # def getattr(self, "validate_"+eve)
+
     # GET
     def list(self, request):
         if "event_type" in request.query_params:
@@ -129,7 +146,6 @@ class EventViewSet(viewsets.ViewSet):
         # deserializer.create()
         event = deserializer.save(author=request.user)
         # save into database
-        event.save()
         # if request.data["event_type"] == "PO":
         #    poll = Poll(id=event, action=event.event_type, room=event.room)
         # serialize
@@ -228,7 +244,7 @@ class TuneViewSet(viewsets.ViewSet):
 
     # READ
     def list(self, request):
-        tunes = Tune.objects.values('id', 'name').order_by('name')
+        tunes = Tune.objects.values("id", "name").order_by("name")
         return Response(tunes)
 
 
