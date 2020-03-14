@@ -259,19 +259,20 @@ class TuneViewSet(viewsets.ViewSet):
 
     # post
     def create(self, request):
-        audio = mutagen.File(request.FILES["file"], easy=True)
-        tune = Tune(
-            name=audio["title"],
-            artist=audio["artist"],
-            album=audio["album"],
-            uploader=request.user,
-            length=audio.info.length,
-            mime=audio.mime[0],
-            audio_file=request.FILES["file"],
-        )
-        tune.save()
-        serializer = TuneSerializer(tune)
-        return Response(serializer.data)
+        for song in request.FILES:
+            audio = mutagen.File(request.FILES[song], easy=True)
+            tune = Tune(
+                name=audio["title"],
+                artist=audio["artist"],
+                album=audio["album"],
+                uploader=request.user,
+                length=audio.info.length,
+                mime=audio.mime[0],
+                audio_file=request.FILES["file"],
+            )
+            tune.save()
+            serializer = TuneSerializer(tune)
+            return Response(serializer.data)
 
     # READ
     def list(self, request):
