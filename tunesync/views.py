@@ -60,6 +60,8 @@ class UserViewSet(viewsets.ViewSet):
         serializer = UserSerializer(u)
         room = Room(creator=u, system_user=u)
         room.save()
+        membership = Membership(user=u, room=room, state="A", role="A")
+        membership.save()
         return Response(serializer.data)
 
     # GET BY PK
