@@ -16,6 +16,7 @@ import { QueueService } from '../queue/queue.service';
 import { RoomsService } from '../rooms/rooms.service';
 import { UsersService } from '../users/users.service';
 import { Song, Room, User, AppEvent } from '../dashboard.models';
+import { User as AuthUser } from '../../auth/auth.models';
 import { MessagingService } from '../messaging/messaging.service';
 import { AppState } from '../../app.module';
 import { Store, select } from '@ngrx/store';
@@ -175,6 +176,23 @@ export class DashboardEffects {
         ),
       ),
     { dispatch: false },
+  );
+
+  getAllUsers$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardActions.getAllUsers),
+      switchMap(() =>
+        this.usersService.getAllUsers().pipe(
+          map((users: any[]) => ({
+            type: DashboardActions.storeAllUsers.type,
+            allUsers: users.map(user => ({
+              username: user.username,
+              userId: user.id,
+            })),
+          })),
+        ),
+      ),
+    ),
   );
 
   constructor(

@@ -6,5 +6,5 @@ export interface Credentials {
 export interface User {
   username: string;
   userId: number;
-  token: string;
+  token?: string;
 }

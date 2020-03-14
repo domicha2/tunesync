@@ -1,6 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 
 import { Song, User, Room, AppEvent } from '../dashboard.models';
+import { User as AuthUser } from '../dashboard.models';
 
 /* Tunes */
 export const createTune = createAction(
@@ -82,4 +83,11 @@ export const getEventsByRoom = createAction(
 export const storeEvents = createAction(
   '[Events API] Store Events',
   props<{ events: AppEvent[] }>(),
+);
+
+/* Users */
+export const getAllUsers = createAction('[Rooms Component] Get All Users');
+export const storeAllUsers = createAction(
+  '[Users API] Store All Users',
+  props<{ allUsers: AuthUser[] }>(),
 );

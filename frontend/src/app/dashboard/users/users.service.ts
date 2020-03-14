@@ -8,6 +8,10 @@ import { HttpWrapperService } from '../../http-wrapper.service';
 export class UsersService {
   constructor(private httpWrapperService: HttpWrapperService) {}
 
+  getAllUsers(): Observable<any> {
+    return this.httpWrapperService.get('/users/');
+  }
+
   getUsersByRoom(roomId: number): Observable<any> {
     return this.httpWrapperService.get(`/rooms/${roomId}/users/`);
   }
