@@ -163,6 +163,7 @@ export class ControlsComponent
   onReplay(): void {
     const song = this.getAudioElement();
     if (song.currentTime >= 10) {
+      this.store.dispatch(DashboardActions.createReplaySongEvent({}));
       song.currentTime -= 10;
     } else {
       song.currentTime = 0;
@@ -172,6 +173,7 @@ export class ControlsComponent
   onForward(): void {
     const song = this.getAudioElement();
     if (song.duration - song.currentTime >= 10) {
+      this.store.dispatch(DashboardActions.createForwardSongEvent({}));
       song.currentTime += 10;
     } else {
       song.currentTime = song.duration;
