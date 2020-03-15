@@ -215,7 +215,11 @@ class EventViewSet(viewsets.ViewSet):
         if request.data["event_type"] == "T":
             tunesync = TuneSync(event_id=event.id, play=request.data["args"]["play"])
             if "modify_queue" in args:
-                tunesync.modify_queue = args["modify_queue"]
+                result = []
+                for song_id in args["modify_queue"]["queue"]:
+                    tune = Tune.objects.filter(pk=song_id).values()
+                    result.append([song_id, tune[0]["length"]])
+                tunesync.modify_queue = result
             tunesync.save()
         if request.data["event_type"] == "U":
             if args["type"] == "I":
@@ -323,6 +327,23 @@ class RoomViewSet(viewsets.ViewSet):
             .order_by("role", "state", "name")
         )
         return Response(users)
+
+    @action(methods=["get"], detail=True)
+    def tunesync(self, request, pk=None):
+        result = {}
+        tunesync = (
+            TuneSync.objects.filter(event__room_id=pk, modify_queue__isnull=False)
+            .order_by("-event__creation_time")
+            .values()[0]
+        )
+        result["last_modify_queue"] = tunesync
+        tunesync = (
+            TuneSync.objects.filter(event__room_id=pk)
+            .order_by("-event__creation_time")
+            .values()[0]
+        )
+        result["last_play"] = tunesync
+        return Response(result)
 
 
 class TuneViewSet(viewsets.ViewSet):
