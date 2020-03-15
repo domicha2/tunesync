@@ -9,6 +9,7 @@ import {
   tap,
   withLatestFrom,
   concatMap,
+  mergeMap,
 } from 'rxjs/operators';
 
 import * as DashboardActions from './dashboard.actions';
@@ -193,11 +194,14 @@ export class DashboardEffects {
       ofType(DashboardActions.createRoom),
       switchMap(action =>
         this.roomsService.createRoom(action.room).pipe(
-          map(response => ({
-            type: DashboardActions.createInviteUsersEvent.type,
-            roomId: response.id,
-            users: action.users,
-          })),
+          mergeMap(response => [
+            {
+              type: DashboardActions.createInviteUsersEvent.type,
+              users: action.users,
+              roomId: response.id,
+            },
+            { type: DashboardActions.getRooms.type },
+          ]),
         ),
       ),
     ),
