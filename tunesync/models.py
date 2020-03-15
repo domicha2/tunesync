@@ -53,7 +53,7 @@ class Event(models.Model):
     creation_time = models.DateTimeField(auto_now_add=True)
     event_type = models.CharField(max_length=2, choices=EVENT_TYPE, default=MESSAGE)
     author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
-    parent_event_id = models.ForeignKey(
+    parent_event = models.ForeignKey(
         "self", null=True, blank=True, on_delete=models.CASCADE, default=None
     )
     args = JSONField()  # this will be a serialized json in a string

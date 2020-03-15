@@ -187,20 +187,30 @@ class EventViewSet(viewsets.ViewSet):
         )
         return Response(response_data)
 
+    def handle_U(self, request, event, **kw):
+        pass
+
     # POST
     def create(self, request):
-        # deserialize
-        deserializer = EventSerializer(data=request.data)
-        if not deserializer.is_valid():
-            Response(status=404)
-            print(deserializer.errors)
-        event = deserializer.save(author=request.user)
-        args = event.args
+        if not set(request.data) <= {"room", "args", "event_type", "parent_event"}:
+            return Response(status=400)
+        try:
+            room = Room.objects.get(pk=request.data["room"])
+        except:
+            return Response(status=400)
+        event = Event(
+            author=request.user, room=room, event_type=request.data["event_type"]
+        )
+        if "parent_event" in request.data:
+            event.parent_event = request.data["parent_event"]
+        args = request.data["args"]
         validate = getattr(self, "validate_" + event.event_type)
-        if not validate(args):
+        try:
+            if not validate(args):
+                return Response(status=400)
+        except AttributeError:
             return Response(status=400)
         if request.data["event_type"] == "U":
-            # if self.validate_U:
             if args["type"] == "I":
                 for user in args["users"]:
                     system_room = Room.objects.get(system_user__id=user)
@@ -217,7 +227,6 @@ class EventViewSet(viewsets.ViewSet):
                     )
                     invite_event.save()
             elif args["type"] == "J":
-                # validate here
                 if args["is_accepted"]:
                     membership = Membership.objects.get(
                         room=event.room, user=request.user
@@ -230,9 +239,26 @@ class EventViewSet(viewsets.ViewSet):
                     )
                     membership.state = "R"
                     membership.save()
+            elif args["type"] == "K":
+                system_room = Room.objects.get(system_user__id=args["user"])
+                kick_event = Event(
+                    author=request.user,
+                    room=system_room,
+                    event_type="U",
+                    args={"type": "K", "room": room.id},
+                )
+                # let them know they've been kicked lol
+                kick_event.save()
+                # delete user from room
+                Membership.objects.get(user__id=args["user"]).delete()
+            elif args["type"] == "C":
+                membership = Membership.objects.get(user__id=args["user"])
+                membership.role = args["role"]
+                membership.save()
         #    poll = Poll(id=event, action=event.event_type, room=event.room)
         # serialize
-
+        event.args = args
+        event.save()
         serialzer = EventSerializer(event)
         return Response(serialzer.data)
 
