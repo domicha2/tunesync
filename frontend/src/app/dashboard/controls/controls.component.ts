@@ -81,6 +81,7 @@ export class ControlsComponent
           ),
         )
         .subscribe(([songStatus, queuedSongs]) => {
+          console.log('in the big subscribe callback');
           this.initSong(songStatus, queuedSongs);
         }),
     );
@@ -94,6 +95,11 @@ export class ControlsComponent
     this.subscription.unsubscribe();
   }
 
+  /**
+   * Called whenever the song status changes (pause or play or seeked)
+   * @param songStatus
+   * @param queue
+   */
   initSong(
     songStatus: { isPlaying: boolean; seekTime: number },
     queue: Song[],
@@ -123,7 +129,7 @@ export class ControlsComponent
         }
       }
     } else if (songStatus.isPlaying === false) {
-      //! MIGHT BE UNNECESSARY since the song is already paused
+      // this is used for other people listening to the room
       this.getAudioElement().pause();
     }
   }
