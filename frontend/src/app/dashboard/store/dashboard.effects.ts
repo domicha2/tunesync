@@ -124,26 +124,25 @@ export class DashboardEffects {
     { dispatch: false },
   );
 
-  removeUserFromRoom$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(DashboardActions.removeUserFromRoom),
-        concatMap(action =>
-          of(action).pipe(
-            withLatestFrom(this.store.pipe(select(selectActiveRoom))),
-          ),
-        ),
-        switchMap(([action, room]) =>
-          this.usersService.removeUserFromRoom(room, action.userId).pipe(
-            tap(response => console.log(response)),
-            map(response => ({
-              type: DashboardActions.getUsersByRoom.type,
-              roomId: room
-            })),
-            catchError(() => EMPTY),
-          ),
+  removeUserFromRoom$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardActions.removeUserFromRoom),
+      concatMap(action =>
+        of(action).pipe(
+          withLatestFrom(this.store.pipe(select(selectActiveRoom))),
         ),
       ),
+      switchMap(([action, room]) =>
+        this.usersService.removeUserFromRoom(room, action.userId).pipe(
+          tap(response => console.log(response)),
+          map(response => ({
+            type: DashboardActions.getUsersByRoom.type,
+            roomId: room,
+          })),
+          catchError(() => EMPTY),
+        ),
+      ),
+    ),
   );
 
   createMessage$ = createEffect(
