@@ -20,20 +20,29 @@
     </button>
   </div>
   <div id="current-song" class="column">
-    <ng-container *ngIf="currentSong">
-      <audio
-        #songElement
-        id="main-song"
-        autoplay
-        [src]="'http://localhost:8000/tunes/' + currentSong.id + '/data/'"
-        (ended)="onEnded($event)"
-      ></audio>
-      <div id="song-data">{{ currentSong.name }}</div>
-    </ng-container>
+    <audio
+      #songElement
+      id="main-song"
+      autoplay
+      src="{{
+        currentSong === undefined
+          ? ''
+          : 'http://localhost:8000/tunes/' + currentSong.id + '/data/'
+      }}"
+      (ended)="onEnded($event)"
+      (timeupdate)="setSongProgress($event)"
+      (play)="this.isPaused = false"
+      (pause)="this.isPaused = true"
+      (loadeddata)="onLoadedData($event)"
+    ></audio>
+    <div id="song-data">
+      {{ currentSong === undefined ? 'No Song' : currentSong.name }}
+    </div>
+
     <div id="progress-bar">
       <mat-progress-bar
         mode="determinate"
-        [value]="getSongProgress()"
+        [value]="songProgress"
         color="warn"
       ></mat-progress-bar>
     </div>
@@ -42,13 +51,28 @@
     <button mat-icon-button matTooltip="Previous song" (click)="onPrevious()">
       <mat-icon>fast_rewind</mat-icon>
     </button>
-    <button mat-icon-button matTooltip="Play" (click)="onPlay()">
+    <button
+      *ngIf="isPaused"
+      mat-icon-button
+      matTooltip="Play"
+      (click)="onPlay()"
+    >
       <mat-icon>play_arrow</mat-icon>
     </button>
-    <button mat-icon-button matTooltip="Pause" (click)="onPause()">
+    <button
+      *ngIf="!isPaused"
+      mat-icon-button
+      matTooltip="Pause"
+      (click)="onPause()"
+    >
       <mat-icon>pause</mat-icon>
     </button>
-    <button mat-icon-button matTooltip="Next song" (click)="onNext()">
+    <button
+      mat-icon-button
+      matTooltip="Next song"
+      [disabled]="queue === undefined || queue.length === 0"
+      (click)="onNext(true)"
+    >
       <mat-icon>fast_forward</mat-icon>
     </button>
     <button mat-icon-button matTooltip="Rewind 10 seconds" (click)="onReplay()">

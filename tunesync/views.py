@@ -354,7 +354,7 @@ class TuneViewSet(viewsets.ViewSet):
 
     # READ
     def list(self, request):
-        tunes = Tune.objects.values("id", "name").order_by("name")
+        tunes = Tune.objects.values("id", "name", "length").order_by("name")
         return Response(tunes)
 
 
