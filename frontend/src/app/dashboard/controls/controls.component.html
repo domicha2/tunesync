@@ -32,6 +32,7 @@
       (ended)="onEnded($event)"
       (timeupdate)="setSongProgress($event)"
       (play)="this.isPaused = false"
+      (pause)="this.isPaused = true"
       (loadeddata)="onLoadedData($event)"
     ></audio>
     <div id="song-data">

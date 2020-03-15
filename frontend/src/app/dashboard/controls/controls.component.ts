@@ -179,7 +179,6 @@ export class ControlsComponent
   }
 
   onPause(): void {
-    this.isPaused = true;
     const song = this.getAudioElement();
     song.pause();
     this.store.dispatch(
