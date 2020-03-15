@@ -52,3 +52,14 @@ export const selectIsPlaying = createSelector(
   (state: AppState) => state.dashboard,
   (dashboard: DashboardState) => (dashboard ? dashboard.isPlaying : undefined),
 );
+
+export const selectSeekTime = createSelector(
+  (state: AppState) => state.dashboard,
+  (dashboard: DashboardState) => (dashboard ? dashboard.seekTime : undefined),
+);
+
+export const selectSongStatus = createSelector(
+  selectIsPlaying,
+  selectSeekTime,
+  (isPlaying, seekTime) => ({ isPlaying, seekTime }),
+);

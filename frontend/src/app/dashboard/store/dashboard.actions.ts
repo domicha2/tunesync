@@ -14,7 +14,7 @@ export const createPauseSongEvent = createAction(
 );
 export const setSongStatus = createAction(
   '[Main Screen Component] Set Song Status',
-  props<{ isPlaying: boolean }>(),
+  props<{ isPlaying: boolean; seekTime?: number }>(),
 );
 
 export const createTune = createAction(
