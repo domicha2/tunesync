@@ -1,0 +1,95 @@
+Message
+    - content "message content"
+User Change
+    - action: see appendix for actions
+    - place all extra args in the same json level
+    - see extra arguments in apendix
+Poll:
+    - action: see appendix for options
+    - extra args follow the same api of the action if it weren't a poll
+Play
+    - song: songId
+    - isPlaying: boolean for if something is isPlaying
+    - timestamp: of song
+Modiy Queue:
+    - queue: Array of songs. each "song" contains metadata about the song"
+
+
+****APPENDIX*****
+List of actions for a Poll:
+- Play
+- Kick
+- Modify Queue
+
+
+
+
+
+List of actions for user change:
+- Kick "K"
+- Join "J"
+- Leave "L"
+- Invite "I"
+- Change Role "C"
+
+Extra args for U:
+- Kick
+    - user: This is the id of the user we are kicking
+- Join
+    - isAccepted: boolean
+- Leave
+    - no args the user is the same as the person who wrote the event
+- invite:
+    - users: array of user id's you want to invite. They will be "other"s for role by default
+- Change Role
+    user: user_id
+    role: new role
+
+
+How to start a poll to kick a user
+
+{
+    room:1, 
+    author:1,
+    event_type: "PO"
+    args: {
+        action: "U"
+        type: "K"
+        user: 2
+    }
+}
+       
+How to actually kick a user
+
+{
+    room:1, 
+    author:1,
+    event_type: "U"
+    args: {
+        type: "K"
+        user: 2
+    }
+} 
+
+How to invite a user:
+
+{
+    room:1, 
+    author:1,
+    event_type: "U"
+    args: {
+        type: "I"
+        users: [2]
+    }
+}   
+
+how to leave :
+{
+    room:1, 
+    author:1,
+    event_type: "U"
+    args: {
+        type: "L"
+    }
+}   
+
