@@ -6,7 +6,7 @@ from rest_framework import serializers
 class TuneSyncSerializer(serializers.ModelSerializer):
     class Meta:
         model = TuneSync
-        fields = ["id", "event", "play", "modify_queue"]
+        fields = ["event_id", "play", "modify_queue"]
 
 
 class UserSerializer(serializers.ModelSerializer):
