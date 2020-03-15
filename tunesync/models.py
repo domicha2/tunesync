@@ -36,17 +36,14 @@ class Room(models.Model):
 class Event(models.Model):
     MESSAGE = "M"
     VOTE = "V"
-    MODIFY_QUEUE = "MQ"
-    PLAY = "PL"
+    TUNESYNC = "T"
     POLL = "PO"
     USER_CHANGE = "U"
     EVENT_TYPE = [
         (POLL, "Poll"),
         (USER_CHANGE, "User Change"),
-        (MESSAGE, "Message"),
+        (TUNESYNC, "Tune Sync"),
         (VOTE, "Vote"),
-        (MODIFY_QUEUE, "Modify Queue"),
-        (PLAY, "Play"),
     ]
     isDeleted = models.BooleanField(default=False)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
@@ -60,6 +57,12 @@ class Event(models.Model):
 
     class Meta:
         indexes = [models.Index(fields=["room", "event_type", "creation_time"])]
+
+
+class TuneSync(models.Model):
+    event = models.OneToOneField(Event, on_delete=models.CASCADE, primary_key=True)
+    play = JSONField()
+    modify_queue = JSONField(null=True, blank=True)
 
 
 class Poll(models.Model):

@@ -1,6 +1,12 @@
 from django.contrib.auth.models import User
-from .models import Membership, Room, Event, Poll, Vote, Tune
+from .models import Membership, Room, Event, Poll, Vote, Tune, TuneSync
 from rest_framework import serializers
+
+
+class TuneSyncSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TuneSync
+        fields = ["id", "play", "modify_queue"]
 
 
 class UserSerializer(serializers.ModelSerializer):
