@@ -45,7 +45,18 @@ export class ControlsComponent
     this.subscription.add(
       this.store.select(selectIsPlaying).subscribe((isPlaying: boolean) => {
         if (isPlaying === true) {
-          this.getAudioElement().play();
+          if (this.currentSong) {
+            const song = this.getAudioElement();
+            song.play();
+          } else {
+            if (this.queue && this.queue.length > 0) {
+              this.currentSong = this.queue[0];
+              this.queue.splice(0, 1);
+              this.store.dispatch(
+                DashboardActions.storeQueue({ queue: this.queue }),
+              );
+            }
+          }
         } else if (isPlaying === false) {
           this.getAudioElement().pause();
         }
@@ -105,7 +116,7 @@ export class ControlsComponent
     } else {
       console.log('else');
       // check if there is a song on the queue to pop
-      this.onNext();
+      this.onNext(true);
     }
   }
 
@@ -143,12 +154,22 @@ export class ControlsComponent
 
   onPrevious(): void {}
 
-  onNext(): void {
+  /**
+   * Gets called when song automatically finishes
+   * or when user presses next or when user presses play with no current song
+   */
+  onNext(triggerEvent: boolean): void {
     // check if there even exists a song waiting on the queue
     if (this.queue && this.queue.length > 0) {
       this.currentSong = this.queue[0];
       this.queue.splice(0, 1);
       this.store.dispatch(DashboardActions.storeQueue({ queue: this.queue }));
+
+      if (triggerEvent) {
+        this.store.dispatch(
+          DashboardActions.createPlaySongEvent({ something: {} }),
+        );
+      }
     }
   }
 
@@ -157,7 +178,7 @@ export class ControlsComponent
    */
   onEnded(event: Event): void {
     console.log(event);
-    this.onNext();
+    this.onNext(false);
   }
 
   onUploadChange(event: Event): void {
