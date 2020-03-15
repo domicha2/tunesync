@@ -70,7 +70,11 @@ export class ControlsComponent implements OnInit, OnDestroy {
   getSongProgress(): number {
     const song = this.getAudioElement();
     if (song) {
-      return (song.currentTime / song.duration) * 100;
+      if (song.currentTime && song.duration) {
+        return (song.currentTime / song.duration) * 100;
+      } else {
+        return 0;
+      }
     } else {
       return 0;
     }
