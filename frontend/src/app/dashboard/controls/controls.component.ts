@@ -57,13 +57,7 @@ export class ControlsComponent
       combineLatest(
         this.store
           .select(selectSongStatus)
-          .pipe(
-            filter(
-              status =>
-                typeof status.isPlaying === 'boolean' &&
-                typeof status.seekTime === 'number',
-            ),
-          ),
+          .pipe(filter(status => typeof status.isPlaying === 'boolean')),
         this.store.select(selectQueuedSongs).pipe(
           filter(songs => songs !== null && songs !== undefined),
           tap((queue: Song[]) => {
