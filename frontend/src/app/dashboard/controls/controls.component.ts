@@ -167,6 +167,9 @@ export class ControlsComponent
           DashboardActions.createPlaySongEvent({ something: {} }),
         );
       }
+    } else {
+      // clear the current song
+      this.currentSong = undefined;
     }
   }
 
