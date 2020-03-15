@@ -222,8 +222,8 @@ export class ControlsComponent
 
   onUploadChange(event: Event): void {
     // tslint:disable-next-line: no-string-literal
-    const tune: File = event.target['files'][0];
-    this.store.dispatch(DashboardActions.createTune({ tune }));
+    const tunes: FileList = event.target['files'];
+    this.store.dispatch(DashboardActions.createTunes({ tunes }));
   }
 
   onQueueClick(): void {

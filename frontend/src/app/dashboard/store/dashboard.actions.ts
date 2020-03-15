@@ -25,9 +25,9 @@ export const setSongStatus = createAction(
   props<{ isPlaying: boolean; seekTime?: number }>(),
 );
 
-export const createTune = createAction(
-  '[Controls Component] Create Tune',
-  props<{ tune: File }>(),
+export const createTunes = createAction(
+  '[Controls Component] Create Tunes',
+  props<{ tunes: FileList }>(),
 );
 
 export const createModifyQueueEvent = createAction(

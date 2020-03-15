@@ -110,15 +110,15 @@ export class DashboardEffects {
     ),
   );
 
-  createTune$ = createEffect(
+  createTunes$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(DashboardActions.createTune),
+        ofType(DashboardActions.createTunes),
         switchMap(action =>
           this.controlsService
-            .createTune(action.tune)
+            .createTunes(action.tunes)
             .pipe(
-              tap(response => console.log('create tune response: ', response)),
+              tap(response => console.log('create tunes response: ', response)),
             ),
         ),
       ),
