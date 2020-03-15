@@ -334,14 +334,19 @@ class RoomViewSet(viewsets.ViewSet):
         tunesync = (
             TuneSync.objects.filter(event__room_id=pk, modify_queue__isnull=False)
             .order_by("-event__creation_time")
-            .values()[0]
+            .values()
         )
+        if tunesync:
+            tunesync = tunesync[0]
+
         result["last_modify_queue"] = tunesync
         tunesync = (
             TuneSync.objects.filter(event__room_id=pk)
             .order_by("-event__creation_time")
-            .values()[0]
+            .values()
         )
+        if tunesync:
+            tunesync = tunesync[0]
         result["last_play"] = tunesync
         return Response(result)
 
