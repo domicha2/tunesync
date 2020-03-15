@@ -41,3 +41,25 @@ export const selectActiveRoom = createSelector(
   (state: AppState) => state.dashboard,
   (dashboard: DashboardState) => dashboard && dashboard.activeRoomId,
 );
+
+export const selectAllUsers = createSelector(
+  (state: AppState) => state.dashboard,
+  (dashboard: DashboardState) =>
+    dashboard && dashboard.allUsers ? dashboard.allUsers.slice() : undefined,
+);
+
+export const selectIsPlaying = createSelector(
+  (state: AppState) => state.dashboard,
+  (dashboard: DashboardState) => (dashboard ? dashboard.isPlaying : undefined),
+);
+
+export const selectSeekTime = createSelector(
+  (state: AppState) => state.dashboard,
+  (dashboard: DashboardState) => (dashboard ? dashboard.seekTime : undefined),
+);
+
+export const selectSongStatus = createSelector(
+  selectIsPlaying,
+  selectSeekTime,
+  (isPlaying, seekTime) => ({ isPlaying, seekTime }),
+);

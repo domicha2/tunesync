@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { HttpWrapperService } from '../../http-wrapper.service';
-import { Message } from '../dashboard.models';
+import { Message, EventType } from '../dashboard.models';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +17,7 @@ export class MessagingService {
       author: message.userId,
       parent_event_id: null,
       args: message.content,
-      event_type: 'M',
+      event_type: EventType.Messaging,
     });
   }
 }

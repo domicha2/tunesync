@@ -4,12 +4,24 @@
     <form class="column" [formGroup]="roomForm">
       <mat-form-field appearance="outline">
         <mat-label>Title</mat-label>
-        <input matInput type="text" formControlName="name" required />
+        <input matInput type="text" formControlName="title" required />
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Subtitle</mat-label>
         <input matInput type="text" formControlName="subtitle" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Invite Users</mat-label>
+        <mat-select multiple [formControl]="users">
+          <mat-option
+            *ngFor="let user of allUsers$ | async"
+            [value]="user.userId"
+          >
+            {{ user.username }}
+          </mat-option>
+        </mat-select>
       </mat-form-field>
     </form>
   </mat-dialog-content>

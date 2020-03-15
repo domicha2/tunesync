@@ -17,7 +17,9 @@ setup(
         "django-simple-captcha",
         "djangorestframework",
         "channels",
-        "django-cors-headers"
+        "django-cors-headers",
+        "psycopg2",
+        "mutagen",
     ],
     classifiers=["Programming Language :: Python :: 3 :: Only"],
 )

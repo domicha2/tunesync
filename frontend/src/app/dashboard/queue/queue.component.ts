@@ -35,7 +35,11 @@ export class QueueComponent implements OnInit, OnDestroy {
 
     this.subscription.add(
       this.store.select(selectQueuedSongs).subscribe((queuedSongs: Song[]) => {
-        this.queuedSongs = queuedSongs;
+        if (this.queuedSongs) {
+          this.queuedSongs = queuedSongs;
+        } else {
+          this.queuedSongs = [];
+        }
       }),
     );
 
@@ -52,14 +56,27 @@ export class QueueComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  drop(event: CdkDragDrop<string[]>): void {
+  drop(event: CdkDragDrop<string[]>, container: 'queue' | 'available'): void {
     if (event.previousContainer === event.container) {
       // reorder list
-      moveItemInArray(
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex,
-      );
+      // only queue can be reordered
+      if (container === 'queue') {
+        // only update if element is actually going to a new index
+        if (event.previousIndex !== event.currentIndex) {
+          moveItemInArray(
+            event.container.data,
+            event.previousIndex,
+            event.currentIndex,
+          );
+
+          // update everyone because queue got reordered
+          this.store.dispatch(
+            DashboardActions.createModifyQueueEvent({
+              queue: this.queuedSongs,
+            }),
+          );
+        }
+      }
     } else {
       transferArrayItem(
         event.previousContainer.data,
@@ -67,14 +84,19 @@ export class QueueComponent implements OnInit, OnDestroy {
         event.previousIndex,
         event.currentIndex,
       );
+
+      // queue lost or gained an item, need to update websocket
+      this.store.dispatch(
+        DashboardActions.createModifyQueueEvent({ queue: this.queuedSongs }),
+      );
     }
 
     // the queue has changed, need to store the updated queue
-    this.store.dispatch(
-      DashboardActions.storeSongs({
-        queuedSongs: this.queuedSongs,
-        availableSongs: this.availableSongs,
-      }),
-    );
+    // this.store.dispatch(
+    //   DashboardActions.storeSongs({
+    //     queuedSongs: this.queuedSongs,
+    //     availableSongs: this.availableSongs,
+    //   }),
+    // );
   }
 }

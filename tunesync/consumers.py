@@ -19,13 +19,13 @@ class EventConsumer(JsonWebsocketConsumer):
         room_id = params.get(b"room_id", (None,))[0]
 
         if not room_id:
-            self.send("no room_id was sent")
+            # self.send("no room_id was sent")
             self.close()
 
         self.group_name = "event-room-{}".format(room_id.decode("utf-8"))
         async_to_sync(self.channel_layer.group_add)(self.group_name, self.channel_name)
 
-        self.send("you are connected " + " " + self.group_name)
+        # self.send("you are connected " + " " + self.group_name)
 
     def disconnect(self, close_code):
         pass

@@ -1,6 +1,19 @@
 export interface Song {
+  id: number;
   name: string;
+  length: number;
   // TODO: add other meta data about song
+}
+
+export enum UserChangeAction {
+  Invite = 'I',
+}
+
+export enum EventType {
+  ModifyQueue = 'MQ',
+  Messaging = 'M',
+  UserChange = 'U',
+  Play = 'PL',
 }
 
 export enum Role {
@@ -32,7 +45,13 @@ export interface User {
   membershipId: number;
 }
 
-export type EventType = 'M';
+export interface ModifyQueueEvent {
+  queue: Song[];
+}
+
+export interface PlayEvent {
+  isPlaying: boolean;
+}
 
 export interface AppEvent {
   event_id: number;
@@ -40,7 +59,7 @@ export interface AppEvent {
   room_id: number;
   parent_event_id: number;
   event_type: EventType;
-  args: any;
+  args: ModifyQueueEvent | any;
   creation_time: string;
   username: string;
 }

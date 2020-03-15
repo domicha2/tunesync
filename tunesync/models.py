@@ -13,13 +13,24 @@ from django.dispatch import receiver
 
 
 class Room(models.Model):
-    title = models.CharField(max_length=30, unique=True)
-    subtitle = models.CharField(max_length=30, blank=True)
+    title = models.CharField(max_length=30, blank=True)
+    subtitle = models.CharField(max_length=30, blank=True, null=True)
     creator = models.ForeignKey(
         User, on_delete=models.CASCADE, blank=True, related_name="creator"
     )
     creation_time = models.DateTimeField(auto_now_add=True)
     members = models.ManyToManyField(User, through="Membership")
+    system_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        default=None,
+        related_name="system_user",
+    )
+
+    class Meta:
+        indexes = [models.Index(fields=["system_user"])]
 
 
 class Event(models.Model):
@@ -35,15 +46,13 @@ class Event(models.Model):
         (MESSAGE, "Message"),
         (VOTE, "Vote"),
         (MODIFY_QUEUE, "Modify Queue"),
-        (
-            PLAY,
-            "Play",
-        ),  # this event takes takes in current time stamp, isPlaying, songId
+        (PLAY, "Play"),
     ]
+    isDeleted = models.BooleanField(default=False)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
     event_type = models.CharField(max_length=2, choices=EVENT_TYPE, default=MESSAGE)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
     parent_event_id = models.ForeignKey(
         "self", null=True, blank=True, on_delete=models.CASCADE, default=None
     )
@@ -64,7 +73,9 @@ class Poll(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
     args = JSONField()
-    indexes = [models.Index(fields=["room", "action", "creation_time"])]
+
+    class Meta:
+        indexes = [models.Index(fields=["room", "action", "creation_time"])]
 
 
 class Vote(models.Model):
@@ -78,10 +89,13 @@ class Vote(models.Model):
 
 
 class Tune(models.Model):
-    name = models.CharField(max_length=30)
-    artist = models.CharField(max_length=30)
-    album = models.CharField(max_length=30)
+    name = models.CharField(max_length=300)
+    artist = models.CharField(max_length=300, blank=True)
+    album = models.CharField(max_length=300, blank=True)
     uploader = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
+    length = models.FloatField(blank=True, null=True)  # seconds
+    mime = models.CharField(max_length=300, blank=True, null=True)
+    audio_file = models.FileField(upload_to="tunes/", null=True)
     # need to add the file meta data stuff later
 
 

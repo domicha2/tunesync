@@ -3,10 +3,10 @@ from .models import Membership, Room, Event, Poll, Vote, Tune
 from rest_framework import serializers
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["url", "username", "email", "groups"]
+        fields = ["id", "username"]
 
 
 class MembershipSerializer(serializers.ModelSerializer):
@@ -18,7 +18,7 @@ class MembershipSerializer(serializers.ModelSerializer):
 class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
-        fields = ["id", "title", "subtitle", "creator", "members"]
+        fields = ["id", "title", "subtitle", "creator", "members", "system_user"]
 
 
 class EventSerializer(serializers.ModelSerializer):
@@ -32,13 +32,14 @@ class EventSerializer(serializers.ModelSerializer):
             "author",
             "parent_event_id",
             "args",
+            "isDeleted",
         ]
 
 
 class VoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vote
-        fields = ["user", "agree"]
+        fields = ["id", "user", "agree"]
 
 
 class PollSerializer(serializers.ModelSerializer):
@@ -50,4 +51,4 @@ class PollSerializer(serializers.ModelSerializer):
 class TuneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tune
-        fields = ["uploader", "name", "artist", "album"]
+        fields = ["id", "uploader", "name", "artist", "album", "mime", "length"]
