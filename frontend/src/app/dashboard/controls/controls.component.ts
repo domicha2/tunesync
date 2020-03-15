@@ -4,6 +4,8 @@ import {
   OnDestroy,
   ViewChild,
   ElementRef,
+  ChangeDetectorRef,
+  AfterContentChecked,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -24,7 +26,8 @@ import { QueueComponent } from '../queue/queue.component';
   templateUrl: './controls.component.html',
   styleUrls: ['./controls.component.scss'],
 })
-export class ControlsComponent implements OnInit, OnDestroy {
+export class ControlsComponent
+  implements OnInit, OnDestroy, AfterContentChecked {
   subscription = new Subscription();
 
   @ViewChild('songElement') songElement: ElementRef;
@@ -32,7 +35,11 @@ export class ControlsComponent implements OnInit, OnDestroy {
   currentSong: Song;
   queue: Song[];
 
-  constructor(private store: Store<AppState>, private matDialog: MatDialog) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private store: Store<AppState>,
+    private matDialog: MatDialog,
+  ) {}
 
   ngOnInit(): void {
     this.subscription.add(
@@ -53,6 +60,10 @@ export class ControlsComponent implements OnInit, OnDestroy {
           this.queue = queuedSongs;
         }),
     );
+  }
+
+  ngAfterContentChecked() {
+    this.cdr.detectChanges();
   }
 
   ngOnDestroy(): void {
