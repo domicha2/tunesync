@@ -122,7 +122,56 @@ class EventViewSet(viewsets.ViewSet):
     """
     """
 
-    # def getattr(self, "validate_"+eve)
+    def validate_M(self, args):
+        """
+        we just need to confirm that there is a content value in the payload
+        """
+        if "content" in args:
+            return isinstance(args["content"], str)
+        else:
+            return False
+
+    def validate_PL(self, args):
+        if set(args.keys()) >= {"song_id", "is_playing", "timestamp"}:
+            return (
+                isinstance(args["song_id"], int)
+                and isinstance(args["is_playing"], bool)
+                and isinstance(args["timestamp"], float)
+            )
+        else:
+            return False
+
+    def validate_MQ(self, args):
+        if "queue" in args:
+            return isinstance(args["queue"], list)
+        else:
+            return False
+
+    def validate_U(self, args):
+        if "type" in args:
+            if args["type"] in {"K", "I", "J", "L", "C"}:
+                event_type = args["type"]
+                if event_type == "K":
+                    return "user" in args
+                elif event_type == "I":
+                    return "users" in args
+                elif event_type == "J":
+                    return "is_accepted" in args
+                elif event_type == "C":
+                    return set(args.keys()) == {"type", "user", "role"}
+                else:
+                    return True
+        return False
+
+    def validate_PO(self, args):
+        if "action":
+            if args["action"] == "U":
+                return self.validate_U(args)
+            elif args["action"] == "MQ":
+                return self.validate_MQ(args)
+            elif args["action"] == "PL":
+                return self.validate_PL(args)
+        return False
 
     # GET
     def list(self, request):
@@ -147,6 +196,9 @@ class EventViewSet(viewsets.ViewSet):
             print(deserializer.errors)
         event = deserializer.save(author=request.user)
         args = event.args
+        validate = getattr(self, "validate_" + event.event_type)
+        if not validate(args):
+            return Response(status=400)
         if request.data["event_type"] == "U":
             # if self.validate_U:
             if args["type"] == "I":
@@ -166,7 +218,7 @@ class EventViewSet(viewsets.ViewSet):
                     invite_event.save()
             elif args["type"] == "J":
                 # validate here
-                if args["isAccepted"]:
+                if args["is_accepted"]:
                     membership = Membership.objects.get(
                         room=event.room, user=request.user
                     )

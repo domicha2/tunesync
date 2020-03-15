@@ -21,6 +21,9 @@ class BaseSettings(DjangoDefaults):
     SESSION_COOKIE_HTTPONLY = True
 
     DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600
+    FILE_UPLOAD_HANDLERS = [
+        "django.core.files.uploadhandler.TemporaryFileUploadHandler"
+    ]
 
     @property
     def SCHEME(self):
