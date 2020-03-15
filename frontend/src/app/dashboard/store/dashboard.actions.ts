@@ -80,7 +80,7 @@ export const storeUsers = createAction(
 );
 export const removeUserFromRoom = createAction(
   '[Kick User Component] Remove User From Room',
-  props<{ membershipId: number }>(),
+  props<{ userId: number }>(),
 );
 
 /* Messaging */

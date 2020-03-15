@@ -250,7 +250,7 @@ class EventViewSet(viewsets.ViewSet):
                 # let them know they've been kicked lol
                 kick_event.save()
                 # delete user from room
-                Membership.objects.get(user__id=args["user"]).delete()
+                Membership.objects.get(user__id=args["user"], room=event.room).delete()
             elif args["type"] == "C":
                 membership = Membership.objects.get(user__id=args["user"])
                 membership.role = args["role"]
