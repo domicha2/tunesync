@@ -18,6 +18,7 @@ export interface DashboardState {
   isPlaying: boolean;
   seekTime: number;
   lastPlayEvent: any;
+  queueIndex: number;
 }
 
 export const initialState: DashboardState = undefined;
@@ -82,6 +83,12 @@ const reducer = createReducer(
     return {
       ...state,
       lastPlayEvent: action.lastPlayEvent,
+    };
+  }),
+  on(DashboardActions.setQueueIndex, (state, action) => {
+    return {
+      ...state,
+      queueIndex: action.queueIndex,
     };
   }),
 );

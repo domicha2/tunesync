@@ -4,6 +4,11 @@ import { Song, User, Room, AppEvent } from '../dashboard.models';
 import { User as AuthUser } from '../dashboard.models';
 
 /* Tunes */
+export const setQueueIndex = createAction(
+  '[Dashboard Effects] Set Queue Index',
+  props<{ queueIndex: number }>(),
+);
+
 export const setLastPlayEvent = createAction(
   '[Controls Component] Set Last Play Event',
   props<{ lastPlayEvent: any }>(),

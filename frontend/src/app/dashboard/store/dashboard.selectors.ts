@@ -69,3 +69,8 @@ export const selectLastPlayEvent = createSelector(
   (dashboard: DashboardState) =>
     dashboard ? dashboard.lastPlayEvent : undefined,
 );
+
+export const selectQueueIndex = createSelector(
+  (state: AppState) => state.dashboard,
+  (dashboard: DashboardState) => (dashboard ? dashboard.queueIndex : undefined),
+);
