@@ -95,6 +95,20 @@ export class DashboardEffects {
     ),
   );
 
+  getTuneSyncEvent$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardActions.getTuneSyncEvent),
+      switchMap(action =>
+        this.roomsService.getTuneSyncEvent(action.roomId).pipe(
+          map(response => ({
+            type: DashboardActions.setTuneSyncEvent.type,
+            tuneSyncEvent: response,
+          })),
+        ),
+      ),
+    ),
+  );
+
   getEventsByRoom$ = createEffect(() =>
     this.actions$.pipe(
       ofType(DashboardActions.getEventsByRoom),

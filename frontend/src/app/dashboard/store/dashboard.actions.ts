@@ -4,6 +4,15 @@ import { Song, User, Room, AppEvent } from '../dashboard.models';
 import { User as AuthUser } from '../dashboard.models';
 
 /* Tunes */
+export const getTuneSyncEvent = createAction(
+  '[Rooms Component] Get TuneSync Event',
+  props<{ roomId: number }>(),
+);
+export const setTuneSyncEvent = createAction(
+  '[Rooms API] Set TuneSync Event',
+  props<{ tuneSyncEvent: any }>(),
+);
+
 export const setQueueIndex = createAction(
   '[Dashboard Effects] Set Queue Index',
   props<{ queueIndex: number }>(),

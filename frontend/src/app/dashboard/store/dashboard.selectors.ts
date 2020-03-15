@@ -74,3 +74,8 @@ export const selectQueueIndex = createSelector(
   (state: AppState) => state.dashboard,
   (dashboard: DashboardState) => (dashboard ? dashboard.queueIndex : undefined),
 );
+
+export const selectTuneSyncEvent = createSelector(
+  (state: AppState) => state.dashboard,
+  (dashboard: DashboardState) => (dashboard ? dashboard.tuneSyncEvent : undefined),
+);
