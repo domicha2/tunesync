@@ -13,10 +13,8 @@ export class MessagingService {
 
   createMessage(message: Message): Observable<any> {
     return this.httpWrapperService.post('/events/', {
-      room_id: message.roomId,
-      author: message.userId,
-      parent_event_id: null,
-      args: message.content,
+      room: message.roomId,
+      args: { content: message.content },
       event_type: EventType.Messaging,
     });
   }

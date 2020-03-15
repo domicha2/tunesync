@@ -9,6 +9,7 @@ import {
   tap,
   withLatestFrom,
   concatMap,
+  mergeMap,
 } from 'rxjs/operators';
 
 import * as DashboardActions from './dashboard.actions';
@@ -94,20 +95,6 @@ export class DashboardEffects {
     ),
   );
 
-  removeUserFromRoom$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(DashboardActions.removeUserFromRoom),
-        switchMap(action =>
-          this.usersService.removeUserFromRoom(action.membershipId).pipe(
-            tap(response => console.log(response)),
-            catchError(() => EMPTY),
-          ),
-        ),
-      ),
-    { dispatch: false },
-  );
-
   getEventsByRoom$ = createEffect(() =>
     this.actions$.pipe(
       ofType(DashboardActions.getEventsByRoom),
@@ -123,19 +110,40 @@ export class DashboardEffects {
     ),
   );
 
-  createTune$ = createEffect(
+  createTunes$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(DashboardActions.createTune),
+        ofType(DashboardActions.createTunes),
         switchMap(action =>
           this.controlsService
-            .createTune(action.tune)
+            .createTunes(action.tunes)
             .pipe(
-              tap(response => console.log('create tune response: ', response)),
+              tap(response => console.log('create tunes response: ', response)),
             ),
         ),
       ),
     { dispatch: false },
+  );
+
+  removeUserFromRoom$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardActions.removeUserFromRoom),
+      concatMap(action =>
+        of(action).pipe(
+          withLatestFrom(this.store.pipe(select(selectActiveRoom))),
+        ),
+      ),
+      switchMap(([action, room]) =>
+        this.usersService.removeUserFromRoom(room, action.userId).pipe(
+          tap(response => console.log(response)),
+          map(response => ({
+            type: DashboardActions.getUsersByRoom.type,
+            roomId: room,
+          })),
+          catchError(() => EMPTY),
+        ),
+      ),
+    ),
   );
 
   createMessage$ = createEffect(
@@ -186,11 +194,14 @@ export class DashboardEffects {
       ofType(DashboardActions.createRoom),
       switchMap(action =>
         this.roomsService.createRoom(action.room).pipe(
-          map(response => ({
-            type: DashboardActions.createInviteUsersEvent.type,
-            roomId: response.id,
-            users: action.users,
-          })),
+          mergeMap(response => [
+            {
+              type: DashboardActions.createInviteUsersEvent.type,
+              users: action.users,
+              roomId: response.id,
+            },
+            { type: DashboardActions.getRooms.type },
+          ]),
         ),
       ),
     ),

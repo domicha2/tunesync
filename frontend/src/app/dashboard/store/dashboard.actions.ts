@@ -4,6 +4,14 @@ import { Song, User, Room, AppEvent } from '../dashboard.models';
 import { User as AuthUser } from '../dashboard.models';
 
 /* Tunes */
+export const createReplaySongEvent = createAction(
+  '[Controls Component] Create Replay Song Event',
+  props<{}>(),
+);
+export const createForwardSongEvent = createAction(
+  '[Controls Component] Create Forward Song Event',
+  props<{}>(),
+);
 export const createPlaySongEvent = createAction(
   '[Controls Component] Create Play Song Event',
   props<{ something: any }>(),
@@ -17,9 +25,9 @@ export const setSongStatus = createAction(
   props<{ isPlaying: boolean; seekTime?: number }>(),
 );
 
-export const createTune = createAction(
-  '[Controls Component] Create Tune',
-  props<{ tune: File }>(),
+export const createTunes = createAction(
+  '[Controls Component] Create Tunes',
+  props<{ tunes: FileList }>(),
 );
 
 export const createModifyQueueEvent = createAction(
@@ -80,7 +88,7 @@ export const storeUsers = createAction(
 );
 export const removeUserFromRoom = createAction(
   '[Kick User Component] Remove User From Room',
-  props<{ membershipId: number }>(),
+  props<{ userId: number }>(),
 );
 
 /* Messaging */
