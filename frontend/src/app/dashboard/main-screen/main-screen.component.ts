@@ -6,7 +6,12 @@ import { Store } from '@ngrx/store';
 import { environment } from '../../../environments/environment';
 import { AppState } from '../../app.module';
 import { selectEvents, selectActiveRoom } from '../store/dashboard.selectors';
-import { AppEvent, EventType, ModifyQueueEvent } from '../dashboard.models';
+import {
+  AppEvent,
+  EventType,
+  ModifyQueueEvent,
+  PlayEvent,
+} from '../dashboard.models';
 import { selectUserId } from '../../auth/auth.selectors';
 import * as DashboardActions from '../store/dashboard.actions';
 import { distinctUntilChanged, filter } from 'rxjs/operators';
@@ -107,6 +112,21 @@ export class MainScreenComponent implements OnInit, OnDestroy {
               this.store.dispatch(DashboardActions.storeQueue(queue));
               break;
             case EventType.Messaging:
+              break;
+            case EventType.Play:
+              // if we just got a play event we could either be playing or pausing the song
+              const payload: PlayEvent = event.args;
+              if (payload.isPlaying) {
+                // play the song
+                this.store.dispatch(
+                  DashboardActions.setSongStatus({ isPlaying: true }),
+                );
+              } else {
+                // pause the song
+                this.store.dispatch(
+                  DashboardActions.setSongStatus({ isPlaying: false }),
+                );
+              }
               break;
             default:
               console.error('bad event type');

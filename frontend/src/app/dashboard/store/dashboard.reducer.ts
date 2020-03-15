@@ -15,6 +15,7 @@ export interface DashboardState {
   events: AppEvent[];
   // users in the application
   allUsers: AuthUser[];
+  isPlaying: boolean;
 }
 
 export const initialState: DashboardState = undefined;
@@ -66,6 +67,12 @@ const reducer = createReducer(
     return {
       ...state,
       allUsers: action.allUsers,
+    };
+  }),
+  on(DashboardActions.setSongStatus, (state, action) => {
+    return {
+      ...state,
+      isPlaying: action.isPlaying,
     };
   }),
 );

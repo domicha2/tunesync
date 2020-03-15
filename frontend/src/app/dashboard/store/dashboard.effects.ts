@@ -209,6 +209,45 @@ export class DashboardEffects {
     { dispatch: false },
   );
 
+  /* Controls Effects */
+  createPlaySongEvent$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(DashboardActions.createPlaySongEvent),
+        concatMap(action =>
+          of(action).pipe(
+            withLatestFrom(this.store.pipe(select(selectActiveRoom))),
+          ),
+        ),
+        tap(data => console.log(data)),
+        switchMap(([action, roomId]) =>
+          this.controlsService
+            .createPlaySongEvent(roomId)
+            .pipe(tap(response => console.log(response))),
+        ),
+      ),
+    { dispatch: false },
+  );
+
+  createPauseSongEvent$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(DashboardActions.createPauseSongEvent),
+        concatMap(action =>
+          of(action).pipe(
+            withLatestFrom(this.store.pipe(select(selectActiveRoom))),
+          ),
+        ),
+        tap(data => console.log('in the pause song effect')),
+        switchMap(([action, roomId]) =>
+          this.controlsService
+            .createPauseSongEvent(roomId)
+            .pipe(tap(response => console.log(response))),
+        ),
+      ),
+    { dispatch: false },
+  );
+
   constructor(
     private actions$: Actions,
     private store: Store<AppState>,
