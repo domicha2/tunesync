@@ -15,6 +15,7 @@ import {
   selectAvailableSongs,
 } from '../store/dashboard.selectors';
 import * as DashboardActions from '../store/dashboard.actions';
+import { Song } from '../dashboard.models';
 
 @Component({
   selector: 'app-queue',
@@ -24,8 +25,8 @@ import * as DashboardActions from '../store/dashboard.actions';
 export class QueueComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
 
-  queuedSongs: DashboardActions.Song[];
-  availableSongs: DashboardActions.Song[];
+  queuedSongs: Song[];
+  availableSongs: Song[];
 
   constructor(private store: Store<AppState>) {}
 
@@ -33,17 +34,19 @@ export class QueueComponent implements OnInit, OnDestroy {
     this.store.dispatch(DashboardActions.getAvailableSongs());
 
     this.subscription.add(
-      this.store
-        .select(selectQueuedSongs)
-        .subscribe((queuedSongs: DashboardActions.Song[]) => {
+      this.store.select(selectQueuedSongs).subscribe((queuedSongs: Song[]) => {
+        if (this.queuedSongs) {
           this.queuedSongs = queuedSongs;
-        }),
+        } else {
+          this.queuedSongs = [];
+        }
+      }),
     );
 
     this.subscription.add(
       this.store
         .select(selectAvailableSongs)
-        .subscribe((availableSongs: DashboardActions.Song[]) => {
+        .subscribe((availableSongs: Song[]) => {
           this.availableSongs = availableSongs;
         }),
     );
@@ -53,14 +56,27 @@ export class QueueComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  drop(event: CdkDragDrop<string[]>): void {
+  drop(event: CdkDragDrop<string[]>, container: 'queue' | 'available'): void {
     if (event.previousContainer === event.container) {
       // reorder list
-      moveItemInArray(
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex,
-      );
+      // only queue can be reordered
+      if (container === 'queue') {
+        // only update if element is actually going to a new index
+        if (event.previousIndex !== event.currentIndex) {
+          moveItemInArray(
+            event.container.data,
+            event.previousIndex,
+            event.currentIndex,
+          );
+
+          // update everyone because queue got reordered
+          this.store.dispatch(
+            DashboardActions.createModifyQueueEvent({
+              queue: this.queuedSongs,
+            }),
+          );
+        }
+      }
     } else {
       transferArrayItem(
         event.previousContainer.data,
@@ -68,14 +84,19 @@ export class QueueComponent implements OnInit, OnDestroy {
         event.previousIndex,
         event.currentIndex,
       );
+
+      // queue lost or gained an item, need to update websocket
+      this.store.dispatch(
+        DashboardActions.createModifyQueueEvent({ queue: this.queuedSongs }),
+      );
     }
 
     // the queue has changed, need to store the updated queue
-    this.store.dispatch(
-      DashboardActions.storeSongs({
-        queuedSongs: this.queuedSongs,
-        availableSongs: this.availableSongs,
-      }),
-    );
+    // this.store.dispatch(
+    //   DashboardActions.storeSongs({
+    //     queuedSongs: this.queuedSongs,
+    //     availableSongs: this.availableSongs,
+    //   }),
+    // );
   }
 }

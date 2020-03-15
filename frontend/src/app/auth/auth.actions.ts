@@ -1,13 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 
-export interface Credentials {
-  username: string;
-  password: string;
-}
-
-export interface User {
-  username: string;
-}
+import { Credentials, User } from './auth.models';
 
 export const signIn = createAction(
   '[Auth Component] Sign In',

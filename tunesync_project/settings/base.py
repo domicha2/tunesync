@@ -20,6 +20,11 @@ class BaseSettings(DjangoDefaults):
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
 
+    DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600
+    FILE_UPLOAD_HANDLERS = [
+        "django.core.files.uploadhandler.TemporaryFileUploadHandler"
+    ]
+
     @property
     def SCHEME(self):
         return "https" if self.SESSION_COOKIE_SECURE else "http"
@@ -82,22 +87,24 @@ class BaseSettings(DjangoDefaults):
     # Application definition
 
     PREREQ_APPS = [
-        "django.contrib.admin",
         "django.contrib.auth",
+        "django.contrib.admin",
         "django.contrib.contenttypes",
         "django.contrib.sessions",
         "django.contrib.messages",
         "django.contrib.staticfiles",
         "rest_framework",
         "corsheaders",
-        "channels"
+        "channels",
+        "rest_framework.authtoken",
+        "django.contrib.sites"
         # "captcha",
     ]
 
     PROJECT_APPS = ["tunesync_project", "tunesync"]
 
     MIDDLEWARE = (
-        'corsheaders.middleware.CorsMiddleware',
+        "corsheaders.middleware.CorsMiddleware",
         "django.contrib.sessions.middleware.SessionMiddleware",
         "django.middleware.common.CommonMiddleware",
         "django.middleware.csrf.CsrfViewMiddleware",
@@ -105,8 +112,8 @@ class BaseSettings(DjangoDefaults):
         "django.contrib.messages.middleware.MessageMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
         "django.middleware.security.SecurityMiddleware",
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'corsheaders.middleware.CorsPostCsrfMiddleware',
+        "django.middleware.csrf.CsrfViewMiddleware",
+        "corsheaders.middleware.CorsPostCsrfMiddleware",
     )
 
     ROOT_URLCONF = PROJECT_NAME + ".urls"
@@ -130,11 +137,10 @@ class BaseSettings(DjangoDefaults):
     CORS_ORIGIN_ALLOW_ALL = True
 
     REST_FRAMEWORK = {
-        # Use Django's standard `django.contrib.auth` permissions,
-        # or allow read-only access for unauthenticated users.
-        "DEFAULT_PERMISSION_CLASSES": [
-            # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-        ]
+        "DEFAULT_AUTHENTICATION_CLASSES": (
+            "rest_framework.authentication.TokenAuthentication",
+        ),
+        "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     }
 
     WSGI_APPLICATION = PROJECT_NAME + ".wsgi.application"
@@ -142,15 +148,6 @@ class BaseSettings(DjangoDefaults):
 
     # Database
     # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
-    @property
-    def DATABASES(self):
-        return {
-            "default": {
-                "ENGINE": "django.db.backends.sqlite3",
-                "NAME": os.path.join(self.BASE_DIR, "tmp/db.sqlite3"),
-            }
-        }
 
     # Internationalization
     # https://docs.djangoproject.com/en/1.8/topics/i18n/

@@ -1,22 +1,43 @@
 <div id="rooms-wrapper" class="column">
   <div class="top-bar row">
     <h1>Rooms</h1>
-    <button mat-icon-button matTooltip="Add room">
+    <button mat-icon-button matTooltip="Add room" (click)="onAddRoom()">
       <mat-icon>add_circle</mat-icon>
     </button>
   </div>
   <div class="list-wrapper column">
     <div id="admin-rooms" class="column">
       <h2>Admin</h2>
-      <div class="list-el" *ngFor="let room of rooms.admin">{{ room }}</div>
+      <div
+        class="list-el"
+        *ngFor="let room of rooms.admin"
+        [ngClass]="{ active: activeRoom === room }"
+        (click)="onRoomClick(room)"
+      >
+        {{ room.title }}
+      </div>
     </div>
     <div id="dj-rooms" class="column">
       <h2>DJ</h2>
-      <div class="list-el" *ngFor="let room of rooms.dj">{{ room }}</div>
+      <div
+        class="list-el"
+        *ngFor="let room of rooms.dj"
+        [ngClass]="{ active: activeRoom === room }"
+        (click)="onRoomClick(room)"
+      >
+        {{ room.title }}
+      </div>
     </div>
     <div id="regular-rooms" class="column">
       <h2>Regular</h2>
-      <div class="list-el" *ngFor="let room of rooms.regular">{{ room }}</div>
+      <div
+        class="list-el"
+        *ngFor="let room of rooms.regular"
+        [ngClass]="{ active: activeRoom === room }"
+        (click)="onRoomClick(room)"
+      >
+        {{ room.title }}
+      </div>
     </div>
   </div>
 </div>

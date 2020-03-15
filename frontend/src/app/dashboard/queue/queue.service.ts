@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { HttpWrapperService } from '../../http-wrapper.service';
+import { Song, EventType } from '../dashboard.models';
 
 @Injectable({
   providedIn: 'root',
@@ -10,11 +11,15 @@ import { HttpWrapperService } from '../../http-wrapper.service';
 export class QueueService {
   constructor(private httpWrapperService: HttpWrapperService) {}
 
-  getQueue(): Observable<any> {
-    return this.httpWrapperService.get('/queue/');
+  getAvailableSongs(): Observable<any> {
+    return this.httpWrapperService.get('/tunes/');
   }
 
-  getAvailableSongs(): Observable<any> {
-    return this.httpWrapperService.get('/available-songs/');
+  createModifyQueueEvent(queue: Song[], roomId: number): Observable<any> {
+    return this.httpWrapperService.post(`/events/`, {
+      room: roomId,
+      args: { queue },
+      event_type: EventType.ModifyQueue,
+    });
   }
 }
