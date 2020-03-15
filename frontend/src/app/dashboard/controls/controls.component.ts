@@ -141,12 +141,10 @@ export class ControlsComponent
   onPause(): void {
     this.isPaused = true;
     const song = this.getAudioElement();
-    if (song) {
-      song.pause();
-      this.store.dispatch(
-        DashboardActions.createPauseSongEvent({ something: {} }),
-      );
-    }
+    song.pause();
+    this.store.dispatch(
+      DashboardActions.createPauseSongEvent({ something: {} }),
+    );
   }
 
   onPrevious(): void {}
