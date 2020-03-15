@@ -4,6 +4,19 @@ import { Song, User, Room, AppEvent } from '../dashboard.models';
 import { User as AuthUser } from '../dashboard.models';
 
 /* Tunes */
+export const createPlaySongEvent = createAction(
+  '[Controls Component] Create Play Song Event',
+  props<{ something: any }>(),
+);
+export const createPauseSongEvent = createAction(
+  '[Controls Component] Create Pause Song Event',
+  props<{ something: any }>(),
+);
+export const setSongStatus = createAction(
+  '[Main Screen Component] Set Song Status',
+  props<{ isPlaying: boolean }>(),
+);
+
 export const createTune = createAction(
   '[Controls Component] Create Tune',
   props<{ tune: File }>(),

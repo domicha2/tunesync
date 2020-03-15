@@ -12,6 +12,7 @@ export enum EventType {
   ModifyQueue = 'MQ',
   Messaging = 'M',
   UserChange = 'U',
+  Play = 'PL',
 }
 
 export enum Role {
@@ -45,6 +46,10 @@ export interface User {
 
 export interface ModifyQueueEvent {
   queue: Song[];
+}
+
+export interface PlayEvent {
+  isPlaying: boolean;
 }
 
 export interface AppEvent {

@@ -11,7 +11,10 @@ import { Store, select } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 
 import * as DashboardActions from '../store/dashboard.actions';
-import { selectQueuedSongs } from '../store/dashboard.selectors';
+import {
+  selectQueuedSongs,
+  selectIsPlaying,
+} from '../store/dashboard.selectors';
 import { AppState } from '../../app.module';
 import { Song } from '../dashboard.models';
 import { QueueComponent } from '../queue/queue.component';
@@ -33,25 +36,21 @@ export class ControlsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscription.add(
+      this.store.select(selectIsPlaying).subscribe((isPlaying: boolean) => {
+        if (isPlaying === true) {
+          this.getAudioElement().play();
+        } else if (isPlaying === false) {
+          this.getAudioElement().pause();
+        }
+      }),
+    );
+
+    this.subscription.add(
       this.store
         .pipe(select(selectQueuedSongs))
         .subscribe((queuedSongs: Song[]) => {
           console.count('sub');
           this.queue = queuedSongs;
-          // TODO: if we have a list of songs ready in the queue
-          // TODO: and no song already playing then autoplay the next song on queue
-          if (
-            this.queue &&
-            this.queue[0] &&
-            (this.currentSong === undefined ||
-              (this.getAudioElement() && this.getAudioElement().ended))
-          ) {
-            console.log('updating the current song');
-            this.currentSong = this.queue[0];
-            setTimeout(() => {
-              this.getAudioElement().play();
-            }, 200);
-          }
         }),
     );
   }
@@ -77,6 +76,24 @@ export class ControlsComponent implements OnInit, OnDestroy {
     }
   }
 
+  onPlay(): void {
+    // check if there is an existing song
+    if (this.currentSong) {
+      console.log('if statement');
+      // resume the song
+      // dispatch an action telling user
+      const song = this.getAudioElement();
+      song.play();
+      this.store.dispatch(
+        DashboardActions.createPlaySongEvent({ something: {} }),
+      );
+    } else {
+      console.log('else');
+      // check if there is a song on the queue to pop
+      this.onNext();
+    }
+  }
+
   onReplay(): void {
     const song = this.getAudioElement();
     if (song) {
@@ -99,17 +116,13 @@ export class ControlsComponent implements OnInit, OnDestroy {
     }
   }
 
-  onPlay(): void {
-    const song = this.getAudioElement();
-    if (song) {
-      song.play();
-    }
-  }
-
   onPause(): void {
     const song = this.getAudioElement();
     if (song) {
       song.pause();
+      this.store.dispatch(
+        DashboardActions.createPauseSongEvent({ something: {} }),
+      );
     }
   }
 
@@ -118,9 +131,6 @@ export class ControlsComponent implements OnInit, OnDestroy {
   onNext(): void {
     // check if there even exists a song waiting on the queue
     if (this.queue && this.queue.length > 0) {
-      // this.store.dispatch(
-      //   DashboardActions.addAvailableSong({ song: this.currentSong }),
-      // );
       this.currentSong = this.queue[0];
       this.queue.splice(0, 1);
       this.store.dispatch(DashboardActions.storeQueue({ queue: this.queue }));

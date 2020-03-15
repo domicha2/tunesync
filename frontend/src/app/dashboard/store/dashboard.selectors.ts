@@ -47,3 +47,8 @@ export const selectAllUsers = createSelector(
   (dashboard: DashboardState) =>
     dashboard && dashboard.allUsers ? dashboard.allUsers.slice() : undefined,
 );
+
+export const selectIsPlaying = createSelector(
+  (state: AppState) => state.dashboard,
+  (dashboard: DashboardState) => (dashboard ? dashboard.isPlaying : undefined),
+);
