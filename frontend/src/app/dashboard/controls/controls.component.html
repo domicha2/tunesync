@@ -32,6 +32,7 @@
       (ended)="onEnded($event)"
       (timeupdate)="setSongProgress($event)"
       (play)="this.isPaused = false"
+      (loadeddata)="onLoadedData($event)"
     ></audio>
     <div id="song-data">
       {{ currentSong === undefined ? 'No Song' : currentSong.name }}

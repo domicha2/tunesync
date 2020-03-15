@@ -16,6 +16,8 @@ import { selectUserId } from '../../auth/auth.selectors';
 import * as DashboardActions from '../store/dashboard.actions';
 import { distinctUntilChanged, filter } from 'rxjs/operators';
 
+import * as moment from 'moment';
+
 @Component({
   selector: 'app-main-screen',
   templateUrl: './main-screen.component.html',
@@ -64,12 +66,46 @@ export class MainScreenComponent implements OnInit, OnDestroy {
   }
 
   handleEventsResponse(events: AppEvent[]): void {
+    const lastPlayedEvent = events.find(
+      event => event.event_type === EventType.Play,
+    );
     const modifyQueueEvent = events.find(
       event => event.event_type === EventType.ModifyQueue,
     );
+
     if (modifyQueueEvent) {
       const queue: ModifyQueueEvent = modifyQueueEvent.args;
-      this.store.dispatch(DashboardActions.storeQueue(queue));
+      const result = { queue: [] };
+      if (queue.queue.length !== 0 && lastPlayedEvent) {
+        const playTimeStamp = moment(lastPlayedEvent.creation_time);
+        let difference = moment().diff(playTimeStamp, 'seconds');
+        console.log('time since last play action', difference);
+
+        let songIndex: number;
+        for (let i = 0; i < queue.queue.length; i++) {
+          // find where the current song is in the queue and the timestamp to seek
+          if (queue.queue[i].length < difference) {
+            difference -= queue.queue[i].length;
+          } else {
+            songIndex = i;
+            // use this time to seek to the current song
+            const seekTime = difference;
+            console.log('seek time: ', seekTime);
+            this.store.dispatch(
+              DashboardActions.setSongStatus({ isPlaying: true, seekTime }),
+            );
+            break;
+          }
+        }
+
+        if (songIndex !== undefined) {
+          // only take a subset of the queue if we know where to take it from
+          result.queue = queue.queue.slice(songIndex);
+        }
+        // use this difference at that song index
+        console.log('time remaining', difference, 'index', songIndex);
+      }
+      this.store.dispatch(DashboardActions.storeQueue(result));
     }
 
     this.events = events.sort((eventA, eventB) =>
