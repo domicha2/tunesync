@@ -31,6 +31,7 @@
       }}"
       (ended)="onEnded($event)"
       (timeupdate)="setSongProgress($event)"
+      (play)="this.isPaused = false"
     ></audio>
     <div id="song-data">
       {{ currentSong === undefined ? 'No Song' : currentSong.name }}
@@ -48,10 +49,20 @@
     <button mat-icon-button matTooltip="Previous song" (click)="onPrevious()">
       <mat-icon>fast_rewind</mat-icon>
     </button>
-    <button mat-icon-button matTooltip="Play" (click)="onPlay()">
+    <button
+      *ngIf="isPaused"
+      mat-icon-button
+      matTooltip="Play"
+      (click)="onPlay()"
+    >
       <mat-icon>play_arrow</mat-icon>
     </button>
-    <button mat-icon-button matTooltip="Pause" (click)="onPause()">
+    <button
+      *ngIf="!isPaused"
+      mat-icon-button
+      matTooltip="Pause"
+      (click)="onPause()"
+    >
       <mat-icon>pause</mat-icon>
     </button>
     <button mat-icon-button matTooltip="Next song" (click)="onNext(true)">

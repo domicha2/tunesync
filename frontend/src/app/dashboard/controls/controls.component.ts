@@ -36,6 +36,7 @@ export class ControlsComponent
   queue: Song[];
 
   songProgress: number;
+  isPaused = true;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -138,6 +139,7 @@ export class ControlsComponent
   }
 
   onPause(): void {
+    this.isPaused = true;
     const song = this.getAudioElement();
     if (song) {
       song.pause();
