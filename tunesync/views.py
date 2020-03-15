@@ -204,6 +204,8 @@ class EventViewSet(viewsets.ViewSet):
         if "parent_event" in request.data:
             event.parent_event = request.data["parent_event"]
         args = request.data["args"]
+        event.args = args
+        event.save()
         # validate = getattr(self, "validate_" + event.event_type)
         # try:
         #     if not validate(args):
@@ -214,8 +216,6 @@ class EventViewSet(viewsets.ViewSet):
             tunesync = TuneSync(event_id=event.id, play=request.data["args"]["play"])
             if "modify_queue" in args:
                 tunesync.modify_queue = args["modify_queue"]
-            event.args = args
-            event.save()
             tunesync.save()
         if request.data["event_type"] == "U":
             if args["type"] == "I":
