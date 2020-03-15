@@ -17,6 +17,7 @@ export interface DashboardState {
   allUsers: AuthUser[];
   isPlaying: boolean;
   seekTime: number;
+  lastPlayEvent: any;
 }
 
 export const initialState: DashboardState = undefined;
@@ -75,6 +76,12 @@ const reducer = createReducer(
       ...state,
       isPlaying: action.isPlaying,
       seekTime: action.seekTime,
+    };
+  }),
+  on(DashboardActions.setLastPlayEvent, (state, action) => {
+    return {
+      ...state,
+      lastPlayEvent: action.lastPlayEvent,
     };
   }),
 );
