@@ -1,6 +1,7 @@
 export interface Song {
   id: number;
   name: string;
+  length: number;
   // TODO: add other meta data about song
 }
 
