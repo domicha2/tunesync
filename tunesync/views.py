@@ -58,7 +58,7 @@ class UserViewSet(viewsets.ViewSet):
             username=request.data["username"], password=request.data["password"]
         )
         serializer = UserSerializer(u)
-        room = Room(creator=u, system_user=u)
+        room = Room(title="System Room", creator=u, system_user=u)
         room.save()
         membership = Membership(user=u, room=room, state="A", role="A")
         membership.save()
