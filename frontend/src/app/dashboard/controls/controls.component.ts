@@ -35,6 +35,8 @@ export class ControlsComponent
   currentSong: Song;
   queue: Song[];
 
+  songProgress: number;
+
   constructor(
     private cdr: ChangeDetectorRef,
     private store: Store<AppState>,
@@ -89,17 +91,10 @@ export class ControlsComponent
     }
   }
 
-  getSongProgress(): number {
-    const song = this.getAudioElement();
-    if (song) {
-      if (song.currentTime && song.duration) {
-        return (song.currentTime / song.duration) * 100;
-      } else {
-        return 0;
-      }
-    } else {
-      return 0;
-    }
+  // take advantage of timeupdate event
+  setSongProgress(event: Event): void {
+    const song = event.target;
+    this.songProgress = (song['currentTime'] / song['duration']) * 100;
   }
 
   onPlay(): void {

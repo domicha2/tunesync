@@ -20,20 +20,26 @@
     </button>
   </div>
   <div id="current-song" class="column">
-    <ng-container *ngIf="currentSong">
-      <audio
-        #songElement
-        id="main-song"
-        autoplay
-        [src]="'http://localhost:8000/tunes/' + currentSong.id + '/data/'"
-        (ended)="onEnded($event)"
-      ></audio>
-      <div id="song-data">{{ currentSong.name }}</div>
-    </ng-container>
+    <audio
+      #songElement
+      id="main-song"
+      autoplay
+      src="{{
+        currentSong === undefined
+          ? ''
+          : 'http://localhost:8000/tunes/' + currentSong.id + '/data/'
+      }}"
+      (ended)="onEnded($event)"
+      (timeupdate)="setSongProgress($event)"
+    ></audio>
+    <div id="song-data">
+      {{ currentSong === undefined ? 'No Song' : currentSong.name }}
+    </div>
+
     <div id="progress-bar">
       <mat-progress-bar
         mode="determinate"
-        [value]="getSongProgress()"
+        [value]="songProgress"
         color="warn"
       ></mat-progress-bar>
     </div>
