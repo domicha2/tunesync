@@ -7,8 +7,13 @@ User Change
 Poll:
     - action: see appendix for options
     - extra args follow the same api of the action if it weren't a poll
+    
+TuneSync:
+    - play: json, see below
+    - modify_queue: json, see below
+    
 Play
-    - song: songId
+    - queue_index: songId
     - is_playing: boolean for if something is isPlaying
     - timestamp: of song
 Modiy Queue:
@@ -20,8 +25,6 @@ List of actions for a Poll:
 - Play
 - Kick
 - Modify Queue
-
-
 
 
 

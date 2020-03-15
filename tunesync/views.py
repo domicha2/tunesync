@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView
-from tunesync.models import Event, Room, Membership, Poll, Tune
+from tunesync.models import Event, Room, Membership, Poll, Tune, TuneSync
 from json import loads, dumps
 
 from django.contrib.auth.models import User
@@ -204,12 +204,19 @@ class EventViewSet(viewsets.ViewSet):
         if "parent_event" in request.data:
             event.parent_event = request.data["parent_event"]
         args = request.data["args"]
-        validate = getattr(self, "validate_" + event.event_type)
-        try:
-            if not validate(args):
-                return Response(status=400)
-        except AttributeError:
-            return Response(status=400)
+        # validate = getattr(self, "validate_" + event.event_type)
+        # try:
+        #     if not validate(args):
+        #         return Response(status=400)
+        # except AttributeError:
+        #     return Response(status=400)
+        if request.data["event_type"] == "T":
+            tunesync = TuneSync(event_id=event.id, play=request.data["args"]["play"])
+            if "modify_queue" in args:
+                tunesync.modify_queue = args["modify_queue"]
+            event.args = args
+            event.save()
+            tunesync.save()
         if request.data["event_type"] == "U":
             if args["type"] == "I":
                 for user in args["users"]:
@@ -250,15 +257,15 @@ class EventViewSet(viewsets.ViewSet):
                 # let them know they've been kicked lol
                 kick_event.save()
                 # delete user from room
-                Membership.objects.get(user__id=args["user"]).delete()
+                Membership.objects.get(room=event.room, user__id=args["user"]).delete()
             elif args["type"] == "C":
                 membership = Membership.objects.get(user__id=args["user"])
                 membership.role = args["role"]
                 membership.save()
         #    poll = Poll(id=event, action=event.event_type, room=event.room)
         # serialize
-        event.args = args
-        event.save()
+        # event.args = args
+        # event.save()
         serialzer = EventSerializer(event)
         return Response(serialzer.data)
 
@@ -310,7 +317,7 @@ class RoomViewSet(viewsets.ViewSet):
     def users(self, request, pk=None):
         # get all user in this room
         users = (
-            Membership.objects.filter(room=pk)
+            Membership.objects.filter(room=pk, state="A")
             .values("role", "state")
             .annotate(membershipId=F("id"), userId=F("user"), name=F("user__username"))
             .order_by("role", "state", "name")
