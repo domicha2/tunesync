@@ -15,19 +15,31 @@ export class ControlsService {
     return this.httpWrapperService.post(`/tunes/`, formData);
   }
 
-  createPlaySongEvent(roomId: number): Observable<any> {
+  createPlaySongEvent(
+    roomId: number,
+    queueIndex: number,
+    timestamp: number,
+  ): Observable<any> {
     return this.httpWrapperService.post('/events/', {
-      event_type: EventType.Play,
+      event_type: EventType.TuneSync,
       room: roomId,
-      args: { isPlaying: true },
+      args: {
+        play: { queue_index: queueIndex, is_playing: true, timestamp },
+      },
     });
   }
 
-  createPauseSongEvent(roomId: number): Observable<any> {
+  createPauseSongEvent(
+    roomId: number,
+    queueIndex: number,
+    timestamp: number,
+  ): Observable<any> {
     return this.httpWrapperService.post('/events/', {
-      event_type: EventType.Play,
+      event_type: EventType.TuneSync,
       room: roomId,
-      args: { isPlaying: false },
+      args: {
+        play: { queue_index: queueIndex, is_playing: false, timestamp },
+      },
     });
   }
 }

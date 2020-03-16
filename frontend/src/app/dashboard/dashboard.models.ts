@@ -5,6 +5,25 @@ export interface Song {
   // TODO: add other meta data about song
 }
 
+export interface TuneSyncEvent {
+  last_modify_queue: QueueState | null;
+  last_play: PlayState | null;
+  play_time: string;
+}
+
+export interface QueueState {
+  event_id: number;
+  // [song id, length]
+  queue: [number, number][];
+}
+
+export interface PlayState {
+  event_id: number;
+  queue_index: number;
+  is_playing: boolean;
+  timestamp: number;
+}
+
 export enum UserChangeAction {
   Invite = 'I',
   Kick = 'K',
@@ -15,6 +34,7 @@ export enum EventType {
   Messaging = 'M',
   UserChange = 'U',
   Play = 'PL',
+  TuneSync = 'T',
 }
 
 export enum Role {

@@ -18,8 +18,8 @@ export class QueueService {
   createModifyQueueEvent(queue: Song[], roomId: number): Observable<any> {
     return this.httpWrapperService.post(`/events/`, {
       room: roomId,
-      args: { queue },
-      event_type: EventType.ModifyQueue,
+      args: { modify_queue: { queue } },
+      event_type: EventType.TuneSync,
     });
   }
 }
