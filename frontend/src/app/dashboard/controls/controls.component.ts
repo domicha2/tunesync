@@ -118,6 +118,7 @@ export class ControlsComponent
         const song = this.getAudioElement();
         if (songStatus.seekTime !== undefined) {
           song.currentTime = songStatus.seekTime;
+          console.log('after seeked time', song.currentTime);
         }
         song.play();
       } else {
@@ -239,6 +240,11 @@ export class ControlsComponent
   onLoadedData(event: Event): void {
     console.log('song is loaded', event);
     this.getAudioElement().currentTime = this.seekTime;
-    this.seekTime = 0;
+    console.log('on load start time 1', this.getAudioElement().currentTime);
+    setTimeout(() => {
+      this.getAudioElement().currentTime = this.seekTime + 1;
+      this.seekTime = 0;
+      console.log('on load start time 2', this.getAudioElement().currentTime);
+    }, 1000);
   }
 }
