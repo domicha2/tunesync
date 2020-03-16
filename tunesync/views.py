@@ -37,13 +37,14 @@ def get_tune_sync(pk):
     )
     if tunesync:
         tunesync = tunesync[0]
+        play_time = Event.objects.filter(pk=tunesync["event_id"]).values()[0][
+            "creation_time"
+        ]
+        result["play_time"] = play_time
     else:
         tunesync = None
+        result["play_time"] = None
     result["last_play"] = tunesync
-    play_time = Event.objects.filter(pk=tunesync["event_id"]).values()[0][
-        "creation_time"
-    ]
-    result["play_time"] = play_time
     return result
 
 
