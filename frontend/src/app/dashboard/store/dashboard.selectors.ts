@@ -81,6 +81,12 @@ export const selectQueueIndexAndRoom = createSelector(
   (index, room) => ({ index, room }),
 );
 
+export const selectQueueIndexAndSongs = createSelector(
+  selectQueueIndex,
+  selectQueuedSongs,
+  (index, songs) => ({ index, songs }),
+);
+
 export const selectTuneSyncEvent = createSelector(
   (state: AppState) => state.dashboard,
   (dashboard: DashboardState) =>
