@@ -127,11 +127,7 @@ export class ControlsComponent
           }
 
           // after this gets executed the onloadeddata event should trigger which would seek the song
-          this.currentSong = queue[0];
-          this.queue.splice(0, 1);
-          this.store.dispatch(
-            DashboardActions.storeQueue({ queue: this.queue }),
-          );
+          this.currentSong = queue[this.queueIndex];
         }
       }
     } else if (songStatus.isPlaying === false) {
@@ -207,11 +203,12 @@ export class ControlsComponent
    * or when user presses next or when user presses play with no current song
    */
   onNext(triggerEvent: boolean): void {
+    this.store.dispatch(
+      DashboardActions.setQueueIndex({ queueIndex: ++this.queueIndex }),
+    );
     // check if there even exists a song waiting on the queue
     if (this.queue && this.queue.length > 0) {
-      this.currentSong = this.queue[0];
-      this.queue.splice(0, 1);
-      this.store.dispatch(DashboardActions.storeQueue({ queue: this.queue }));
+      this.currentSong = this.queue[this.queueIndex];
 
       if (triggerEvent) {
         this.store.dispatch(
