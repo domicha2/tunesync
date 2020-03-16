@@ -157,6 +157,9 @@ def update_event_listeners(sender, instance, **kwargs):
     """
     Alerts consumer of new events
     """
+    if instance.event_type == "T":
+        return
+
     room = instance.room
     group_name = "event-room-{}".format(room.id)
 
@@ -177,5 +180,19 @@ def update_event_listeners(sender, instance, **kwargs):
         group_name, {"type": "user_notify_event", "text": message}
     )
 
+
+@receiver(post_save, sender=TuneSync, dispatch_uid="update_tunesync_listeners")
+def update_tunesync_listeners(sender, instance, **kwargs):
+    room = instance.event.room.id
+
+    tunesync = TuneSync.get_tune_sync(room)
+    group_name = "event-room-{}".format(room)
+
+    channel_layer = channels.layers.get_channel_layer()
+    tunesync["play_time"] = tunesync["play_time"].isoformat()
+
+    async_to_sync(channel_layer.group_send)(
+        group_name, {"type": "user_notify_event", "text": tunesync}
+    )
     # need end point for websocket token
     # signed with hmacs
