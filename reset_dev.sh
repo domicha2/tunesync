@@ -22,6 +22,8 @@ END $$;
 EOF
 
 M showmigrations
+rm -rf "tunesync/migrations/"
+M showmigrations
 M makemigrations
 M makemigrations tunesync
 M migrate auth
