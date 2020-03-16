@@ -114,72 +114,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         console.log('connected to web socket');
       };
 
-      this.webSocket.onmessage = (messageEvent: MessageEvent) => {
-        const event: AppEvent = JSON.parse(messageEvent.data);
-        console.log('payload from websocket: ', event);
-        if (event.event_id || event['last_modify_queue']) {
-          switch (event.event_type) {
-            // !TUNESYNC EVENT
-            case undefined:
-              console.log('dealing with tunesync event');
-              // determine what type of event it was
-              // if it is playing the dispatch set song stat
-              // if it is modifying the queue, need to dispatch a new queue
-              const tuneSyncEvent = {
-                last_modify_queue: event['last_modify_queue'],
-                last_play: event['last_play'],
-                play_time: event['play_time'],
-              } as TuneSyncEventWS;
-              if (
-                tuneSyncEvent.last_play === null ||
-                tuneSyncEvent.last_modify_queue.event_id >
-                  tuneSyncEvent.last_play.event_id
-              ) {
-                // the  DJ made a modify queue event
-                // need to dispatch new queue into my store
-                this.store.dispatch(
-                  DashboardActions.storeQueue({
-                    queue: tuneSyncEvent.last_modify_queue.modify_queue.map(
-                      ([id, length, name]) => ({ id, length, name }),
-                    ),
-                  }),
-                );
-              } else {
-                // the DJ made a play event
-                console.log('dj made a play event');
-              }
-              break;
-            case EventType.Messaging:
-              break;
-            case EventType.Play:
-              // if we just got a play event we could either be playing or pausing the song
-              const payload: PlayEvent = event.args;
-              if (payload.isPlaying) {
-                // play the song
-                this.store.dispatch(
-                  DashboardActions.setSongStatus({ isPlaying: true }),
-                );
-              } else {
-                // pause the song
-                this.store.dispatch(
-                  DashboardActions.setSongStatus({ isPlaying: false }),
-                );
-              }
-              break;
-            default:
-              console.error('bad event type');
-              break;
-          }
-          this.events.push(event);
-          setTimeout(
-            () =>
-              document
-                .querySelector('mat-list-item:last-child')
-                .scrollIntoView(),
-            500,
-          );
-        }
-      };
+      this.webSocket.onmessage = this.webSocketMessageHandler;
 
       this.webSocket.onerror = (event: Event) => {
         console.log('there was an error with the websocket');
@@ -188,6 +123,71 @@ export class MainScreenComponent implements OnInit, OnDestroy {
       this.webSocket.onclose = (closedEvent: CloseEvent) => {
         console.log('disconnected from web socket');
       };
+    }
+  }
+
+  webSocketMessageHandler(messageEvent: MessageEvent): void {
+    const event: AppEvent = JSON.parse(messageEvent.data);
+    console.log('payload from websocket: ', event);
+    if (event.event_id || event['last_modify_queue']) {
+      switch (event.event_type) {
+        // !TUNESYNC EVENT
+        case undefined:
+          console.log('dealing with tunesync event');
+          // determine what type of event it was
+          // if it is playing the dispatch set song stat
+          // if it is modifying the queue, need to dispatch a new queue
+          const tuneSyncEvent = {
+            last_modify_queue: event['last_modify_queue'],
+            last_play: event['last_play'],
+            play_time: event['play_time'],
+          } as TuneSyncEventWS;
+          if (
+            tuneSyncEvent.last_play === null ||
+            tuneSyncEvent.last_modify_queue.event_id >
+              tuneSyncEvent.last_play.event_id
+          ) {
+            // the  DJ made a modify queue event
+            // need to dispatch new queue into my store
+            this.store.dispatch(
+              DashboardActions.storeQueue({
+                queue: tuneSyncEvent.last_modify_queue.modify_queue.map(
+                  ([id, length, name]) => ({ id, length, name }),
+                ),
+              }),
+            );
+          } else {
+            // the DJ made a play event
+            console.log('dj made a play event');
+          }
+          break;
+        case EventType.Messaging:
+          break;
+        case EventType.Play:
+          // if we just got a play event we could either be playing or pausing the song
+          const payload: PlayEvent = event.args;
+          if (payload.isPlaying) {
+            // play the song
+            this.store.dispatch(
+              DashboardActions.setSongStatus({ isPlaying: true }),
+            );
+          } else {
+            // pause the song
+            this.store.dispatch(
+              DashboardActions.setSongStatus({ isPlaying: false }),
+            );
+          }
+          break;
+        default:
+          console.error('bad event type');
+          break;
+      }
+      this.events.push(event);
+      setTimeout(
+        () =>
+          document.querySelector('mat-list-item:last-child').scrollIntoView(),
+        500,
+      );
     }
   }
 
