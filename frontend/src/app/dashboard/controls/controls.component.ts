@@ -142,6 +142,8 @@ export class ControlsComponent
           this.seekTime = songStatus.seekTime;
         }
         this.currentSong = this.queue[this.queueIndex];
+      } else {
+        this.getAudioElement().pause();
       }
     }
   }

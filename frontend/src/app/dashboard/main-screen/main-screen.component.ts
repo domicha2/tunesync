@@ -147,6 +147,17 @@ export class MainScreenComponent implements OnInit, OnDestroy {
               } else {
                 // the DJ made a play event
                 console.log('dj made a play event');
+                // ! could have race condition but handleTuneSync function has the same design
+                this.store.dispatch(
+                  DashboardActions.setQueueIndex({
+                    queueIndex: tuneSyncEvent.last_play.play.queue_index,
+                  }),
+                );
+                this.store.dispatch(
+                  DashboardActions.setSongStatus({
+                    isPlaying: tuneSyncEvent.last_play.play.is_playing,
+                  }),
+                );
               }
               break;
             case EventType.Messaging:
