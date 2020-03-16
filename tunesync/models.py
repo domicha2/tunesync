@@ -87,12 +87,10 @@ class TuneSync(models.Model):
             play_time = Event.objects.filter(pk=tunesync["event_id"]).values()[0][
                 "creation_time"
             ]
-            result["play_time"] = play_time
         else:
             tunesync = None
-            result["play_time"] = None
         result["last_play"] = tunesync
-
+        result["play_time"] = play_time
         return result
 
 
