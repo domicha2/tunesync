@@ -228,23 +228,30 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         console.log('time since last play action', difference);
 
         let songIndex: number;
-        for (let i = playEvent.queue_index; i < queue.length; i++) {
-          if (i === playEvent.queue_index) {
+        for (let i = playEvent.play.queue_index; i < queue.length; i++) {
+          console.log(i);
+          if (i === playEvent.play.queue_index) {
             // first iteration only
-            if (queue[i].length - playEvent.timestamp < difference) {
+            console.log(
+              'initial diff',
+              queue[i].length - playEvent.timestamp < difference,
+            );
+            if (queue[i].length - playEvent.play.timestamp < difference) {
               // remaining time in the first song can be subtracted
               difference -= queue[i].length - playEvent.timestamp;
             } else {
               // stop here
               this.store.dispatch(
                 DashboardActions.setQueueIndex({
-                  queueIndex: playEvent.queue_index,
+                  queueIndex: playEvent.play.queue_index,
                 }),
               );
-              const seekTime = playEvent.timestamp + difference;
+
+              const seekTime = playEvent.play.timestamp + difference;
+              console.log('finished in the first loop; seek at: ', seekTime);
               this.store.dispatch(
                 DashboardActions.setSongStatus({
-                  isPlaying: playEvent.is_playing,
+                  isPlaying: playEvent.play.is_playing,
                   seekTime,
                 }),
               );
@@ -268,7 +275,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
             );
             this.store.dispatch(
               DashboardActions.setSongStatus({
-                isPlaying: playEvent.is_playing,
+                isPlaying: playEvent.play.is_playing,
                 seekTime,
               }),
             );
