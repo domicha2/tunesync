@@ -161,7 +161,6 @@ export class ControlsComponent
         DashboardActions.createPlaySongEvent({ timestamp: song.currentTime }),
       );
     } else {
-      // check if there is a song on the queue to pop
       this.onNext(true);
     }
   }
@@ -201,11 +200,11 @@ export class ControlsComponent
    * or when user presses next or when user presses play with no current song
    */
   onNext(triggerEvent: boolean): void {
-    this.store.dispatch(
-      DashboardActions.setQueueIndex({ queueIndex: ++this.queueIndex }),
-    );
     // check if there even exists a song waiting on the queue
     if (this.queue && this.queue.length > 0) {
+      this.store.dispatch(
+        DashboardActions.setQueueIndex({ queueIndex: ++this.queueIndex }),
+      );
       this.currentSong = this.queue[this.queueIndex];
 
       if (triggerEvent) {
