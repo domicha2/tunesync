@@ -156,7 +156,8 @@ class EventViewSet(viewsets.ViewSet):
         args = request.data["args"]
         if "modify_queue" in args:
             if not self.validate_MQ(args["modify_queue"]):
-                return 400
+                print("here")
+                return Response(status=400)
             result = []
             for song_id in args["modify_queue"]["queue"]:
                 tune = Tune.objects.filter(pk=song_id).values()
@@ -164,7 +165,8 @@ class EventViewSet(viewsets.ViewSet):
             tunesync.modify_queue = result
         if "play" in args:
             if not self.validate_PL(args["play"]):
-                return 400
+                print("no here")
+                return Response(status=400)
             tunesync.play = args["play"]
         tunesync.save()
         result = TuneSync.get_tune_sync(event.room.id)
@@ -286,7 +288,6 @@ class EventViewSet(viewsets.ViewSet):
         if "parent_event" in request.data:
             event.parent_event = request.data["parent_event"]
         handle_event = getattr(self, "handle_" + event.event_type)
-        print(event)
         result = handle_event(request, event)
         return result
 
