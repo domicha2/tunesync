@@ -72,7 +72,10 @@ export class QueueComponent implements OnInit, OnDestroy {
           // update everyone because queue got reordered
           this.store.dispatch(
             DashboardActions.createModifyQueueEvent({
-              queue: this.queuedSongs,
+              queue: this.masterQueue
+                .slice(0, this.songIndex + 1)
+                .concat(this.queuedSongs)
+                .map(el => el.id),
             }),
           );
         }
@@ -87,7 +90,12 @@ export class QueueComponent implements OnInit, OnDestroy {
 
       // queue lost or gained an item, need to update websocket
       this.store.dispatch(
-        DashboardActions.createModifyQueueEvent({ queue: this.queuedSongs }),
+        DashboardActions.createModifyQueueEvent({
+          queue: this.masterQueue
+            .slice(0, this.songIndex + 1)
+            .concat(this.queuedSongs)
+            .map(el => el.id),
+        }),
       );
     }
 

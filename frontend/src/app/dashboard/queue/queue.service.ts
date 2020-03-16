@@ -15,7 +15,7 @@ export class QueueService {
     return this.httpWrapperService.get('/tunes/');
   }
 
-  createModifyQueueEvent(queue: Song[], roomId: number): Observable<any> {
+  createModifyQueueEvent(queue: number[], roomId: number): Observable<any> {
     return this.httpWrapperService.post(`/events/`, {
       room: roomId,
       args: { modify_queue: { queue } },
