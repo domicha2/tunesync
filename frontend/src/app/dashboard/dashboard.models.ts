@@ -13,8 +13,9 @@ export interface TuneSyncEvent {
 
 export interface QueueState {
   event_id: number;
-  // [song id, length]
-  queue: [number, number, string][];
+  // [song id, length, name]
+  modify_queue: [number, number, string][];
+  play: any;
 }
 
 export interface PlayState {
