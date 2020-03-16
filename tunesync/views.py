@@ -151,6 +151,7 @@ class EventViewSet(viewsets.ViewSet):
         """
         Returns status code to use
         """
+        event.save()
         tunesync = TuneSync(event_id=event.id)
         args = request.data["args"]
         if "modify_queue" in args:
@@ -165,7 +166,6 @@ class EventViewSet(viewsets.ViewSet):
             if not self.validate_PL(args["play"]):
                 return 400
             tunesync.play = args["play"]
-        event.save()
         tunesync.save()
         result = TuneSync.get_tune_sync(event.room.id)
         return Response(result, status=200)
@@ -286,6 +286,7 @@ class EventViewSet(viewsets.ViewSet):
         if "parent_event" in request.data:
             event.parent_event = request.data["parent_event"]
         handle_event = getattr(self, "handle_" + event.event_type)
+        print(event)
         result = handle_event(request, event)
         return result
 
