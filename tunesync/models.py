@@ -61,7 +61,7 @@ class Event(models.Model):
 
 class TuneSync(models.Model):
     event = models.OneToOneField(Event, on_delete=models.CASCADE, primary_key=True)
-    play = JSONField()
+    play = JSONField(null=True, blank=True)
     modify_queue = JSONField(null=True, blank=True)
 
     def get_tune_sync(pk):

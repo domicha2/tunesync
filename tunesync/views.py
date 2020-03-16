@@ -16,7 +16,6 @@ from django.db.models import F, Q, Subquery, Value, CharField
 from django.contrib.auth import authenticate, login
 import mutagen
 
-
 class IndexPage(TemplateView):
     template_name = "index.html"
 
@@ -155,8 +154,9 @@ class EventViewSet(viewsets.ViewSet):
         if "modify_queue" in args:
             if not self.validate_MQ(args["modify_queue"]):
                 return 400
-        if not self.validate_PL(args["play"]):
-            return 400
+        if "play" in args:
+            if not self.validate_PL(args["play"]):
+                return 400
         event.save()
         tunesync = TuneSync(event_id=event.id, play=args["play"])
         result = []
