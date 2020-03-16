@@ -74,6 +74,8 @@ class TuneSync(models.Model):
         )
         if tunesync:
             tunesync = tunesync[0]
+        else:
+            tunesync = None
         result["last_modify_queue"] = tunesync
         tunesync = (
             TuneSync.objects.filter(event__room_id=pk)
@@ -82,11 +84,15 @@ class TuneSync(models.Model):
         )
         if tunesync:
             tunesync = tunesync[0]
+            play_time = Event.objects.filter(pk=tunesync["event_id"]).values()[0][
+                "creation_time"
+            ]
+            result["play_time"] = play_time
+        else:
+            tunesync = None
+            result["play_time"] = None
         result["last_play"] = tunesync
-        play_time = Event.objects.filter(pk=tunesync["event_id"]).values()[0][
-            "creation_time"
-        ]
-        result["play_time"] = play_time
+
 
         return result
 
