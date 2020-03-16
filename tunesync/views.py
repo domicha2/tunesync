@@ -16,38 +16,6 @@ from django.db.models import F, Q, Subquery, Value, CharField
 from django.contrib.auth import authenticate, login
 import mutagen
 
-
-def get_tune_sync(pk):
-    result = {}
-    play_time = None
-    tunesync = (
-        TuneSync.objects.filter(event__room_id=pk, modify_queue__isnull=False)
-        .order_by("-event__creation_time")
-        .values()
-    )
-    if tunesync:
-        tunesync = tunesync[0]
-    else:
-        tunesync = None
-    result["last_modify_queue"] = tunesync
-    tunesync = (
-        TuneSync.objects.filter(event__room_id=pk, play__isnull=False)
-        .order_by("-event__creation_time")
-        .values()
-    )
-    if tunesync:
-        tunesync = tunesync[0]
-        play_time = Event.objects.filter(pk=tunesync["event_id"]).values()[0][
-            "creation_time"
-        ]
-        result["play_time"] = play_time
-    else:
-        tunesync = None
-        result["play_time"] = None
-    result["last_play"] = tunesync
-    return result
-
-
 class IndexPage(TemplateView):
     template_name = "index.html"
 
@@ -194,10 +162,10 @@ class EventViewSet(viewsets.ViewSet):
         result = []
         for song_id in args["modify_queue"]["queue"]:
             tune = Tune.objects.filter(pk=song_id).values()
-            result.append([song_id, tune[0]["length"]])
+            result.append([song_id, tune[0]["length"], tune[0]["name"]])
         tunesync.modify_queue = result
         tunesync.save()
-        result = get_tune_sync(event.room.id)
+        result = TuneSync.get_tune_sync(event.room.id)
         return Response(result, status=200)
 
     def validate_U(self, args):
@@ -315,7 +283,6 @@ class EventViewSet(viewsets.ViewSet):
         )
         if "parent_event" in request.data:
             event.parent_event = request.data["parent_event"]
-        event.save()
         handle_event = getattr(self, "handle_" + event.event_type)
         result = handle_event(request, event)
         return result
@@ -377,7 +344,7 @@ class RoomViewSet(viewsets.ViewSet):
 
     @action(methods=["get"], detail=True)
     def tunesync(self, request, pk=None):
-        result = get_tune_sync(pk)
+        result = TuneSync.get_tune_sync(pk)
         return Response(result)
 
 
@@ -400,6 +367,7 @@ class TuneViewSet(viewsets.ViewSet):
 
     # post
     def create(self, request):
+        result = []
         for song in request.FILES:
             audio = mutagen.File(request.FILES[song], easy=True)
             tune = Tune(
@@ -413,7 +381,8 @@ class TuneViewSet(viewsets.ViewSet):
             )
             tune.save()
             serializer = TuneSerializer(tune)
-        return Response(len(request.FILES))
+            result.append(serializer.data)
+        return Response(result)
 
     # READ
     def list(self, request):
