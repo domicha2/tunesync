@@ -16,6 +16,7 @@ import * as DashboardActions from '../store/dashboard.actions';
 import {
   selectQueuedSongs,
   selectSongStatus,
+  selectQueueIndex,
 } from '../store/dashboard.selectors';
 import { AppState } from '../../app.module';
 import { Song } from '../dashboard.models';
@@ -40,6 +41,7 @@ export class ControlsComponent
   isPaused = true;
 
   seekTime = 0;
+  queueIndex = 0;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -48,6 +50,16 @@ export class ControlsComponent
   ) {}
 
   ngOnInit(): void {
+    this.subscription.add(
+      this.store
+        .select(selectQueueIndex)
+        .pipe(filter(index => index !== undefined))
+        .subscribe(index => {
+          console.log('queue index: ', index);
+          this.queueIndex = index;
+        }),
+    );
+
     /**
      * if song status changes, make sure there exists a queue
      * if song status changes again thats fine
