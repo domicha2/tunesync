@@ -170,7 +170,7 @@ export class ControlsComponent
    * or when user presses next or when user presses play with no current song
    */
   onNext(triggerEvent: boolean): void {
-    if (this.queueIndex < this.queue.length) {
+    if (this.queueIndex + 1 < this.queue.length) {
       // there exists a song on the queue ready to be played
       this.store.dispatch(
         DashboardActions.setQueueIndex({ queueIndex: ++this.queueIndex }),
