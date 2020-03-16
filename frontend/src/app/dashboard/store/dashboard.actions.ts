@@ -50,7 +50,7 @@ export const createTunes = createAction(
 
 export const createModifyQueueEvent = createAction(
   '[Queue Component] Create Modify Queue Event',
-  props<{ queue: Song[] }>(),
+  props<{ queue: number[] }>(),
 );
 
 export const storeQueue = createAction(

@@ -16,6 +16,7 @@ import * as DashboardActions from '../store/dashboard.actions';
 import {
   selectQueuedSongs,
   selectSongStatus,
+  selectQueueIndex,
 } from '../store/dashboard.selectors';
 import { AppState } from '../../app.module';
 import { Song } from '../dashboard.models';
@@ -40,6 +41,7 @@ export class ControlsComponent
   isPaused = true;
 
   seekTime = 0;
+  queueIndex = 0;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -48,6 +50,16 @@ export class ControlsComponent
   ) {}
 
   ngOnInit(): void {
+    this.subscription.add(
+      this.store
+        .select(selectQueueIndex)
+        .pipe(filter(index => index !== undefined))
+        .subscribe(index => {
+          console.log('queue index: ', index);
+          this.queueIndex = index;
+        }),
+    );
+
     /**
      * if song status changes, make sure there exists a queue
      * if song status changes again thats fine
@@ -115,11 +127,7 @@ export class ControlsComponent
           }
 
           // after this gets executed the onloadeddata event should trigger which would seek the song
-          this.currentSong = queue[0];
-          this.queue.splice(0, 1);
-          this.store.dispatch(
-            DashboardActions.storeQueue({ queue: this.queue }),
-          );
+          this.currentSong = queue[this.queueIndex];
         }
       }
     } else if (songStatus.isPlaying === false) {
@@ -145,7 +153,6 @@ export class ControlsComponent
   onPlay(): void {
     // check if there is an existing song
     if (this.currentSong) {
-      console.log('if statement');
       // resume the song
       // dispatch an action telling user
       const song = this.getAudioElement();
@@ -154,9 +161,30 @@ export class ControlsComponent
         DashboardActions.createPlaySongEvent({ timestamp: song.currentTime }),
       );
     } else {
-      console.log('else');
-      // check if there is a song on the queue to pop
       this.onNext(true);
+    }
+  }
+
+  /**
+   * Gets called when song automatically finishes
+   * or when user presses next or when user presses play with no current song
+   */
+  onNext(triggerEvent: boolean): void {
+    if (this.queueIndex + 1 < this.queue.length) {
+      // there exists a song on the queue ready to be played
+      this.store.dispatch(
+        DashboardActions.setQueueIndex({ queueIndex: ++this.queueIndex }),
+      );
+      this.currentSong = this.queue[this.queueIndex];
+      if (triggerEvent) {
+        // user generated event
+        this.store.dispatch(
+          DashboardActions.createPlaySongEvent({ timestamp: 0 }),
+        );
+      }
+    } else {
+      // clear the current song
+      this.currentSong = undefined;
     }
   }
 
@@ -189,28 +217,6 @@ export class ControlsComponent
   }
 
   onPrevious(): void {}
-
-  /**
-   * Gets called when song automatically finishes
-   * or when user presses next or when user presses play with no current song
-   */
-  onNext(triggerEvent: boolean): void {
-    // check if there even exists a song waiting on the queue
-    if (this.queue && this.queue.length > 0) {
-      this.currentSong = this.queue[0];
-      this.queue.splice(0, 1);
-      this.store.dispatch(DashboardActions.storeQueue({ queue: this.queue }));
-
-      if (triggerEvent) {
-        this.store.dispatch(
-          DashboardActions.createPlaySongEvent({ timestamp: 0 }),
-        );
-      }
-    } else {
-      // clear the current song
-      this.currentSong = undefined;
-    }
-  }
 
   /**
    * Auto-click the next song button for the user

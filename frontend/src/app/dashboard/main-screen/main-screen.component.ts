@@ -15,6 +15,10 @@ import {
   EventType,
   ModifyQueueEvent,
   PlayEvent,
+  TuneSyncEvent,
+  QueueState,
+  PlayState,
+  TuneSyncEventWS,
 } from '../dashboard.models';
 import { selectUserId } from '../../auth/auth.selectors';
 import * as DashboardActions from '../store/dashboard.actions';
@@ -39,7 +43,10 @@ export class MainScreenComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.store
         .select(selectTuneSyncEvent)
-        .subscribe(response => console.log('tunesync event', response)),
+        .pipe(filter(data => data !== undefined))
+        .subscribe((response: TuneSyncEvent) => {
+          this.handleTuneSyncEvent(response);
+        }),
     );
 
     this.subscription.add(
@@ -75,49 +82,10 @@ export class MainScreenComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
+  /**
+   * refactor later
+   */
   handleEventsResponse(events: AppEvent[]): void {
-    const lastPlayedEvent = events.find(
-      event => event.event_type === EventType.Play,
-    );
-    const modifyQueueEvent = events.find(
-      event => event.event_type === EventType.ModifyQueue,
-    );
-
-    if (modifyQueueEvent) {
-      const queue: ModifyQueueEvent = modifyQueueEvent.args;
-      const result = { queue: [] };
-      if (queue.queue.length !== 0 && lastPlayedEvent) {
-        const playTimeStamp = moment(lastPlayedEvent.creation_time);
-        let difference = moment().diff(playTimeStamp, 'seconds');
-        console.log('time since last play action', difference);
-
-        let songIndex: number;
-        for (let i = 0; i < queue.queue.length; i++) {
-          // find where the current song is in the queue and the timestamp to seek
-          if (queue.queue[i].length < difference) {
-            difference -= queue.queue[i].length;
-          } else {
-            songIndex = i;
-            // use this time to seek to the current song
-            const seekTime = difference;
-            console.log('seek time: ', seekTime);
-            this.store.dispatch(
-              DashboardActions.setSongStatus({ isPlaying: true, seekTime }),
-            );
-            break;
-          }
-        }
-
-        if (songIndex !== undefined) {
-          // only take a subset of the queue if we know where to take it from
-          result.queue = queue.queue.slice(songIndex);
-        }
-        // use this difference at that song index
-        console.log('time remaining', difference, 'index', songIndex);
-      }
-      this.store.dispatch(DashboardActions.storeQueue(result));
-    }
-
     this.events = events.sort((eventA, eventB) =>
       new Date(eventA.creation_time) > new Date(eventB.creation_time) ? 1 : -1,
     );
@@ -147,15 +115,39 @@ export class MainScreenComponent implements OnInit, OnDestroy {
       };
 
       this.webSocket.onmessage = (messageEvent: MessageEvent) => {
-        console.log('received a message', messageEvent);
-        // TODO: take action based on the data from the event
-        // TODO: could update the view or not
         const event: AppEvent = JSON.parse(messageEvent.data);
-        if (event.event_id) {
+        console.log('payload from websocket: ', event);
+        if (event.event_id || event['last_modify_queue']) {
           switch (event.event_type) {
-            case EventType.ModifyQueue:
-              const queue: ModifyQueueEvent = event.args;
-              this.store.dispatch(DashboardActions.storeQueue(queue));
+            // !TUNESYNC EVENT
+            case undefined:
+              console.log('dealing with tunesync event');
+              // determine what type of event it was
+              // if it is playing the dispatch set song stat
+              // if it is modifying the queue, need to dispatch a new queue
+              const tuneSyncEvent = {
+                last_modify_queue: event['last_modify_queue'],
+                last_play: event['last_play'],
+                play_time: event['play_time'],
+              } as TuneSyncEventWS;
+              if (
+                tuneSyncEvent.last_play === null ||
+                tuneSyncEvent.last_modify_queue.event_id >
+                  tuneSyncEvent.last_play.event_id
+              ) {
+                // the  DJ made a modify queue event
+                // need to dispatch new queue into my store
+                this.store.dispatch(
+                  DashboardActions.storeQueue({
+                    queue: tuneSyncEvent.last_modify_queue.modify_queue.map(
+                      ([id, length, name]) => ({ id, length, name }),
+                    ),
+                  }),
+                );
+              } else {
+                // the DJ made a play event
+                console.log('dj made a play event');
+              }
               break;
             case EventType.Messaging:
               break;
@@ -196,6 +188,107 @@ export class MainScreenComponent implements OnInit, OnDestroy {
       this.webSocket.onclose = (closedEvent: CloseEvent) => {
         console.log('disconnected from web socket');
       };
+    }
+  }
+
+  handleTuneSyncEvent(tuneSyncEvent: TuneSyncEvent): void {
+    let queue;
+    let playEvent;
+    // ! might have to relook at the null logic
+    if (tuneSyncEvent.last_modify_queue === null) {
+      this.store.dispatch(
+        DashboardActions.storeQueue({
+          queue: [],
+        }),
+      );
+    } else {
+      queue = (tuneSyncEvent.last_modify_queue as QueueState).modify_queue.map(
+        ([id, length, name]) => ({
+          id,
+          length,
+          name,
+        }),
+      );
+      this.store.dispatch(DashboardActions.storeQueue({ queue }));
+    }
+    if (tuneSyncEvent.last_play === null) {
+      // no last play state
+      this.store.dispatch(DashboardActions.setQueueIndex({ queueIndex: -1 }));
+    } else {
+      playEvent = tuneSyncEvent.last_play as PlayState;
+    }
+
+    if (queue) {
+      if (queue.length !== 0 && playEvent) {
+        // queue exists and something played before
+        const playTimeStamp = moment(tuneSyncEvent.play_time);
+        let difference = moment().diff(playTimeStamp, 'seconds', true);
+        console.log('time since last play action', difference);
+
+        let songIndex: number;
+        for (let i = playEvent.play.queue_index; i < queue.length; i++) {
+          console.log(i);
+          if (i === playEvent.play.queue_index) {
+            // first iteration only
+            console.log(
+              'initial diff',
+              queue[i].length - playEvent.timestamp < difference,
+            );
+            console.log('init differe', queue[i].length - playEvent.timestamp);
+            if (queue[i].length - playEvent.play.timestamp < difference) {
+              console.log('in the if statement some how');
+              // remaining time in the first song can be subtracted
+              difference -= queue[i].length - playEvent.timestamp;
+            } else {
+              console.log(
+                'exiting after initial loop dispatch new queue index and dispatch new song status',
+              );
+              // stop here
+              this.store.dispatch(
+                DashboardActions.setQueueIndex({
+                  queueIndex: playEvent.play.queue_index,
+                }),
+              );
+
+              const seekTime = playEvent.play.timestamp + difference;
+              console.log('finished in the first loop; seek at: ', seekTime);
+              this.store.dispatch(
+                DashboardActions.setSongStatus({
+                  isPlaying: playEvent.play.is_playing,
+                  seekTime,
+                }),
+              );
+              break;
+            }
+            // do need to execute logic below
+            continue;
+          }
+          // find where the current song is in the queue and the timestamp to seek
+          if (queue[i].length < difference) {
+            difference -= queue[i].length;
+          } else {
+            songIndex = i;
+            // use this time to seek to the current song
+            const seekTime = difference;
+            console.log('seek time: ', seekTime);
+            this.store.dispatch(
+              DashboardActions.setQueueIndex({
+                queueIndex: songIndex,
+              }),
+            );
+            this.store.dispatch(
+              DashboardActions.setSongStatus({
+                isPlaying: playEvent.play.is_playing,
+                seekTime,
+              }),
+            );
+            break;
+          }
+        }
+
+        // use this difference at that song index
+        console.log('time remaining', difference, 'index', songIndex);
+      }
     }
   }
 }

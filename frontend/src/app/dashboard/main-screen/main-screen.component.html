@@ -17,6 +17,9 @@
         <ng-container *ngSwitchCase="'U'">
           {{ event.username + ' made a user change' }}
         </ng-container>
+        <ng-container *ngSwitchDefault>
+          {{ 'music got adjusted the music' }}
+        </ng-container>
       </div>
     </mat-list-item>
   </mat-list>
