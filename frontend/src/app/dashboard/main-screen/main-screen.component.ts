@@ -192,6 +192,8 @@ export class MainScreenComponent implements OnInit, OnDestroy {
   }
 
   handleTuneSyncEvent(tuneSyncEvent: TuneSyncEvent): void {
+    let queue;
+    let playEvent;
     // ! might have to relook at the null logic
     if (tuneSyncEvent.last_modify_queue === null) {
       this.store.dispatch(
@@ -199,20 +201,25 @@ export class MainScreenComponent implements OnInit, OnDestroy {
           queue: [],
         }),
       );
+    } else {
+      queue = (tuneSyncEvent.last_modify_queue as QueueState).modify_queue;
+      this.store.dispatch(
+        DashboardActions.storeQueue({
+          queue: queue.map(([id, length, name]) => ({
+            id,
+            length,
+            name,
+          })),
+        }),
+      );
     }
     if (tuneSyncEvent.last_play === null) {
       // no last play state
       this.store.dispatch(DashboardActions.setQueueIndex({ queueIndex: -1 }));
+    } else {
+      playEvent = tuneSyncEvent.last_play as PlayState;
     }
 
-    if (
-      tuneSyncEvent.last_modify_queue === null ||
-      tuneSyncEvent.last_play === null
-    )
-      return;
-
-    const queue = (tuneSyncEvent.last_modify_queue as QueueState).queue;
-    const playEvent = tuneSyncEvent.last_play as PlayState;
     if (queue) {
       if (queue.length !== 0 && playEvent) {
         // queue exists and something played before
@@ -272,15 +279,6 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         // use this difference at that song index
         console.log('time remaining', difference, 'index', songIndex);
       }
-      this.store.dispatch(
-        DashboardActions.storeQueue({
-          queue: queue.map(([id, length, name]) => ({
-            id,
-            length,
-            name,
-          })),
-        }),
-      );
     }
   }
 }
