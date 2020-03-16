@@ -27,14 +27,18 @@ def get_tune_sync(pk):
     )
     if tunesync:
         tunesync = tunesync[0]
+    else:
+        tunesync = None
     result["last_modify_queue"] = tunesync
     tunesync = (
-        TuneSync.objects.filter(event__room_id=pk)
+        TuneSync.objects.filter(event__room_id=pk, play__isnull=False)
         .order_by("-event__creation_time")
         .values()
     )
     if tunesync:
         tunesync = tunesync[0]
+    else:
+        tunesync = None
     result["last_play"] = tunesync
     play_time = Event.objects.filter(pk=tunesync["event_id"]).values()[0][
         "creation_time"
@@ -181,8 +185,9 @@ class EventViewSet(viewsets.ViewSet):
         if "modify_queue" in args:
             if not self.validate_MQ(args["modify_queue"]):
                 return 400
-        if not self.validate_PL(args["play"]):
-            return 400
+        if "play" in args:
+            if not self.validate_PL(args["play"]):
+                return 400
         event.save()
         tunesync = TuneSync(event_id=event.id, play=args["play"])
         result = []
@@ -192,7 +197,6 @@ class EventViewSet(viewsets.ViewSet):
         tunesync.modify_queue = result
         tunesync.save()
         result = get_tune_sync(event.room.id)
-        print(result)
         return Response(result, status=200)
 
     def validate_U(self, args):
