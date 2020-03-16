@@ -220,6 +220,22 @@ export class MainScreenComponent implements OnInit, OnDestroy {
 
     if (queue) {
       if (queue.length !== 0 && playEvent) {
+        if (!playEvent.play.is_playing) {
+          // EASY CASE
+          this.store.dispatch(
+            DashboardActions.setQueueIndex({
+              queueIndex: playEvent.play.queue_index,
+            }),
+          );
+          this.store.dispatch(
+            DashboardActions.setSongStatus({
+              seekTime: playEvent.play.timestamp,
+              isPlaying: false,
+            }),
+          );
+          return;
+        }
+
         // queue exists and something played before
         const playTimeStamp = moment(tuneSyncEvent.play_time);
         let difference = moment().diff(playTimeStamp, 'seconds', true);
@@ -232,13 +248,16 @@ export class MainScreenComponent implements OnInit, OnDestroy {
             // first iteration only
             console.log(
               'initial diff',
-              queue[i].length - playEvent.timestamp < difference,
+              queue[i].length - playEvent.play.timestamp < difference,
             );
-            console.log('init differe', queue[i].length - playEvent.timestamp);
+            console.log(
+              'init differe',
+              queue[i].length - playEvent.play.timestamp,
+            );
             if (queue[i].length - playEvent.play.timestamp < difference) {
               console.log('in the if statement some how');
               // remaining time in the first song can be subtracted
-              difference -= queue[i].length - playEvent.timestamp;
+              difference -= queue[i].length - playEvent.play.timestamp;
             } else {
               console.log(
                 'exiting after initial loop dispatch new queue index and dispatch new song status',

@@ -211,14 +211,19 @@ export class DashboardEffects {
       ofType(DashboardActions.createRoom),
       switchMap(action =>
         this.roomsService.createRoom(action.room).pipe(
-          mergeMap(response => [
-            {
-              type: DashboardActions.createInviteUsersEvent.type,
-              users: action.users,
-              roomId: response.id,
-            },
-            { type: DashboardActions.getRooms.type },
-          ]),
+          mergeMap(response => {
+            if (action.users === null || action.users.length === 0) {
+              return [{ type: DashboardActions.getRooms.type }];
+            }
+            return [
+              {
+                type: DashboardActions.createInviteUsersEvent.type,
+                users: action.users,
+                roomId: response.id,
+              },
+              { type: DashboardActions.getRooms.type },
+            ];
+          }),
         ),
       ),
     ),

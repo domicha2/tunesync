@@ -41,6 +41,7 @@ export class ControlsComponent
   isPaused = true;
 
   seekTime = 0;
+  pauseOnLoaded: boolean;
   queueIndex = 0;
 
   constructor(
@@ -113,11 +114,13 @@ export class ControlsComponent
     console.log(this.queue);
     console.log('seek time:', songStatus.seekTime);
     if (songStatus.isPlaying === true) {
+      this.pauseOnLoaded = false;
       if (this.currentSong) {
         // i believe this is executed when the websocket broadcast play on a paused song
         const song = this.getAudioElement();
         if (songStatus.seekTime !== undefined) {
           song.currentTime = songStatus.seekTime;
+          console.log('after seeked time', song.currentTime);
         }
         song.play();
       } else {
@@ -131,8 +134,15 @@ export class ControlsComponent
         }
       }
     } else if (songStatus.isPlaying === false) {
-      // this is used for other people listening to the room
-      this.getAudioElement().pause();
+      this.pauseOnLoaded = true;
+      console.log('wanting to pause the song');
+      if (this.currentSong === undefined) {
+        // need to set the current song, pause, then seek to the given time
+        if (songStatus.seekTime !== undefined) {
+          this.seekTime = songStatus.seekTime;
+        }
+        this.currentSong = this.queue[this.queueIndex];
+      }
     }
   }
 
@@ -236,9 +246,28 @@ export class ControlsComponent
     this.matDialog.open(QueueComponent, {});
   }
 
+  /**
+   * This function duplicates the code to alleviate a race condition bug
+   * @param event
+   */
   onLoadedData(event: Event): void {
     console.log('song is loaded', event);
     this.getAudioElement().currentTime = this.seekTime;
-    this.seekTime = 0;
+    console.log('on load start time 1', this.getAudioElement().currentTime);
+
+    if (this.pauseOnLoaded) {
+      // this is used for other people listening to the room
+      this.getAudioElement().pause();
+    }
+
+    setTimeout(() => {
+      if (!this.pauseOnLoaded) {
+        this.getAudioElement().currentTime = this.seekTime + 0.5;
+      } else {
+        this.getAudioElement().currentTime = this.seekTime;
+      }
+      console.log('on load start time 2', this.getAudioElement().currentTime);
+      this.seekTime = 0;
+    }, 500);
   }
 }
