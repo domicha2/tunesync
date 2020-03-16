@@ -16,4 +16,8 @@ export class RoomsService {
   createRoom(room: Room): Observable<any> {
     return this.httpWrapperService.post('/rooms/', room);
   }
+
+  getTuneSyncEvent(roomId: number): Observable<any> {
+    return this.httpWrapperService.get(`/rooms/${roomId}/tunesync/`);
+  }
 }

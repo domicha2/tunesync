@@ -5,7 +5,11 @@ import { Store } from '@ngrx/store';
 
 import { environment } from '../../../environments/environment';
 import { AppState } from '../../app.module';
-import { selectEvents, selectActiveRoom } from '../store/dashboard.selectors';
+import {
+  selectEvents,
+  selectActiveRoom,
+  selectTuneSyncEvent,
+} from '../store/dashboard.selectors';
 import {
   AppEvent,
   EventType,
@@ -32,6 +36,12 @@ export class MainScreenComponent implements OnInit, OnDestroy {
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
+    this.subscription.add(
+      this.store
+        .select(selectTuneSyncEvent)
+        .subscribe(response => console.log('tunesync event', response)),
+    );
+
     this.subscription.add(
       this.store.select(selectUserId).subscribe((userId: number) => {
         this.userId = userId;
