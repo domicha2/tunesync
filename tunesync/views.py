@@ -381,7 +381,7 @@ class TuneViewSet(viewsets.ViewSet):
                 uploader=request.user,
                 length=audio.info.length,
                 mime=audio.mime[0],
-                audio_file=song,
+                audio_file=request.FILES[song],
             )
             tune.save()
             serializer = TuneSerializer(tune)
