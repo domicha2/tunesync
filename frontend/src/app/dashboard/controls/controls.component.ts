@@ -151,7 +151,7 @@ export class ControlsComponent
       const song = this.getAudioElement();
       song.play();
       this.store.dispatch(
-        DashboardActions.createPlaySongEvent({ something: {} }),
+        DashboardActions.createPlaySongEvent({ timestamp: song.currentTime }),
       );
     } else {
       console.log('else');
@@ -184,7 +184,7 @@ export class ControlsComponent
     const song = this.getAudioElement();
     song.pause();
     this.store.dispatch(
-      DashboardActions.createPauseSongEvent({ something: {} }),
+      DashboardActions.createPauseSongEvent({ timestamp: song.currentTime }),
     );
   }
 
@@ -203,7 +203,7 @@ export class ControlsComponent
 
       if (triggerEvent) {
         this.store.dispatch(
-          DashboardActions.createPlaySongEvent({ something: {} }),
+          DashboardActions.createPlaySongEvent({ timestamp: 0 }),
         );
       }
     } else {

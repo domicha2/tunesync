@@ -61,6 +61,7 @@ export class RoomsComponent implements OnInit, OnDestroy {
     );
     this.store.dispatch(DashboardActions.getUsersByRoom({ roomId: room.id }));
     this.store.dispatch(DashboardActions.getEventsByRoom({ roomId: room.id }));
+    this.store.dispatch(DashboardActions.getTuneSyncEvent({ roomId: room.id }));
   }
 
   onAddRoom(): void {

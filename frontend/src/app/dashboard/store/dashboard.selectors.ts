@@ -75,7 +75,14 @@ export const selectQueueIndex = createSelector(
   (dashboard: DashboardState) => (dashboard ? dashboard.queueIndex : undefined),
 );
 
+export const selectQueueIndexAndRoom = createSelector(
+  selectQueueIndex,
+  selectActiveRoom,
+  (index, room) => ({ index, room }),
+);
+
 export const selectTuneSyncEvent = createSelector(
   (state: AppState) => state.dashboard,
-  (dashboard: DashboardState) => (dashboard ? dashboard.tuneSyncEvent : undefined),
+  (dashboard: DashboardState) =>
+    dashboard ? dashboard.tuneSyncEvent : undefined,
 );

@@ -15,6 +15,7 @@ export enum EventType {
   Messaging = 'M',
   UserChange = 'U',
   Play = 'PL',
+  TuneSync = 'T',
 }
 
 export enum Role {

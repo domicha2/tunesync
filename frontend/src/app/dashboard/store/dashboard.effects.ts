@@ -23,7 +23,10 @@ import { AppState } from '../../app.module';
 import { Store, select } from '@ngrx/store';
 import { selectUserAndRoom } from '../../app.selectors';
 import { MainScreenService } from '../main-screen/main-screen.service';
-import { selectActiveRoom } from './dashboard.selectors';
+import {
+  selectActiveRoom,
+  selectQueueIndexAndRoom,
+} from './dashboard.selectors';
 import { selectUserId } from '../../auth/auth.selectors';
 import { ControlsService } from '../controls/controls.service';
 
@@ -241,13 +244,13 @@ export class DashboardEffects {
         ofType(DashboardActions.createPlaySongEvent),
         concatMap(action =>
           of(action).pipe(
-            withLatestFrom(this.store.pipe(select(selectActiveRoom))),
+            withLatestFrom(this.store.pipe(select(selectQueueIndexAndRoom))),
           ),
         ),
         tap(data => console.log(data)),
-        switchMap(([action, roomId]) =>
+        switchMap(([action, data]) =>
           this.controlsService
-            .createPlaySongEvent(roomId)
+            .createPlaySongEvent(data.room, data.index, action.timestamp)
             .pipe(tap(response => console.log(response))),
         ),
       ),
@@ -260,13 +263,13 @@ export class DashboardEffects {
         ofType(DashboardActions.createPauseSongEvent),
         concatMap(action =>
           of(action).pipe(
-            withLatestFrom(this.store.pipe(select(selectActiveRoom))),
+            withLatestFrom(this.store.pipe(select(selectQueueIndexAndRoom))),
           ),
         ),
         tap(data => console.log('in the pause song effect')),
-        switchMap(([action, roomId]) =>
+        switchMap(([action, data]) =>
           this.controlsService
-            .createPauseSongEvent(roomId)
+            .createPauseSongEvent(data.room, data.index, action.timestamp)
             .pipe(tap(response => console.log(response))),
         ),
       ),

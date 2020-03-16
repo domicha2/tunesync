@@ -32,11 +32,11 @@ export const createForwardSongEvent = createAction(
 );
 export const createPlaySongEvent = createAction(
   '[Controls Component] Create Play Song Event',
-  props<{ something: any }>(),
+  props<{ timestamp: number }>(),
 );
 export const createPauseSongEvent = createAction(
   '[Controls Component] Create Pause Song Event',
-  props<{ something: any }>(),
+  props<{ timestamp: number }>(),
 );
 export const setSongStatus = createAction(
   '[Main Screen Component] Set Song Status',
