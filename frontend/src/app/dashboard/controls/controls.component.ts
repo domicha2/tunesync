@@ -153,7 +153,6 @@ export class ControlsComponent
   onPlay(): void {
     // check if there is an existing song
     if (this.currentSong) {
-      console.log('if statement');
       // resume the song
       // dispatch an action telling user
       const song = this.getAudioElement();
@@ -162,7 +161,6 @@ export class ControlsComponent
         DashboardActions.createPlaySongEvent({ timestamp: song.currentTime }),
       );
     } else {
-      console.log('else');
       // check if there is a song on the queue to pop
       this.onNext(true);
     }
