@@ -124,7 +124,7 @@ class EventViewSet(viewsets.ViewSet):
             return (
                 isinstance(args["queue_index"], int)
                 and isinstance(args["is_playing"], bool)
-                and isinstance(args["timestamp"], float)
+                and (isinstance(args["timestamp"], float) or isinstance(args["timestamp"], int))
             )
         else:
             return False
