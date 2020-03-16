@@ -7,9 +7,11 @@ import { EventType } from '../dashboard.models';
 export class ControlsService {
   constructor(private httpWrapperService: HttpWrapperService) {}
 
-  createTune(tune: File): Observable<any> {
+  createTunes(tunes: FileList): Observable<any> {
     const formData: FormData = new FormData();
-    formData.append('file', tune, tune.name);
+    for (let i = 0; i < tunes.length; i++) {
+      formData.append(i.toString(), tunes[i], tunes[i].name);
+    }
     return this.httpWrapperService.post(`/tunes/`, formData);
   }
 

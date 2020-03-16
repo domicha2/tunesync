@@ -25,7 +25,11 @@ export class UsersService {
     return this.httpWrapperService.get(`/rooms/${roomId}/users/`);
   }
 
-  removeUserFromRoom(membershipId: number): Observable<any> {
-    return this.httpWrapperService.delete(`/memberships/${membershipId}/`);
+  removeUserFromRoom(roomId: number, userId: number): Observable<any> {
+    return this.httpWrapperService.post('/events/', {
+      event_type: EventType.UserChange,
+      room: roomId,
+      args: { type: UserChangeAction.Kick, user: userId },
+    });
   }
 }
