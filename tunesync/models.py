@@ -87,12 +87,10 @@ class TuneSync(models.Model):
             play_time = Event.objects.filter(pk=tunesync["event_id"]).values()[0][
                 "creation_time"
             ]
-            result["play_time"] = play_time
         else:
             tunesync = None
-            result["play_time"] = None
         result["last_play"] = tunesync
-
+        result["play_time"] = play_time
         return result
 
 
@@ -189,7 +187,8 @@ def update_tunesync_listeners(sender, instance, **kwargs):
     group_name = "event-room-{}".format(room)
 
     channel_layer = channels.layers.get_channel_layer()
-    tunesync["play_time"] = tunesync["play_time"].isoformat()
+    if "play_time" in tunesync:
+        tunesync["play_time"] = tunesync["play_time"].isoformat()
 
     async_to_sync(channel_layer.group_send)(
         group_name, {"type": "user_notify_event", "text": tunesync}
