@@ -14,7 +14,7 @@ export interface TuneSyncEvent {
 export interface QueueState {
   event_id: number;
   // [song id, length]
-  queue: [number, number][];
+  queue: [number, number, string][];
 }
 
 export interface PlayState {
@@ -22,6 +22,20 @@ export interface PlayState {
   queue_index: number;
   is_playing: boolean;
   timestamp: number;
+}
+
+export interface TuneSyncEventWS {
+  last_modify_queue: {
+    event_id: number;
+    play: { queue_index: number; is_playing: boolean; timestamp: number };
+    modify_queue: [number, number, string][];
+  };
+  last_play: {
+    event_id: number;
+    play: { queue_index: number; is_playing: boolean; timestamp: number };
+    modify_queue: [number, number, string][];
+  };
+  play_time: string;
 }
 
 export enum UserChangeAction {
