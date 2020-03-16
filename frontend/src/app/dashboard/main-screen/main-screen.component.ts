@@ -202,16 +202,14 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         }),
       );
     } else {
-      queue = (tuneSyncEvent.last_modify_queue as QueueState).modify_queue;
-      this.store.dispatch(
-        DashboardActions.storeQueue({
-          queue: queue.map(([id, length, name]) => ({
-            id,
-            length,
-            name,
-          })),
+      queue = (tuneSyncEvent.last_modify_queue as QueueState).modify_queue.map(
+        ([id, length, name]) => ({
+          id,
+          length,
+          name,
         }),
       );
+      this.store.dispatch(DashboardActions.storeQueue({ queue }));
     }
     if (tuneSyncEvent.last_play === null) {
       // no last play state
@@ -236,10 +234,15 @@ export class MainScreenComponent implements OnInit, OnDestroy {
               'initial diff',
               queue[i].length - playEvent.timestamp < difference,
             );
+            console.log('init differe', queue[i].length - playEvent.timestamp);
             if (queue[i].length - playEvent.play.timestamp < difference) {
+              console.log('in the if statement some how');
               // remaining time in the first song can be subtracted
               difference -= queue[i].length - playEvent.timestamp;
             } else {
+              console.log(
+                'exiting after initial loop dispatch new queue index and dispatch new song status',
+              );
               // stop here
               this.store.dispatch(
                 DashboardActions.setQueueIndex({
