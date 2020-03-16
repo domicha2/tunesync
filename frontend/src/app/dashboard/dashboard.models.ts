@@ -6,8 +6,8 @@ export interface Song {
 }
 
 export interface TuneSyncEvent {
-  last_modify_queue: QueueState;
-  last_play: PlayState;
+  last_modify_queue: QueueState | null;
+  last_play: PlayState | null;
   play_time: string;
 }
 
