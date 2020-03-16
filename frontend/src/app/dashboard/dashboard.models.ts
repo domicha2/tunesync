@@ -20,9 +20,12 @@ export interface QueueState {
 
 export interface PlayState {
   event_id: number;
-  queue_index: number;
-  is_playing: boolean;
-  timestamp: number;
+  modify_queue: any;
+  play: {
+    queue_index: number;
+    is_playing: boolean;
+    timestamp: number;
+  };
 }
 
 export interface TuneSyncEventWS {
