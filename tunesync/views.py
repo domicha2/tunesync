@@ -162,7 +162,7 @@ class EventViewSet(viewsets.ViewSet):
         result = []
         for song_id in args["modify_queue"]["queue"]:
             tune = Tune.objects.filter(pk=song_id).values()
-            result.append([song_id, tune[0]["length"]])
+            result.append([song_id, tune[0]["length"], tune[0]["name"]])
         tunesync.modify_queue = result
         tunesync.save()
         result = TuneSync.get_tune_sync(event.room.id)

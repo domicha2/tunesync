@@ -87,6 +87,7 @@ class TuneSync(models.Model):
             "creation_time"
         ]
         result["play_time"] = play_time
+
         return result
 
 
