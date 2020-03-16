@@ -16,6 +16,7 @@ from django.db.models import F, Q, Subquery, Value, CharField
 from django.contrib.auth import authenticate, login
 import mutagen
 
+
 class IndexPage(TemplateView):
     template_name = "index.html"
 
@@ -150,20 +151,21 @@ class EventViewSet(viewsets.ViewSet):
         """
         Returns status code to use
         """
+        tunesync = TuneSync(event_id=event.id)
         args = request.data["args"]
         if "modify_queue" in args:
             if not self.validate_MQ(args["modify_queue"]):
                 return 400
+            result = []
+            for song_id in args["modify_queue"]["queue"]:
+                tune = Tune.objects.filter(pk=song_id).values()
+                result.append([song_id, tune[0]["length"], tune[0]["name"]])
+            tunesync.modify_queue = result
         if "play" in args:
             if not self.validate_PL(args["play"]):
                 return 400
+            tunesync.play = args["play"]
         event.save()
-        tunesync = TuneSync(event_id=event.id, play=args["play"])
-        result = []
-        for song_id in args["modify_queue"]["queue"]:
-            tune = Tune.objects.filter(pk=song_id).values()
-            result.append([song_id, tune[0]["length"], tune[0]["name"]])
-        tunesync.modify_queue = result
         tunesync.save()
         result = TuneSync.get_tune_sync(event.room.id)
         return Response(result, status=200)
