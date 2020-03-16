@@ -187,7 +187,7 @@ def update_tunesync_listeners(sender, instance, **kwargs):
     group_name = "event-room-{}".format(room)
 
     channel_layer = channels.layers.get_channel_layer()
-    if "play_time" in tunesync:
+    if "play_time" in tunesync and tunesync["play_time"] is not None:
         tunesync["play_time"] = tunesync["play_time"].isoformat()
 
     async_to_sync(channel_layer.group_send)(
