@@ -222,7 +222,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
       if (queue.length !== 0 && playEvent) {
         // queue exists and something played before
         const playTimeStamp = moment(tuneSyncEvent.play_time);
-        let difference = moment().diff(playTimeStamp, 'seconds');
+        let difference = moment().diff(playTimeStamp, 'seconds', true);
         console.log('time since last play action', difference);
 
         let songIndex: number;
