@@ -165,6 +165,29 @@ export class ControlsComponent
     }
   }
 
+  /**
+   * Gets called when song automatically finishes
+   * or when user presses next or when user presses play with no current song
+   */
+  onNext(triggerEvent: boolean): void {
+    if (this.queueIndex < this.queue.length) {
+      // there exists a song on the queue ready to be played
+      this.store.dispatch(
+        DashboardActions.setQueueIndex({ queueIndex: ++this.queueIndex }),
+      );
+      this.currentSong = this.queue[this.queueIndex];
+      if (triggerEvent) {
+        // user generated event
+        this.store.dispatch(
+          DashboardActions.createPlaySongEvent({ timestamp: 0 }),
+        );
+      }
+    } else {
+      // clear the current song
+      this.currentSong = undefined;
+    }
+  }
+
   onReplay(): void {
     const song = this.getAudioElement();
     if (song.currentTime >= 10) {
@@ -194,29 +217,6 @@ export class ControlsComponent
   }
 
   onPrevious(): void {}
-
-  /**
-   * Gets called when song automatically finishes
-   * or when user presses next or when user presses play with no current song
-   */
-  onNext(triggerEvent: boolean): void {
-    // check if there even exists a song waiting on the queue
-    if (this.queue && this.queue.length > 0) {
-      this.store.dispatch(
-        DashboardActions.setQueueIndex({ queueIndex: ++this.queueIndex }),
-      );
-      this.currentSong = this.queue[this.queueIndex];
-
-      if (triggerEvent) {
-        this.store.dispatch(
-          DashboardActions.createPlaySongEvent({ timestamp: 0 }),
-        );
-      }
-    } else {
-      // clear the current song
-      this.currentSong = undefined;
-    }
-  }
 
   /**
    * Auto-click the next song button for the user
