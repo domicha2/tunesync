@@ -82,10 +82,20 @@
     >
       <mat-icon>fast_forward</mat-icon>
     </button>
-    <button mat-icon-button matTooltip="Rewind 10 seconds" (click)="onReplay()">
+    <button
+      mat-icon-button
+      matTooltip="Rewind 10 seconds"
+      (click)="onReplay()"
+      [disabled]="queue === undefined || queue.length === 0"
+    >
       <mat-icon>replay_10</mat-icon>
     </button>
-    <button mat-icon-button matTooltip="Skip 10 seconds" (click)="onForward()">
+    <button
+      mat-icon-button
+      matTooltip="Skip 10 seconds"
+      (click)="onForward()"
+      [disabled]="queue === undefined || queue.length === 0"
+    >
       <mat-icon>forward_10</mat-icon>
     </button>
   </div>
