@@ -124,7 +124,10 @@ class EventViewSet(viewsets.ViewSet):
             return (
                 isinstance(args["queue_index"], int)
                 and isinstance(args["is_playing"], bool)
-                and (isinstance(args["timestamp"], float) or isinstance(args["timestamp"], int))
+                and (
+                    isinstance(args["timestamp"], float)
+                    or isinstance(args["timestamp"], int)
+                )
             )
         else:
             return False
@@ -196,7 +199,11 @@ class EventViewSet(viewsets.ViewSet):
                 room=system_room,
                 author=request.user,
                 event_type="U",
-                args={"type": "I", "room": event.room.id},
+                args={
+                    "type": "I",
+                    "room_id": event.room.id,
+                    "room_name": event.room.title,
+                },
             )
             invite_event.save()
         return 200
