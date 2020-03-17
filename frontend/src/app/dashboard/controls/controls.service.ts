@@ -7,25 +7,54 @@ import { EventType } from '../dashboard.models';
 export class ControlsService {
   constructor(private httpWrapperService: HttpWrapperService) {}
 
-  createTune(tune: File): Observable<any> {
+  createTunes(tunes: FileList): Observable<any> {
     const formData: FormData = new FormData();
-    formData.append('file', tune, tune.name);
+    for (let i = 0; i < tunes.length; i++) {
+      formData.append(i.toString(), tunes[i], tunes[i].name);
+    }
     return this.httpWrapperService.post(`/tunes/`, formData);
   }
 
-  createPlaySongEvent(roomId: number): Observable<any> {
+  createSeekSongEvent(
+    roomId: number,
+    queueIndex: number,
+    timestamp: number,
+    isPlaying: boolean,
+  ): Observable<any> {
     return this.httpWrapperService.post('/events/', {
-      event_type: EventType.Play,
+      event_type: EventType.TuneSync,
       room: roomId,
-      args: { isPlaying: true },
+      args: {
+        play: { queue_index: queueIndex, is_playing: isPlaying, timestamp },
+      },
     });
   }
 
-  createPauseSongEvent(roomId: number): Observable<any> {
+  createPlaySongEvent(
+    roomId: number,
+    queueIndex: number,
+    timestamp: number,
+  ): Observable<any> {
     return this.httpWrapperService.post('/events/', {
-      event_type: EventType.Play,
+      event_type: EventType.TuneSync,
       room: roomId,
-      args: { isPlaying: false },
+      args: {
+        play: { queue_index: queueIndex, is_playing: true, timestamp },
+      },
+    });
+  }
+
+  createPauseSongEvent(
+    roomId: number,
+    queueIndex: number,
+    timestamp: number,
+  ): Observable<any> {
+    return this.httpWrapperService.post('/events/', {
+      event_type: EventType.TuneSync,
+      room: roomId,
+      args: {
+        play: { queue_index: queueIndex, is_playing: false, timestamp },
+      },
     });
   }
 }

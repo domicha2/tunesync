@@ -58,8 +58,44 @@ export const selectSeekTime = createSelector(
   (dashboard: DashboardState) => (dashboard ? dashboard.seekTime : undefined),
 );
 
+export const selectLastPlayEvent = createSelector(
+  (state: AppState) => state.dashboard,
+  (dashboard: DashboardState) =>
+    dashboard ? dashboard.lastPlayEvent : undefined,
+);
+
+export const selectQueueIndex = createSelector(
+  (state: AppState) => state.dashboard,
+  (dashboard: DashboardState) => (dashboard ? dashboard.queueIndex : undefined),
+);
+
+export const selectQueueIndexAndRoom = createSelector(
+  selectQueueIndex,
+  selectActiveRoom,
+  (index, room) => ({ index, room }),
+);
+
+export const selectQueueIndexAndSongs = createSelector(
+  selectQueueIndex,
+  selectQueuedSongs,
+  (index, songs) => ({ index, songs }),
+);
+
+export const selectTuneSyncEvent = createSelector(
+  (state: AppState) => state.dashboard,
+  (dashboard: DashboardState) =>
+    dashboard ? dashboard.tuneSyncEvent : undefined,
+);
+
 export const selectSongStatus = createSelector(
   selectIsPlaying,
   selectSeekTime,
-  (isPlaying, seekTime) => ({ isPlaying, seekTime }),
+  selectQueueIndex,
+  (isPlaying, seekTime, queueIndex) => ({ isPlaying, seekTime, queueIndex }),
+);
+
+export const selectActiveRoomName = createSelector(
+  (state: AppState) => state.dashboard,
+  (dashboard: DashboardState) =>
+    dashboard ? dashboard.activeRoomName : undefined,
 );

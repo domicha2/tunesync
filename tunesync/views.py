@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView
-from tunesync.models import Event, Room, Membership, Poll, Tune
+from tunesync.models import Event, Room, Membership, Tune, TuneSync
 from json import loads, dumps
 
 from django.contrib.auth.models import User
@@ -37,13 +37,13 @@ class UserViewSet(viewsets.ViewSet):
         if "skip" not in request.query_params:
             skip = 0
         else:
-            skip = int(request.query_params["skip"][0])
+            skip = int(request.query_params["skip"])
 
         if "limit" not in request.query_params:
             limit = 5
         else:
-            limit = int(request.query_params["limit"][0])
-        users = User.objects.exclude(pk=request.user.id).order_by("-username")[
+            limit = int(request.query_params["limit"])
+        users = User.objects.exclude(pk=request.user.id).order_by("username")[
             skip:limit
         ]
         result = []
@@ -58,7 +58,7 @@ class UserViewSet(viewsets.ViewSet):
             username=request.data["username"], password=request.data["password"]
         )
         serializer = UserSerializer(u)
-        room = Room(creator=u, system_user=u)
+        room = Room(title="System Room", creator=u, system_user=u)
         room.save()
         membership = Membership(user=u, room=room, state="A", role="A")
         membership.save()
@@ -119,24 +119,15 @@ class UserViewSet(viewsets.ViewSet):
 
 
 class EventViewSet(viewsets.ViewSet):
-    """
-    """
-
-    def validate_M(self, args):
-        """
-        we just need to confirm that there is a content value in the payload
-        """
-        if "content" in args:
-            return isinstance(args["content"], str)
-        else:
-            return False
-
     def validate_PL(self, args):
-        if set(args.keys()) >= {"song_id", "is_playing", "timestamp"}:
+        if set(args.keys()) >= {"queue_index", "is_playing", "timestamp"}:
             return (
-                isinstance(args["song_id"], int)
+                isinstance(args["queue_index"], int)
                 and isinstance(args["is_playing"], bool)
-                and isinstance(args["timestamp"], float)
+                and (
+                    isinstance(args["timestamp"], float)
+                    or isinstance(args["timestamp"], int)
+                )
             )
         else:
             return False
@@ -147,21 +138,121 @@ class EventViewSet(viewsets.ViewSet):
         else:
             return False
 
+    def handle_M(self, request, event, **kw):
+        """
+        we just need to confirm that there is a content value in the payload
+        """
+        args = request.data["args"]
+        if "content" in args:
+            if isinstance(args["content"], str):
+                event.save()
+                serializer = EventSerializer(event)
+                return Response(serializer.data)
+        return Response(status=400)
+
+    def handle_T(self, request, event):
+        """
+        Returns status code to use
+        """
+        event.save()
+        tunesync = TuneSync(event_id=event.id)
+        args = request.data["args"]
+        if "modify_queue" in args:
+            if not self.validate_MQ(args["modify_queue"]):
+                print("here")
+                return Response(status=400)
+            result = []
+            for song_id in args["modify_queue"]["queue"]:
+                tune = Tune.objects.filter(pk=song_id).values()
+                result.append([song_id, tune[0]["length"], tune[0]["name"]])
+            tunesync.modify_queue = result
+        if "play" in args:
+            if not self.validate_PL(args["play"]):
+                print("no here")
+                return Response(status=400)
+            tunesync.play = args["play"]
+        tunesync.save()
+        result = TuneSync.get_tune_sync(event.room.id)
+        return Response(result, status=200)
+
     def validate_U(self, args):
+        event_type = args["type"]
+        if event_type == "K":
+            return "user" in args
+        elif event_type == "I":
+            return "users" in args
+        elif event_type == "J":
+            return "is_accepted" in args
+        elif event_type == "C":
+            return set(args.keys()) == {"type", "user", "role"}
+        else:
+            return True
+        return False
+
+    def handle_U_I(self, args, event, request, **kw):
+        for user in args["users"]:
+            system_room = Room.objects.get(system_user__id=user)
+            u_obj = User.objects.get(pk=user)
+            membership = Membership(room=event.room, user=u_obj, state="P", role="R")
+            membership.save()
+            invite_event = Event(
+                room=system_room,
+                author=request.user,
+                event_type="U",
+                args={
+                    "type": "I",
+                    "room_id": event.room.id,
+                    "room_name": event.room.title,
+                },
+            )
+            invite_event.save()
+        return 200
+
+    def handle_U_J(self, args, event, request, **kw):
+        user = request.user
+        if args["is_accepted"]:
+            membership = Membership.objects.get(room=event.room, user=user)
+            membership.state = "A"
+            membership.save()
+        else:
+            membership = Membership.objects.get(room=event.room, user=user)
+            membership.state = "R"
+            membership.save()
+        return 200
+
+    def handle_U_K(self, args, event, request, **kw):
+        user = request.user
+        system_room = Room.objects.get(system_user__id=args["user"])
+        kick_event = Event(
+            author=user,
+            room=system_room,
+            event_type="U",
+            args={"type": "K", "room": event.room.id},
+        )
+        # let them know they've been kicked lol
+        kick_event.save()
+        # delete user from room
+        Membership.objects.get(room=event.room, user__id=args["user"]).delete()
+        return 200
+
+    def handle_U_C(self, args, event, **kw):
+        membership = Membership.objects.get(user__id=args["user"], room=event.room)
+        membership.role = args["role"]
+        membership.save()
+        return 200
+
+    def handle_U(self, request, event, **kw):
+        args = request.data["args"]
         if "type" in args:
             if args["type"] in {"K", "I", "J", "L", "C"}:
-                event_type = args["type"]
-                if event_type == "K":
-                    return "user" in args
-                elif event_type == "I":
-                    return "users" in args
-                elif event_type == "J":
-                    return "is_accepted" in args
-                elif event_type == "C":
-                    return set(args.keys()) == {"type", "user", "role"}
-                else:
-                    return True
-        return False
+                if self.validate_U(args):
+                    print("here")
+                    event.save()
+                    handle_event = getattr(self, "handle_U_" + args["type"])
+                    result = handle_event(args, event, request=request)
+                    serializer = EventSerializer(event)
+                    return Response(serializer.data, status=result)
+        return Response(status=400)
 
     def validate_PO(self, args):
         if "action":
@@ -189,52 +280,23 @@ class EventViewSet(viewsets.ViewSet):
 
     # POST
     def create(self, request):
-        # deserialize
-        deserializer = EventSerializer(data=request.data)
-        if not deserializer.is_valid():
-            Response(status=404)
-            print(deserializer.errors)
-        event = deserializer.save(author=request.user)
-        args = event.args
-        validate = getattr(self, "validate_" + event.event_type)
-        if not validate(args):
+        if not set(request.data) <= {"room", "args", "event_type", "parent_event"}:
             return Response(status=400)
-        if request.data["event_type"] == "U":
-            # if self.validate_U:
-            if args["type"] == "I":
-                for user in args["users"]:
-                    system_room = Room.objects.get(system_user__id=user)
-                    u_obj = User.objects.get(pk=user)
-                    membership = Membership(
-                        room=event.room, user=u_obj, state="P", role="R"
-                    )
-                    membership.save()
-                    invite_event = Event(
-                        room=system_room,
-                        author=request.user,
-                        event_type="U",
-                        args={"type": "I", "room": event.room.id},
-                    )
-                    invite_event.save()
-            elif args["type"] == "J":
-                # validate here
-                if args["is_accepted"]:
-                    membership = Membership.objects.get(
-                        room=event.room, user=request.user
-                    )
-                    membership.state = "A"
-                    membership.save()
-                else:
-                    membership = Membership.objects.get(
-                        room=event.room, user=request.user
-                    )
-                    membership.state = "R"
-                    membership.save()
-        #    poll = Poll(id=event, action=event.event_type, room=event.room)
-        # serialize
-
-        serialzer = EventSerializer(event)
-        return Response(serialzer.data)
+        try:
+            room = Room.objects.get(pk=request.data["room"])
+        except:
+            return Response(status=400)
+        event = Event(
+            author=request.user,
+            room=room,
+            event_type=request.data["event_type"],
+            args=request.data["args"],
+        )
+        if "parent_event" in request.data:
+            event.parent_event = request.data["parent_event"]
+        handle_event = getattr(self, "handle_" + event.event_type)
+        result = handle_event(request, event)
+        return result
 
 
 class RoomViewSet(viewsets.ViewSet):
@@ -284,12 +346,17 @@ class RoomViewSet(viewsets.ViewSet):
     def users(self, request, pk=None):
         # get all user in this room
         users = (
-            Membership.objects.filter(room=pk)
+            Membership.objects.filter(room=pk, state="A")
             .values("role", "state")
             .annotate(membershipId=F("id"), userId=F("user"), name=F("user__username"))
             .order_by("role", "state", "name")
         )
         return Response(users)
+
+    @action(methods=["get"], detail=True)
+    def tunesync(self, request, pk=None):
+        result = TuneSync.get_tune_sync(pk)
+        return Response(result)
 
 
 class TuneViewSet(viewsets.ViewSet):
@@ -311,6 +378,7 @@ class TuneViewSet(viewsets.ViewSet):
 
     # post
     def create(self, request):
+        result = []
         for song in request.FILES:
             audio = mutagen.File(request.FILES[song], easy=True)
             tune = Tune(
@@ -320,11 +388,12 @@ class TuneViewSet(viewsets.ViewSet):
                 uploader=request.user,
                 length=audio.info.length,
                 mime=audio.mime[0],
-                audio_file=request.FILES["file"],
+                audio_file=request.FILES[song],
             )
             tune.save()
             serializer = TuneSerializer(tune)
-            return Response(serializer.data)
+            result.append(serializer.data)
+        return Response(result)
 
     # READ
     def list(self, request):

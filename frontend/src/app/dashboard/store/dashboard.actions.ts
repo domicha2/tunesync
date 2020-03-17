@@ -3,28 +3,65 @@ import { createAction, props } from '@ngrx/store';
 import { Song, User, Room, AppEvent } from '../dashboard.models';
 import { User as AuthUser } from '../dashboard.models';
 
+export const resetState = createAction('[Rooms Component] Reset State');
+
 /* Tunes */
+export const getTuneSyncEvent = createAction(
+  '[Rooms Component] Get TuneSync Event',
+  props<{ roomId: number }>(),
+);
+export const setTuneSyncEvent = createAction(
+  '[Rooms API] Set TuneSync Event',
+  props<{ tuneSyncEvent: any }>(),
+);
+
+export const setQueueIndex = createAction(
+  '[Dashboard Effects] Set Queue Index',
+  props<{ queueIndex: number }>(),
+);
+
+export const setLastPlayEvent = createAction(
+  '[Controls Component] Set Last Play Event',
+  props<{ lastPlayEvent: any }>(),
+);
+
+export const createPreviousSongEvent = createAction(
+  '[Controls Component] Create Previous Song Event',
+  props<{ timestamp: number; isPlaying: boolean; queueIndex: number }>(),
+);
+export const createNextSongEvent = createAction(
+  '[Controls Component] Create Next Song Event',
+  props<{ timestamp: number; isPlaying: boolean; queueIndex: number }>(),
+);
+export const createReplaySongEvent = createAction(
+  '[Controls Component] Create Replay Song Event',
+  props<{ timestamp: number; isPlaying: boolean }>(),
+);
+export const createForwardSongEvent = createAction(
+  '[Controls Component] Create Forward Song Event',
+  props<{ timestamp: number; isPlaying: boolean }>(),
+);
 export const createPlaySongEvent = createAction(
   '[Controls Component] Create Play Song Event',
-  props<{ something: any }>(),
+  props<{ timestamp: number }>(),
 );
 export const createPauseSongEvent = createAction(
   '[Controls Component] Create Pause Song Event',
-  props<{ something: any }>(),
+  props<{ timestamp: number }>(),
 );
 export const setSongStatus = createAction(
   '[Main Screen Component] Set Song Status',
-  props<{ isPlaying: boolean; seekTime?: number }>(),
+  props<{ isPlaying: boolean; seekTime?: number; queueIndex: number }>(),
 );
 
-export const createTune = createAction(
-  '[Controls Component] Create Tune',
-  props<{ tune: File }>(),
+export const createTunes = createAction(
+  '[Controls Component] Create Tunes',
+  props<{ tunes: FileList }>(),
 );
 
 export const createModifyQueueEvent = createAction(
   '[Queue Component] Create Modify Queue Event',
-  props<{ queue: Song[] }>(),
+  props<{ queue: number[] }>(),
 );
 
 export const storeQueue = createAction(
@@ -34,11 +71,6 @@ export const storeQueue = createAction(
 
 export const getAvailableSongs = createAction(
   '[Queue Component] Get Available Songs',
-);
-
-export const addAvailableSong = createAction(
-  '[Controls Component] Add Available Song',
-  props<{ song: Song }>(),
 );
 
 export const storeAvailableSongs = createAction(
@@ -67,7 +99,7 @@ export const storeRooms = createAction(
 );
 export const setActiveRoom = createAction(
   '[Rooms Component] Set Active Room',
-  props<{ activeRoomId: number }>(),
+  props<{ activeRoomId: number; activeRoomName: string }>(),
 );
 
 export const getUsersByRoom = createAction(
@@ -80,7 +112,7 @@ export const storeUsers = createAction(
 );
 export const removeUserFromRoom = createAction(
   '[Kick User Component] Remove User From Room',
-  props<{ membershipId: number }>(),
+  props<{ userId: number }>(),
 );
 
 /* Messaging */
@@ -107,4 +139,9 @@ export const storeAllUsers = createAction(
 export const createInviteUsersEvent = createAction(
   '[Dashboard Effect] Create Invite Users Event',
   props<{ users: number[]; roomId: number }>(),
+);
+
+export const createInviteResponseEvent = createAction(
+  '[Main Screen Component] Create Invite Response Event',
+  props<{ roomId: number; response: 'A' | 'R' }>(),
 );

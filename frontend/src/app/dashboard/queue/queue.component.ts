@@ -13,9 +13,11 @@ import { AppState } from '../../app.module';
 import {
   selectQueuedSongs,
   selectAvailableSongs,
+  selectQueueIndexAndSongs,
 } from '../store/dashboard.selectors';
 import * as DashboardActions from '../store/dashboard.actions';
 import { Song } from '../dashboard.models';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-queue',
@@ -25,8 +27,10 @@ import { Song } from '../dashboard.models';
 export class QueueComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
 
-  queuedSongs: Song[];
-  availableSongs: Song[];
+  masterQueue: Song[] = [];
+  queuedSongs: Song[] = [];
+  availableSongs: Song[] = [];
+  songIndex: number;
 
   constructor(private store: Store<AppState>) {}
 
@@ -34,13 +38,22 @@ export class QueueComponent implements OnInit, OnDestroy {
     this.store.dispatch(DashboardActions.getAvailableSongs());
 
     this.subscription.add(
-      this.store.select(selectQueuedSongs).subscribe((queuedSongs: Song[]) => {
-        if (this.queuedSongs) {
-          this.queuedSongs = queuedSongs;
-        } else {
-          this.queuedSongs = [];
-        }
-      }),
+      this.store
+        .select(selectQueueIndexAndSongs)
+        .pipe(
+          filter(data => data.index !== undefined && data.songs !== undefined),
+        )
+        .subscribe(data => {
+          this.songIndex = data.index;
+          // have two queues, one visible and one in the background
+          if (data.songs) {
+            this.masterQueue = data.songs.slice();
+            this.queuedSongs = data.songs.slice(data.index + 1);
+          } else {
+            this.masterQueue = [];
+            this.queuedSongs = [];
+          }
+        }),
     );
 
     this.subscription.add(
@@ -72,7 +85,10 @@ export class QueueComponent implements OnInit, OnDestroy {
           // update everyone because queue got reordered
           this.store.dispatch(
             DashboardActions.createModifyQueueEvent({
-              queue: this.queuedSongs,
+              queue: this.masterQueue
+                .slice(0, this.songIndex + 1)
+                .concat(this.queuedSongs)
+                .map(el => el.id),
             }),
           );
         }
@@ -87,7 +103,12 @@ export class QueueComponent implements OnInit, OnDestroy {
 
       // queue lost or gained an item, need to update websocket
       this.store.dispatch(
-        DashboardActions.createModifyQueueEvent({ queue: this.queuedSongs }),
+        DashboardActions.createModifyQueueEvent({
+          queue: this.masterQueue
+            .slice(0, this.songIndex + 1)
+            .concat(this.queuedSongs)
+            .map(el => el.id),
+        }),
       );
     }
 

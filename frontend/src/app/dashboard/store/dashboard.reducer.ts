@@ -12,17 +12,24 @@ export interface DashboardState {
   // users in a room
   users: User[];
   activeRoomId: number;
+  activeRoomName: string;
   events: AppEvent[];
   // users in the application
   allUsers: AuthUser[];
   isPlaying: boolean;
   seekTime: number;
+  lastPlayEvent: any;
+  queueIndex: number;
+  tuneSyncEvent: any;
 }
 
 export const initialState: DashboardState = undefined;
 
 const reducer = createReducer(
   initialState,
+  on(DashboardActions.resetState, (state, action) => ({
+    rooms: state.rooms,
+  })),
   on(DashboardActions.storeQueue, (state, action: any) => {
     return { ...state, queuedSongs: action.queue };
   }),
@@ -35,10 +42,6 @@ const reducer = createReducer(
       availableSongs: action.availableSongs,
       queuedSongs: action.queuedSongs,
     };
-  }),
-  on(DashboardActions.addAvailableSong, (state, action) => {
-    state.availableSongs.push(action.song);
-    return state;
   }),
   on(DashboardActions.storeRooms, (state, action) => {
     return {
@@ -56,6 +59,7 @@ const reducer = createReducer(
     return {
       ...state,
       activeRoomId: action.activeRoomId,
+      activeRoomName: action.activeRoomName,
     };
   }),
   on(DashboardActions.storeEvents, (state, action) => {
@@ -75,6 +79,25 @@ const reducer = createReducer(
       ...state,
       isPlaying: action.isPlaying,
       seekTime: action.seekTime,
+      queueIndex: action.queueIndex,
+    };
+  }),
+  on(DashboardActions.setLastPlayEvent, (state, action) => {
+    return {
+      ...state,
+      lastPlayEvent: action.lastPlayEvent,
+    };
+  }),
+  on(DashboardActions.setQueueIndex, (state, action) => {
+    return {
+      ...state,
+      queueIndex: action.queueIndex,
+    };
+  }),
+  on(DashboardActions.setTuneSyncEvent, (state, action) => {
+    return {
+      ...state,
+      tuneSyncEvent: action.tuneSyncEvent,
     };
   }),
 );

@@ -36,24 +36,21 @@ class Room(models.Model):
 class Event(models.Model):
     MESSAGE = "M"
     VOTE = "V"
-    MODIFY_QUEUE = "MQ"
-    PLAY = "PL"
+    TUNESYNC = "T"
     POLL = "PO"
     USER_CHANGE = "U"
     EVENT_TYPE = [
         (POLL, "Poll"),
         (USER_CHANGE, "User Change"),
-        (MESSAGE, "Message"),
+        (TUNESYNC, "Tune Sync"),
         (VOTE, "Vote"),
-        (MODIFY_QUEUE, "Modify Queue"),
-        (PLAY, "Play"),
     ]
     isDeleted = models.BooleanField(default=False)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
     event_type = models.CharField(max_length=2, choices=EVENT_TYPE, default=MESSAGE)
     author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
-    parent_event_id = models.ForeignKey(
+    parent_event = models.ForeignKey(
         "self", null=True, blank=True, on_delete=models.CASCADE, default=None
     )
     args = JSONField()  # this will be a serialized json in a string
@@ -62,13 +59,48 @@ class Event(models.Model):
         indexes = [models.Index(fields=["room", "event_type", "creation_time"])]
 
 
+class TuneSync(models.Model):
+    event = models.OneToOneField(Event, on_delete=models.CASCADE, primary_key=True)
+    play = JSONField(null=True, blank=True)
+    modify_queue = JSONField(null=True, blank=True)
+
+    def get_tune_sync(pk):
+        result = {}
+        play_time = None
+        tunesync = (
+            TuneSync.objects.filter(event__room_id=pk, modify_queue__isnull=False)
+            .order_by("-event__creation_time")
+            .values()
+        )
+        if tunesync:
+            tunesync = tunesync[0]
+        else:
+            tunesync = None
+        result["last_modify_queue"] = tunesync
+        tunesync = (
+            TuneSync.objects.filter(event__room_id=pk, play__isnull=False)
+            .order_by("-event__creation_time")
+            .values()
+        )
+        if tunesync:
+            tunesync = tunesync[0]
+            play_time = Event.objects.filter(pk=tunesync["event_id"]).values()[0][
+                "creation_time"
+            ]
+        else:
+            tunesync = None
+        result["last_play"] = tunesync
+        result["play_time"] = play_time
+        return result
+
+
 class Poll(models.Model):
     KICK = "K"
     MODIFY_QUEUE = "MQ"
     PLAY = "PL"
     ACTIONS = [(KICK, "Kick"), (MODIFY_QUEUE, "Modify Queue"), (PLAY, "Play")]
     # TODO:
-    id = models.OneToOneField(Event, on_delete=models.CASCADE, primary_key=True)
+    event = models.OneToOneField(Event, on_delete=models.CASCADE, primary_key=True)
     action = models.CharField(max_length=2, choices=ACTIONS)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
@@ -123,6 +155,9 @@ def update_event_listeners(sender, instance, **kwargs):
     """
     Alerts consumer of new events
     """
+    if instance.event_type == "T":
+        return
+
     room = instance.room
     group_name = "event-room-{}".format(room.id)
 
@@ -143,5 +178,20 @@ def update_event_listeners(sender, instance, **kwargs):
         group_name, {"type": "user_notify_event", "text": message}
     )
 
+
+@receiver(post_save, sender=TuneSync, dispatch_uid="update_tunesync_listeners")
+def update_tunesync_listeners(sender, instance, **kwargs):
+    room = instance.event.room.id
+
+    tunesync = TuneSync.get_tune_sync(room)
+    group_name = "event-room-{}".format(room)
+
+    channel_layer = channels.layers.get_channel_layer()
+    if "play_time" in tunesync and tunesync["play_time"] is not None:
+        tunesync["play_time"] = tunesync["play_time"].isoformat()
+
+    async_to_sync(channel_layer.group_send)(
+        group_name, {"type": "user_notify_event", "text": tunesync}
+    )
     # need end point for websocket token
     # signed with hmacs

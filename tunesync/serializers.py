@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from .models import Membership, Room, Event, Poll, Vote, Tune
+from .models import Membership, Room, Event, Poll, Vote, Tune, TuneSync
 from rest_framework import serializers
 
 
@@ -45,7 +45,7 @@ class VoteSerializer(serializers.ModelSerializer):
 class PollSerializer(serializers.ModelSerializer):
     class Meta:
         model = Poll
-        fields = ["id", "action", "room", "creation_time", "args"]
+        fields = ["action", "room", "creation_time", "args"]
 
 
 class TuneSerializer(serializers.ModelSerializer):
