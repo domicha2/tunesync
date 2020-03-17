@@ -102,6 +102,8 @@ export class MainScreenComponent implements OnInit, OnDestroy {
       //! hard coded refactor if have time
       if (this.activeRoomName !== 'System Room' && event.event_type === 'U') {
         return false;
+      } else if (event.event_type === EventType.TuneSync) {
+        return false;
       } else {
         return true;
       }
