@@ -156,26 +156,12 @@ export class MainScreenComponent implements OnInit, OnDestroy {
                 this.store.dispatch(
                   DashboardActions.setSongStatus({
                     isPlaying: tuneSyncEvent.last_play.play.is_playing,
+                    seekTime: tuneSyncEvent.last_play.play.timestamp,
                   }),
                 );
               }
               break;
             case EventType.Messaging:
-              break;
-            case EventType.Play:
-              // if we just got a play event we could either be playing or pausing the song
-              const payload: PlayEvent = event.args;
-              if (payload.isPlaying) {
-                // play the song
-                this.store.dispatch(
-                  DashboardActions.setSongStatus({ isPlaying: true }),
-                );
-              } else {
-                // pause the song
-                this.store.dispatch(
-                  DashboardActions.setSongStatus({ isPlaying: false }),
-                );
-              }
               break;
             default:
               console.error('bad event type');

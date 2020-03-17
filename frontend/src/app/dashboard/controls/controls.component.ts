@@ -143,7 +143,9 @@ export class ControlsComponent
         }
         this.currentSong = this.queue[this.queueIndex];
       } else {
-        this.getAudioElement().pause();
+        const song = this.getAudioElement();
+        song.pause();
+        song.currentTime = songStatus.seekTime;
       }
     }
   }
@@ -202,22 +204,34 @@ export class ControlsComponent
 
   onReplay(): void {
     const song = this.getAudioElement();
+    let timestamp: number;
     if (song.currentTime >= 10) {
-      this.store.dispatch(DashboardActions.createReplaySongEvent({}));
-      song.currentTime -= 10;
+      timestamp = song.currentTime - 10;
     } else {
-      song.currentTime = 0;
+      timestamp = 0;
     }
+    this.store.dispatch(
+      DashboardActions.createReplaySongEvent({
+        timestamp,
+        isPlaying: !this.isPaused,
+      }),
+    );
   }
 
   onForward(): void {
     const song = this.getAudioElement();
+    let timestamp: number;
     if (song.duration - song.currentTime >= 10) {
-      this.store.dispatch(DashboardActions.createForwardSongEvent({}));
-      song.currentTime += 10;
+      timestamp = song.currentTime + 10;
     } else {
-      song.currentTime = song.duration;
+      timestamp = song.duration;
     }
+    this.store.dispatch(
+      DashboardActions.createForwardSongEvent({
+        timestamp,
+        isPlaying: !this.isPaused,
+      }),
+    );
   }
 
   onPause(): void {

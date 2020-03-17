@@ -24,11 +24,11 @@ export const setLastPlayEvent = createAction(
 );
 export const createReplaySongEvent = createAction(
   '[Controls Component] Create Replay Song Event',
-  props<{}>(),
+  props<{ timestamp: number; isPlaying: boolean }>(),
 );
 export const createForwardSongEvent = createAction(
   '[Controls Component] Create Forward Song Event',
-  props<{}>(),
+  props<{ timestamp: number; isPlaying: boolean }>(),
 );
 export const createPlaySongEvent = createAction(
   '[Controls Component] Create Play Song Event',
