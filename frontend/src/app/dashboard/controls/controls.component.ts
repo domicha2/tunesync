@@ -278,12 +278,12 @@ export class ControlsComponent
 
     setTimeout(() => {
       if (!this.pauseOnLoaded) {
-        this.getAudioElement().currentTime = this.seekTime + 0.5;
+        this.getAudioElement().currentTime = this.seekTime + 1;
       } else {
         this.getAudioElement().currentTime = this.seekTime;
       }
       console.log('on load start time 2', this.getAudioElement().currentTime);
       this.seekTime = 0;
-    }, 500);
+    }, 1000);
   }
 }
