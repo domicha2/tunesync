@@ -16,6 +16,7 @@ from django.db.models import F, Q, Subquery, Value, CharField
 from django.contrib.auth import authenticate, login
 import mutagen
 
+
 class IndexPage(TemplateView):
     template_name = "index.html"
 
@@ -36,13 +37,13 @@ class UserViewSet(viewsets.ViewSet):
         if "skip" not in request.query_params:
             skip = 0
         else:
-            skip = int(request.query_params["skip"][0])
+            skip = int(request.query_params["skip"])
 
         if "limit" not in request.query_params:
             limit = 5
         else:
-            limit = int(request.query_params["limit"][0])
-        users = User.objects.exclude(pk=request.user.id).order_by("-username")[
+            limit = int(request.query_params["limit"])
+        users = User.objects.exclude(pk=request.user.id).order_by("username")[
             skip:limit
         ]
         result = []
@@ -123,7 +124,10 @@ class EventViewSet(viewsets.ViewSet):
             return (
                 isinstance(args["queue_index"], int)
                 and isinstance(args["is_playing"], bool)
-                and isinstance(args["timestamp"], float)
+                and (
+                    isinstance(args["timestamp"], float)
+                    or isinstance(args["timestamp"], int)
+                )
             )
         else:
             return False
@@ -150,20 +154,23 @@ class EventViewSet(viewsets.ViewSet):
         """
         Returns status code to use
         """
+        event.save()
+        tunesync = TuneSync(event_id=event.id)
         args = request.data["args"]
         if "modify_queue" in args:
             if not self.validate_MQ(args["modify_queue"]):
-                return 400
+                print("here")
+                return Response(status=400)
+            result = []
+            for song_id in args["modify_queue"]["queue"]:
+                tune = Tune.objects.filter(pk=song_id).values()
+                result.append([song_id, tune[0]["length"], tune[0]["name"]])
+            tunesync.modify_queue = result
         if "play" in args:
             if not self.validate_PL(args["play"]):
-                return 400
-        event.save()
-        tunesync = TuneSync(event_id=event.id, play=args["play"])
-        result = []
-        for song_id in args["modify_queue"]["queue"]:
-            tune = Tune.objects.filter(pk=song_id).values()
-            result.append([song_id, tune[0]["length"], tune[0]["name"]])
-        tunesync.modify_queue = result
+                print("no here")
+                return Response(status=400)
+            tunesync.play = args["play"]
         tunesync.save()
         result = TuneSync.get_tune_sync(event.room.id)
         return Response(result, status=200)
@@ -192,7 +199,11 @@ class EventViewSet(viewsets.ViewSet):
                 room=system_room,
                 author=request.user,
                 event_type="U",
-                args={"type": "I", "room": event.room.id},
+                args={
+                    "type": "I",
+                    "room_id": event.room.id,
+                    "room_name": event.room.title,
+                },
             )
             invite_event.save()
         return 200
@@ -377,7 +388,7 @@ class TuneViewSet(viewsets.ViewSet):
                 uploader=request.user,
                 length=audio.info.length,
                 mime=audio.mime[0],
-                audio_file=song,
+                audio_file=request.FILES[song],
             )
             tune.save()
             serializer = TuneSerializer(tune)

@@ -74,20 +74,23 @@ class TuneSync(models.Model):
         )
         if tunesync:
             tunesync = tunesync[0]
+        else:
+            tunesync = None
         result["last_modify_queue"] = tunesync
         tunesync = (
-            TuneSync.objects.filter(event__room_id=pk)
+            TuneSync.objects.filter(event__room_id=pk, play__isnull=False)
             .order_by("-event__creation_time")
             .values()
         )
         if tunesync:
             tunesync = tunesync[0]
+            play_time = Event.objects.filter(pk=tunesync["event_id"]).values()[0][
+                "creation_time"
+            ]
+        else:
+            tunesync = None
         result["last_play"] = tunesync
-        play_time = Event.objects.filter(pk=tunesync["event_id"]).values()[0][
-            "creation_time"
-        ]
         result["play_time"] = play_time
-
         return result
 
 
@@ -184,7 +187,8 @@ def update_tunesync_listeners(sender, instance, **kwargs):
     group_name = "event-room-{}".format(room)
 
     channel_layer = channels.layers.get_channel_layer()
-    tunesync["play_time"] = tunesync["play_time"].isoformat()
+    if "play_time" in tunesync and tunesync["play_time"] is not None:
+        tunesync["play_time"] = tunesync["play_time"].isoformat()
 
     async_to_sync(channel_layer.group_send)(
         group_name, {"type": "user_notify_event", "text": tunesync}
