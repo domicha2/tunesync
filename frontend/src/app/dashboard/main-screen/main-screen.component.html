@@ -24,8 +24,19 @@
                   event.username
               }}
             </h3>
-            <button mat-raised-button>Accept</button>
-            <button mat-raised-button color="warn">Reject</button>
+            <button
+              mat-raised-button
+              (click)="onInviteResponse('A', event.args.room_id)"
+            >
+              Accept
+            </button>
+            <button
+              mat-raised-button
+              color="warn"
+              (click)="onInviteResponse('R', event.args.room_id)"
+            >
+              Reject
+            </button>
           </div>
         </ng-container>
         <ng-container *ngSwitchDefault>

@@ -32,4 +32,21 @@ export class UsersService {
       args: { type: UserChangeAction.Kick, user: userId },
     });
   }
+
+  createInviteResponseEvent(
+    roomId: number,
+    response: 'A' | 'R',
+  ): Observable<any> {
+    let is_accepted: boolean;
+    if (response === 'A') {
+      is_accepted = true;
+    } else if (response === 'R') {
+      is_accepted = false;
+    }
+    return this.httpWrapperService.post('/events/', {
+      event_type: EventType.UserChange,
+      room: roomId,
+      args: { type: 'J', is_accepted },
+    });
+  }
 }

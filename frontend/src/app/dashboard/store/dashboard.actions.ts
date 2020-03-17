@@ -143,3 +143,8 @@ export const createInviteUsersEvent = createAction(
   '[Dashboard Effect] Create Invite Users Event',
   props<{ users: number[]; roomId: number }>(),
 );
+
+export const createInviteResponseEvent = createAction(
+  '[Main Screen Component] Create Invite Response Event',
+  props<{ roomId: number; response: 'A' | 'R' }>(),
+);

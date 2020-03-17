@@ -304,4 +304,10 @@ export class MainScreenComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  onInviteResponse(response: 'A' | 'R', roomId: number): void {
+    this.store.dispatch(
+      DashboardActions.createInviteResponseEvent({ roomId, response }),
+    );
+  }
 }
