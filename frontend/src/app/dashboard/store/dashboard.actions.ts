@@ -22,13 +22,22 @@ export const setLastPlayEvent = createAction(
   '[Controls Component] Set Last Play Event',
   props<{ lastPlayEvent: any }>(),
 );
+
+export const createPreviousSongEvent = createAction(
+  '[Controls Component] Create Previous Song Event',
+  props<{ timestamp: number; isPlaying: boolean; queueIndex: number }>(),
+);
+export const createNextSongEvent = createAction(
+  '[Controls Component] Create Next Song Event',
+  props<{ timestamp: number; isPlaying: boolean; queueIndex: number }>(),
+);
 export const createReplaySongEvent = createAction(
   '[Controls Component] Create Replay Song Event',
-  props<{}>(),
+  props<{ timestamp: number; isPlaying: boolean }>(),
 );
 export const createForwardSongEvent = createAction(
   '[Controls Component] Create Forward Song Event',
-  props<{}>(),
+  props<{ timestamp: number; isPlaying: boolean }>(),
 );
 export const createPlaySongEvent = createAction(
   '[Controls Component] Create Play Song Event',
@@ -40,7 +49,7 @@ export const createPauseSongEvent = createAction(
 );
 export const setSongStatus = createAction(
   '[Main Screen Component] Set Song Status',
-  props<{ isPlaying: boolean; seekTime?: number }>(),
+  props<{ isPlaying: boolean; seekTime?: number; queueIndex: number }>(),
 );
 
 export const createTunes = createAction(

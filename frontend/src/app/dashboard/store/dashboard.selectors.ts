@@ -58,12 +58,6 @@ export const selectSeekTime = createSelector(
   (dashboard: DashboardState) => (dashboard ? dashboard.seekTime : undefined),
 );
 
-export const selectSongStatus = createSelector(
-  selectIsPlaying,
-  selectSeekTime,
-  (isPlaying, seekTime) => ({ isPlaying, seekTime }),
-);
-
 export const selectLastPlayEvent = createSelector(
   (state: AppState) => state.dashboard,
   (dashboard: DashboardState) =>
@@ -91,4 +85,11 @@ export const selectTuneSyncEvent = createSelector(
   (state: AppState) => state.dashboard,
   (dashboard: DashboardState) =>
     dashboard ? dashboard.tuneSyncEvent : undefined,
+);
+
+export const selectSongStatus = createSelector(
+  selectIsPlaying,
+  selectSeekTime,
+  selectQueueIndex,
+  (isPlaying, seekTime, queueIndex) => ({ isPlaying, seekTime, queueIndex }),
 );

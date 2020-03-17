@@ -147,24 +147,17 @@ export class MainScreenComponent implements OnInit, OnDestroy {
               } else {
                 // the DJ made a play event
                 console.log('dj made a play event');
+                // ! could have race condition but handleTuneSync function has the same design
+                this.store.dispatch(
+                  DashboardActions.setSongStatus({
+                    isPlaying: tuneSyncEvent.last_play.play.is_playing,
+                    seekTime: tuneSyncEvent.last_play.play.timestamp,
+                    queueIndex: tuneSyncEvent.last_play.play.queue_index,
+                  }),
+                );
               }
               break;
             case EventType.Messaging:
-              break;
-            case EventType.Play:
-              // if we just got a play event we could either be playing or pausing the song
-              const payload: PlayEvent = event.args;
-              if (payload.isPlaying) {
-                // play the song
-                this.store.dispatch(
-                  DashboardActions.setSongStatus({ isPlaying: true }),
-                );
-              } else {
-                // pause the song
-                this.store.dispatch(
-                  DashboardActions.setSongStatus({ isPlaying: false }),
-                );
-              }
               break;
             default:
               console.error('bad event type');
@@ -214,6 +207,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
     if (tuneSyncEvent.last_play === null) {
       // no last play state
       this.store.dispatch(DashboardActions.setQueueIndex({ queueIndex: -1 }));
+      //! what shouldni do?
     } else {
       playEvent = tuneSyncEvent.last_play as PlayState;
     }
@@ -223,14 +217,10 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         if (!playEvent.play.is_playing) {
           // EASY CASE
           this.store.dispatch(
-            DashboardActions.setQueueIndex({
-              queueIndex: playEvent.play.queue_index,
-            }),
-          );
-          this.store.dispatch(
             DashboardActions.setSongStatus({
               seekTime: playEvent.play.timestamp,
               isPlaying: false,
+              queueIndex: playEvent.play.queue_index,
             }),
           );
           return;
@@ -263,11 +253,6 @@ export class MainScreenComponent implements OnInit, OnDestroy {
                 'exiting after initial loop dispatch new queue index and dispatch new song status',
               );
               // stop here
-              this.store.dispatch(
-                DashboardActions.setQueueIndex({
-                  queueIndex: playEvent.play.queue_index,
-                }),
-              );
 
               const seekTime = playEvent.play.timestamp + difference;
               console.log('finished in the first loop; seek at: ', seekTime);
@@ -275,9 +260,10 @@ export class MainScreenComponent implements OnInit, OnDestroy {
                 DashboardActions.setSongStatus({
                   isPlaying: playEvent.play.is_playing,
                   seekTime,
+                  queueIndex: playEvent.play.queue_index,
                 }),
               );
-              break;
+              return;
             }
             // do need to execute logic below
             continue;
@@ -290,23 +276,30 @@ export class MainScreenComponent implements OnInit, OnDestroy {
             // use this time to seek to the current song
             const seekTime = difference;
             console.log('seek time: ', seekTime);
-            this.store.dispatch(
-              DashboardActions.setQueueIndex({
-                queueIndex: songIndex,
-              }),
-            );
+
             this.store.dispatch(
               DashboardActions.setSongStatus({
                 isPlaying: playEvent.play.is_playing,
                 seekTime,
+                queueIndex: songIndex,
               }),
             );
-            break;
+            // use this difference at that song index
+            console.log('time remaining', difference, 'index', songIndex);
+            return;
           }
         }
 
-        // use this difference at that song index
-        console.log('time remaining', difference, 'index', songIndex);
+        if (songIndex === undefined) {
+          console.log('all songs have finished');
+          this.store.dispatch(
+            DashboardActions.setSongStatus({
+              isPlaying: false,
+              seekTime: queue[queue.length - 1].length,
+              queueIndex: queue.length - 1,
+            }),
+          );
+        }
       }
     }
   }

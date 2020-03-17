@@ -15,6 +15,21 @@ export class ControlsService {
     return this.httpWrapperService.post(`/tunes/`, formData);
   }
 
+  createSeekSongEvent(
+    roomId: number,
+    queueIndex: number,
+    timestamp: number,
+    isPlaying: boolean,
+  ): Observable<any> {
+    return this.httpWrapperService.post('/events/', {
+      event_type: EventType.TuneSync,
+      room: roomId,
+      args: {
+        play: { queue_index: queueIndex, is_playing: isPlaying, timestamp },
+      },
+    });
+  }
+
   createPlaySongEvent(
     roomId: number,
     queueIndex: number,

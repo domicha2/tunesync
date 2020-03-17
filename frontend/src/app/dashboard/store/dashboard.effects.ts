@@ -243,6 +243,58 @@ export class DashboardEffects {
   );
 
   /* Controls Effects */
+  createChangeSongEvent$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(
+          DashboardActions.createPreviousSongEvent,
+          DashboardActions.createNextSongEvent,
+        ),
+        concatMap(action =>
+          of(action).pipe(
+            withLatestFrom(this.store.pipe(select(selectQueueIndexAndRoom))),
+          ),
+        ),
+        switchMap(([action, data]) =>
+          this.controlsService
+            .createSeekSongEvent(
+              data.room,
+              action.queueIndex,
+              action.timestamp,
+              action.isPlaying,
+            )
+            .pipe(tap(response => console.log('change song res: ', response))),
+        ),
+      ),
+    { dispatch: false },
+  );
+
+  createSeekSongEvent$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(
+          DashboardActions.createForwardSongEvent,
+          DashboardActions.createReplaySongEvent,
+        ),
+        concatMap(action =>
+          of(action).pipe(
+            withLatestFrom(this.store.pipe(select(selectQueueIndexAndRoom))),
+          ),
+        ),
+        switchMap(([action, data]) =>
+          this.controlsService
+            .createSeekSongEvent(
+              data.room,
+              data.index,
+              action.timestamp,
+              action.isPlaying,
+            )
+            .pipe(tap(response => console.log('seek song: ', response))),
+        ),
+      ),
+    { dispatch: false },
+  );
+
   createPlaySongEvent$ = createEffect(
     () =>
       this.actions$.pipe(
