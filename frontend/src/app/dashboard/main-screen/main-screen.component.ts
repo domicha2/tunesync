@@ -188,13 +188,12 @@ export class MainScreenComponent implements OnInit, OnDestroy {
               console.error('bad event type');
               break;
           }
-          setTimeout(
-            () =>
-              document
-                .querySelector('mat-list-item:last-child')
-                .scrollIntoView(),
-            500,
-          );
+          setTimeout(() => {
+            const item = document.querySelector('mat-list-item:last-child');
+            if (item) {
+              item.scrollIntoView();
+            }
+          }, 500);
         }
       };
 
