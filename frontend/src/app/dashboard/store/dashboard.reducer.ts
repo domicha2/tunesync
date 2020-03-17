@@ -43,10 +43,6 @@ const reducer = createReducer(
       queuedSongs: action.queuedSongs,
     };
   }),
-  on(DashboardActions.addAvailableSong, (state, action) => {
-    state.availableSongs.push(action.song);
-    return state;
-  }),
   on(DashboardActions.storeRooms, (state, action) => {
     return {
       ...state,
