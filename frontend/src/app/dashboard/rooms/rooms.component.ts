@@ -56,6 +56,7 @@ export class RoomsComponent implements OnInit, OnDestroy {
 
   onRoomClick(room: Room): void {
     this.activeRoom = room;
+    this.store.dispatch(DashboardActions.resetState());
     this.store.dispatch(
       DashboardActions.setActiveRoom({
         activeRoomId: room.id,

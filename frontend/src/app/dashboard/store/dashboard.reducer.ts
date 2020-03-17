@@ -27,6 +27,9 @@ export const initialState: DashboardState = undefined;
 
 const reducer = createReducer(
   initialState,
+  on(DashboardActions.resetState, (state, action) => ({
+    rooms: state.rooms,
+  })),
   on(DashboardActions.storeQueue, (state, action: any) => {
     return { ...state, queuedSongs: action.queue };
   }),

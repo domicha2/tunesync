@@ -3,6 +3,8 @@ import { createAction, props } from '@ngrx/store';
 import { Song, User, Room, AppEvent } from '../dashboard.models';
 import { User as AuthUser } from '../dashboard.models';
 
+export const resetState = createAction('[Rooms Component] Reset State');
+
 /* Tunes */
 export const getTuneSyncEvent = createAction(
   '[Rooms Component] Get TuneSync Event',
