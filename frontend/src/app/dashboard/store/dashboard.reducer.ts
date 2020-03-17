@@ -78,6 +78,7 @@ const reducer = createReducer(
       ...state,
       isPlaying: action.isPlaying,
       seekTime: action.seekTime,
+      queueIndex: action.queueIndex,
     };
   }),
   on(DashboardActions.setLastPlayEvent, (state, action) => {

@@ -49,7 +49,7 @@ export const createPauseSongEvent = createAction(
 );
 export const setSongStatus = createAction(
   '[Main Screen Component] Set Song Status',
-  props<{ isPlaying: boolean; seekTime?: number }>(),
+  props<{ isPlaying: boolean; seekTime?: number; queueIndex: number }>(),
 );
 
 export const createTunes = createAction(
