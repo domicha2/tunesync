@@ -43,7 +43,7 @@ class UserViewSet(viewsets.ViewSet):
             limit = 5
         else:
             limit = int(request.query_params["limit"])
-        users = User.objects.exclude(pk=request.user.id).order_by("-username")[
+        users = User.objects.exclude(pk=request.user.id).order_by("username")[
             skip:limit
         ]
         result = []
