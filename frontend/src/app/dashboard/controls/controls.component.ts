@@ -242,7 +242,18 @@ export class ControlsComponent
     );
   }
 
-  onPrevious(): void {}
+  /**
+   * Listen to the previous song in the queue
+   */
+  onPrevious(): void {
+    this.store.dispatch(
+      DashboardActions.createPreviousSongEvent({
+        timestamp: 0,
+        isPlaying: !this.isPaused,
+        queueIndex: this.queueIndex - 1,
+      }),
+    );
+  }
 
   /**
    * Auto-click the next song button for the user
