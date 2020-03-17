@@ -197,10 +197,12 @@ export class ControlsComponent
           }),
         );
       } else {
+        // on ended function turns it to true, need to turn it back off
+        this.isPaused = false;
         this.store.dispatch(
           DashboardActions.setSongStatus({
             isPlaying: !this.isPaused,
-            queueIndex: ++this.queueIndex,
+            queueIndex: this.queueIndex + 1,
             seekTime: 0,
           }),
         );
@@ -293,6 +295,7 @@ export class ControlsComponent
 
     if (this.pauseOnLoaded) {
       // this is used for other people listening to the room
+      console.log('in the fucking pause method');
       this.getAudioElement().pause();
     }
 
