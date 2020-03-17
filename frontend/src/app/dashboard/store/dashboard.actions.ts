@@ -102,7 +102,7 @@ export const storeRooms = createAction(
 );
 export const setActiveRoom = createAction(
   '[Rooms Component] Set Active Room',
-  props<{ activeRoomId: number }>(),
+  props<{ activeRoomId: number; activeRoomName: string }>(),
 );
 
 export const getUsersByRoom = createAction(

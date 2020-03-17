@@ -12,6 +12,7 @@ export interface DashboardState {
   // users in a room
   users: User[];
   activeRoomId: number;
+  activeRoomName: string;
   events: AppEvent[];
   // users in the application
   allUsers: AuthUser[];
@@ -59,6 +60,7 @@ const reducer = createReducer(
     return {
       ...state,
       activeRoomId: action.activeRoomId,
+      activeRoomName: action.activeRoomName,
     };
   }),
   on(DashboardActions.storeEvents, (state, action) => {

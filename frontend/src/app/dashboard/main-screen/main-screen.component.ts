@@ -9,6 +9,7 @@ import {
   selectEvents,
   selectActiveRoom,
   selectTuneSyncEvent,
+  selectActiveRoomName,
 } from '../store/dashboard.selectors';
 import {
   AppEvent,
@@ -36,10 +37,17 @@ export class MainScreenComponent implements OnInit, OnDestroy {
   events: AppEvent[] = [];
   webSocket: WebSocket;
   userId: number;
+  activeRoomName: string;
 
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
+    this.subscription.add(
+      this.store
+        .select(selectActiveRoomName)
+        .subscribe(name => (this.activeRoomName = name)),
+    );
+
     this.subscription.add(
       this.store
         .select(selectTuneSyncEvent)
@@ -90,6 +98,14 @@ export class MainScreenComponent implements OnInit, OnDestroy {
     this.events = events.sort((eventA, eventB) =>
       new Date(eventA.creation_time) > new Date(eventB.creation_time) ? 1 : -1,
     );
+    this.events = this.events.filter(event => {
+      //! hard coded refactor if have time
+      if (this.activeRoomName !== 'System Room' && event.event_type === 'U') {
+        return false;
+      } else {
+        return true;
+      }
+    });
     setTimeout(() => {
       const el = document.querySelector('mat-list-item:last-child');
       if (el) {
@@ -158,13 +174,18 @@ export class MainScreenComponent implements OnInit, OnDestroy {
                 );
               }
               break;
+            case EventType.UserChange:
+              if (this.activeRoomName === 'System Room') {
+                this.events.push(event);
+              }
+              break;
             case EventType.Messaging:
+              this.events.push(event);
               break;
             default:
               console.error('bad event type');
               break;
           }
-          this.events.push(event);
           setTimeout(
             () =>
               document
