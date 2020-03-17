@@ -10,7 +10,7 @@ export class UsersService {
   constructor(private httpWrapperService: HttpWrapperService) {}
 
   getAllUsers(): Observable<any> {
-    return this.httpWrapperService.get('/users/');
+    return this.httpWrapperService.get('/users/?limit=100');
   }
 
   createInviteUsersEvent(users: number[], roomId: number): Observable<any> {
@@ -30,6 +30,23 @@ export class UsersService {
       event_type: EventType.UserChange,
       room: roomId,
       args: { type: UserChangeAction.Kick, user: userId },
+    });
+  }
+
+  createInviteResponseEvent(
+    roomId: number,
+    response: 'A' | 'R',
+  ): Observable<any> {
+    let is_accepted: boolean;
+    if (response === 'A') {
+      is_accepted = true;
+    } else if (response === 'R') {
+      is_accepted = false;
+    }
+    return this.httpWrapperService.post('/events/', {
+      event_type: EventType.UserChange,
+      room: roomId,
+      args: { type: 'J', is_accepted },
     });
   }
 }

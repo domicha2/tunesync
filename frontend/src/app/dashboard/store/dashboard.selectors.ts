@@ -93,3 +93,9 @@ export const selectSongStatus = createSelector(
   selectQueueIndex,
   (isPlaying, seekTime, queueIndex) => ({ isPlaying, seekTime, queueIndex }),
 );
+
+export const selectActiveRoomName = createSelector(
+  (state: AppState) => state.dashboard,
+  (dashboard: DashboardState) =>
+    dashboard ? dashboard.activeRoomName : undefined,
+);

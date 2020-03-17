@@ -15,10 +15,32 @@
           {{ event.username + ' played a song' }}
         </ng-container>
         <ng-container *ngSwitchCase="'U'">
-          {{ event.username + ' made a user change' }}
+          <div class="user-invite-form">
+            <h3>
+              {{
+                'You have been invited to ' +
+                  event.args.room_name +
+                  ' by ' +
+                  event.username
+              }}
+            </h3>
+            <button
+              mat-raised-button
+              (click)="onInviteResponse('A', event.args.room_id)"
+            >
+              Accept
+            </button>
+            <button
+              mat-raised-button
+              color="warn"
+              (click)="onInviteResponse('R', event.args.room_id)"
+            >
+              Reject
+            </button>
+          </div>
         </ng-container>
         <ng-container *ngSwitchDefault>
-          {{  'Music got adjusted' }}
+          {{ 'Music got adjusted' }}
         </ng-container>
       </div>
     </mat-list-item>

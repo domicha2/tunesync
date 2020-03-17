@@ -333,6 +333,20 @@ export class DashboardEffects {
     { dispatch: false },
   );
 
+  createInviteResponseEvent$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardActions.createInviteResponseEvent),
+      switchMap(action =>
+        this.usersService
+          .createInviteResponseEvent(action.roomId, action.response)
+          .pipe(
+            tap(response => console.log(response)),
+            map(() => ({ type: DashboardActions.getRooms.type })),
+          ),
+      ),
+    ),
+  );
+
   constructor(
     private actions$: Actions,
     private store: Store<AppState>,

@@ -37,13 +37,13 @@ class UserViewSet(viewsets.ViewSet):
         if "skip" not in request.query_params:
             skip = 0
         else:
-            skip = int(request.query_params["skip"][0])
+            skip = int(request.query_params["skip"])
 
         if "limit" not in request.query_params:
             limit = 5
         else:
-            limit = int(request.query_params["limit"][0])
-        users = User.objects.exclude(pk=request.user.id).order_by("-username")[
+            limit = int(request.query_params["limit"])
+        users = User.objects.exclude(pk=request.user.id).order_by("username")[
             skip:limit
         ]
         result = []
