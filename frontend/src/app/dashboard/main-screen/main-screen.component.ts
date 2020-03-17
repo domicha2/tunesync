@@ -298,12 +298,24 @@ export class MainScreenComponent implements OnInit, OnDestroy {
                 seekTime,
               }),
             );
-            break;
+            // use this difference at that song index
+            console.log('time remaining', difference, 'index', songIndex);
+            return;
           }
         }
 
-        // use this difference at that song index
-        console.log('time remaining', difference, 'index', songIndex);
+        if (songIndex === undefined) {
+          console.log('all songs have finished');
+          this.store.dispatch(
+            DashboardActions.setQueueIndex({ queueIndex: queue.length - 1 }),
+          );
+          this.store.dispatch(
+            DashboardActions.setSongStatus({
+              isPlaying: false,
+              seekTime: queue[queue.length - 1].length,
+            }),
+          );
+        }
       }
     }
   }
