@@ -88,6 +88,12 @@ export interface ModifyQueueEvent {
   queue: Song[];
 }
 
+export interface InviteEvent {
+  type: 'I';
+  room_id: number;
+  room_name: string;
+}
+
 export interface PlayEvent {
   isPlaying: boolean;
 }

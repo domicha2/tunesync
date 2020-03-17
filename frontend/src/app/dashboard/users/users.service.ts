@@ -10,7 +10,7 @@ export class UsersService {
   constructor(private httpWrapperService: HttpWrapperService) {}
 
   getAllUsers(): Observable<any> {
-    return this.httpWrapperService.get('/users/');
+    return this.httpWrapperService.get('/users/?limit=100');
   }
 
   createInviteUsersEvent(users: number[], roomId: number): Observable<any> {

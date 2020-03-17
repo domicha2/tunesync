@@ -86,6 +86,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
    * refactor later
    */
   handleEventsResponse(events: AppEvent[]): void {
+    console.log(events);
     this.events = events.sort((eventA, eventB) =>
       new Date(eventA.creation_time) > new Date(eventB.creation_time) ? 1 : -1,
     );
