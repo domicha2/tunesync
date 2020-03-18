@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission
+from .models import Membership
 
 # https://stackoverflow.com/questions/47122471/how-to-set-a-method-in-django-rest-frameworks-viewset-to-not-require-authentica
 # Can only set permissions for the entire viewset
@@ -29,3 +30,87 @@ class AnonCreateAndUpdateOwnerOnly(BasePermission):
             or request.user.is_staff
         )
 
+
+class InRoomOnly(BasePermission):
+    """
+    Users must be in the room to actually do anything 
+    """
+
+    def has_permission(self, request, view):
+        if view.action == "list":
+            if "room" in request.query_params:
+                room_id = int(request.query_params["room"])
+            else:
+                return False
+        else:
+            if "room" in request.data:
+                room_id = request.data["room"]
+            else:
+                return False
+        membership = Membership.get_membership(room_id, request.user)
+        if membership:
+            return membership[0]["state"] == "P" or membership[0]["state"] == "A"
+        else:
+            return False
+
+
+def is_event_type(request, view, event):
+    if view.action == "create":
+        if "event_type" in request.data:
+            event_type = request.data["event_type"]
+        else:
+            return False
+        return event_type == event
+    return False
+
+
+class DjOrAbove(BasePermission):
+    """
+    only DJ's or admins can post events of type T
+    """
+
+    def has_permission(self, request, view):
+        if is_event_type(request, view, "T"):
+            membership = Membership.get_membership(room_id, request.user)
+            return membership[0]["role"] == "A" or membership[0]["role"] == "D"
+        return True
+
+
+class RoomAdminOnly(BasePermission):
+    def has_permission(self, request, view):
+        if "room" in request.data:
+            room_id = request.data["room"]
+        else:
+            return True
+        if is_event_type(request, view, "U"):
+            try:
+                if request.data["args"]["type"] in {"C", "K"}:
+                    return Membership.is_admin(room_id, request.user)
+            except:
+                return False
+        return True
+
+
+class JoinPendingOnly(BasePermission):
+    def has_permission(self, request, view):
+        if "room" in request.data:
+            room_id = request.data["room"]
+        else:
+            return True
+        if is_event_type(request, view, "U"):
+            try:
+                if request.data["args"]["type"] == "J":
+                    state = Membership.get_membership(room_id, request.user)[0]["state"]
+                    print(state)
+                    return state == "P"
+            except:
+                return False
+        return True
+
+
+class UploaderOnly(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return (
+            view.action in ["destroy", "update", "partial_update"]
+            and obj.uploader.id == request.user.id
+        )
