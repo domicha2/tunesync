@@ -191,7 +191,7 @@ class EventViewSet(viewsets.ViewSet):
         event.save()
         agree_field = args["agree"]
         user = request.user
-        poll = Event.objects.filter(id=request.data["parent_event"])
+        poll = Poll.objects.filter(event_id=request.data["parent_event"])[0]
         vote_event = Vote(event=event, poll=poll, user=user, agree=agree_field)
         # save the vote
         vote_event.save()
@@ -347,7 +347,7 @@ class EventViewSet(viewsets.ViewSet):
         )
         if "parent_event" in request.data:
             parent_event = Event.objects.filter(pk=request.data["parent_event"])
-            event.parent_event = parent_event[0]
+            event.parent_event = parent_event
         handle_event = getattr(self, "handle_" + event.event_type)
         result = handle_event(request, event)
         return result
