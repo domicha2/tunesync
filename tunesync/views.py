@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView
-from tunesync.models import Event, Room, Membership, Tune, TuneSync
+from tunesync.models import Event, Room, Membership, Tune, TuneSync, Poll
 from json import loads, dumps
 
 from django.contrib.auth.models import User
@@ -149,6 +149,41 @@ class EventViewSet(viewsets.ViewSet):
                 serializer = EventSerializer(event)
                 return Response(serializer.data)
         return Response(status=400)
+
+    def handle_PO(self, request, event, **kw):
+        """
+        Handler for all types of polling:
+        Play(PL), Kick(U), Modify Queue(MQ)
+        """
+        args = request.data["args"]
+        if not self.validate_PO(args):
+          print("Improper polling request")
+          return Response(status=400)
+        # save event to table
+        event.save()
+        # retrieve room the poll is happening in
+        polling_room = event.room
+        action_type = args["action"]
+        # Check if the action is a kick, we want to store K
+        if action_type == "U":
+          action_type = "K"
+        poll_event = Poll(
+          event=event,
+          action=action_type,
+          room=polling_room,
+          # not sure what i have to put in here?
+          # roomId so we know where to have the poll?
+          args={
+            "room_id": event.room.id,
+            "room_name": event.room.title,
+          },
+        )
+        # save the poll and we're done
+        poll_event.save()
+        return Response(status=200)
+
+    def handle_V(self, a):
+        return False
 
     def handle_T(self, request, event):
         """
