@@ -120,9 +120,9 @@ class UserViewSet(viewsets.ViewSet):
 
 class EventViewSet(viewsets.ViewSet):
     def validate_PL(self, args):
-        if set(args.keys()) >= {"queue_index", "is_playing", "timestamp"}:
+        if set(args.keys()) >= {"song_id", "is_playing", "timestamp"}:
             return (
-                isinstance(args["queue_index"], int)
+                isinstance(args["song_id"], int)
                 and isinstance(args["is_playing"], bool)
                 and (
                     isinstance(args["timestamp"], float)
