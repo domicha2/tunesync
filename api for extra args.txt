@@ -58,7 +58,7 @@ How to start a poll to play a song
     args: {
         action: "PL"
         timestamp: 11.5
-        song_id: 2
+        queue_index: 2
         is_playing: True
     }
 }

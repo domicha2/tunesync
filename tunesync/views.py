@@ -120,9 +120,9 @@ class UserViewSet(viewsets.ViewSet):
 
 class EventViewSet(viewsets.ViewSet):
     def validate_PL(self, args):
-        if set(args.keys()) >= {"song_id", "is_playing", "timestamp"}:
+        if set(args.keys()) >= {"queue_index", "is_playing", "timestamp"}:
             return (
-                isinstance(args["song_id"], int)
+                isinstance(args["queue_index"], int)
                 and isinstance(args["is_playing"], bool)
                 and (
                     isinstance(args["timestamp"], float)
@@ -194,7 +194,7 @@ class EventViewSet(viewsets.ViewSet):
         event.save()
         agree_field = args["agree"]
         user = request.user
-        poll = Poll.objects.get(pk=request.data["parent_event"])
+        poll = Event.objects.filter(id=request.data["parent_event"])
         vote_event = Vote(
           event=event,
           poll=poll,
