@@ -111,6 +111,7 @@ class Poll(models.Model):
 
 
 class Vote(models.Model):
+    event = models.OneToOneField(Event, on_delete=models.CASCADE)
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     agree = models.BooleanField()

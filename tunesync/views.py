@@ -174,16 +174,42 @@ class EventViewSet(viewsets.ViewSet):
           # not sure what i have to put in here?
           # roomId so we know where to have the poll?
           args={
-            "room_id": event.room.id,
-            "room_name": event.room.title,
+            "room_id": polling_room.id,
+            "room_name": polling_room.title,
           },
         )
         # save the poll and we're done
         poll_event.save()
         return Response(status=200)
 
-    def handle_V(self, a):
-        return False
+    def handle_V(self, request, event, **kw):
+        """
+        Handler for the voting on any polls in a room
+        """
+        args = request.data["args"]
+        if not self.validate_V(args):
+          print("Improper vote format")
+          return Response(status=400)
+        # save event to Event table
+        event.save()
+        agree_field = args["agree"]
+        user = request.user
+        poll = Poll.objects.get(pk=request.data["parent_event"])
+        vote_event = Vote(
+          event=event,
+          poll=poll,
+          user=user,
+          agree=agree_field
+        )
+        # save the vote
+        vote_event.save()
+        return Response(status=200)
+
+    def validate_V(self, args):
+        if "agree" in args:
+            return isinstance(args["agree"], bool)
+        else:
+            return False
 
     def handle_T(self, request, event):
         """
