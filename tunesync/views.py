@@ -347,7 +347,7 @@ class EventViewSet(viewsets.ViewSet):
         )
         if "parent_event" in request.data:
             parent_event = Event.objects.filter(pk=request.data["parent_event"])
-            event.parent_event = parent_event
+            event.parent_event = parent_event[0]
         handle_event = getattr(self, "handle_" + event.event_type)
         result = handle_event(request, event)
         return result
