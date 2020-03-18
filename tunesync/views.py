@@ -157,8 +157,8 @@ class EventViewSet(viewsets.ViewSet):
         """
         args = request.data["args"]
         if not self.validate_PO(args):
-          print("Improper polling request")
-          return Response(status=400)
+            print("Improper polling request")
+            return Response(status=400)
         # save event to table
         event.save()
         # retrieve room the poll is happening in
@@ -166,17 +166,14 @@ class EventViewSet(viewsets.ViewSet):
         action_type = args["action"]
         # Check if the action is a kick, we want to store K
         if action_type == "U":
-          action_type = "K"
+            action_type = "K"
         poll_event = Poll(
-          event=event,
-          action=action_type,
-          room=polling_room,
-          # not sure what i have to put in here?
-          # roomId so we know where to have the poll?
-          args={
-            "room_id": polling_room.id,
-            "room_name": polling_room.title,
-          },
+            event=event,
+            action=action_type,
+            room=polling_room,
+            # not sure what i have to put in here?
+            # roomId so we know where to have the poll?
+            args={"room_id": polling_room.id, "room_name": polling_room.title},
         )
         # save the poll and we're done
         poll_event.save()
@@ -188,19 +185,14 @@ class EventViewSet(viewsets.ViewSet):
         """
         args = request.data["args"]
         if not self.validate_V(args):
-          print("Improper vote format")
-          return Response(status=400)
+            print("Improper vote format")
+            return Response(status=400)
         # save event to Event table
         event.save()
         agree_field = args["agree"]
         user = request.user
         poll = Event.objects.filter(id=request.data["parent_event"])
-        vote_event = Vote(
-          event=event,
-          poll=poll,
-          user=user,
-          agree=agree_field
-        )
+        vote_event = Vote(event=event, poll=poll, user=user, agree=agree_field)
         # save the vote
         vote_event.save()
         return Response(status=200)
@@ -354,7 +346,8 @@ class EventViewSet(viewsets.ViewSet):
             args=request.data["args"],
         )
         if "parent_event" in request.data:
-            event.parent_event = request.data["parent_event"]
+            parent_event = Event.objects.filter(pk=request.data["parent_event"])
+            event.parent_event = parent_event
         handle_event = getattr(self, "handle_" + event.event_type)
         result = handle_event(request, event)
         return result
