@@ -4,7 +4,14 @@ from json import loads, dumps
 
 from django.contrib.auth.models import User
 from rest_framework import viewsets
-from .permissions import AnonCreateAndUpdateOwnerOnly
+from .permissions import (
+    AnonCreateAndUpdateOwnerOnly,
+    InRoomOnly,
+    DjOrAbove,
+    RoomAdminOnly,
+    JoinPendingOnly,
+    UploaderOnly,
+)
 from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -119,6 +126,9 @@ class UserViewSet(viewsets.ViewSet):
 
 
 class EventViewSet(viewsets.ViewSet):
+
+    permission_classes = [InRoomOnly, DjOrAbove, RoomAdminOnly, JoinPendingOnly]
+
     def validate_PL(self, args):
         if set(args.keys()) >= {"queue_index", "is_playing", "timestamp"}:
             return (
@@ -321,9 +331,12 @@ class EventViewSet(viewsets.ViewSet):
     def list(self, request):
         if "event_type" in request.query_params:
             event_type = request.query_params["event_type"]
-        room_id = int(request.query_params["room"][0])
-        skip = int(request.query_params["skip"][0])
-        limit = int(request.query_params["limit"][0])
+        try:
+            room_id = int(request.query_params["room"])
+            skip = int(request.query_params["skip"])
+            limit = int(request.query_params["limit"])
+        except:
+            return Response(status=400)
         response_data = (
             Event.objects.filter(room__pk=room_id, event_type=event_type)
             .order_by("-creation_time")
@@ -356,6 +369,8 @@ class EventViewSet(viewsets.ViewSet):
 class RoomViewSet(viewsets.ViewSet):
     """
     """
+
+    permission_classes = [UploaderOnly]
 
     # GET
     def list(self, request):

@@ -150,6 +150,21 @@ class Membership(models.Model):
     class Meta:
         indexes = [models.Index(fields=["room", "user"])]
 
+    def get_membership(room_id, user):
+        """
+        room_id: int
+        user: user instance
+        """
+        result = Membership.objects.filter(user=user, room_id=room_id).values()
+        return result
+
+    def is_admin(room_id, user):
+        result = Membership.objects.filter(user=user, room_id=room_id).values()
+        if result:
+            return result[0]["role"] == "A"
+        else:
+            return False
+
 
 @receiver(post_save, sender=Event, dispatch_uid="update_event_listeners")
 def update_event_listeners(sender, instance, **kwargs):
