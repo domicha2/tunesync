@@ -16,6 +16,7 @@ import * as DashboardActions from '../store/dashboard.actions';
 import {
   selectQueuedSongs,
   selectSongStatus,
+  selectQueueIndex,
 } from '../store/dashboard.selectors';
 import { AppState } from '../../app.module';
 import { Song } from '../dashboard.models';
@@ -40,6 +41,8 @@ export class ControlsComponent
   isPaused = true;
 
   seekTime = 0;
+  pauseOnLoaded: boolean;
+  queueIndex = -1;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -55,9 +58,14 @@ export class ControlsComponent
      */
     this.subscription.add(
       combineLatest(
-        this.store
-          .select(selectSongStatus)
-          .pipe(filter(status => typeof status.isPlaying === 'boolean')),
+        this.store.select(selectSongStatus).pipe(
+          tap(data => console.log('song status', data)),
+          filter(
+            status =>
+              typeof status.isPlaying === 'boolean' &&
+              typeof status.queueIndex === 'number',
+          ),
+        ),
         this.store.select(selectQueuedSongs).pipe(
           filter(songs => songs !== null && songs !== undefined),
           tap((queue: Song[]) => {
@@ -71,7 +79,8 @@ export class ControlsComponent
           distinctUntilChanged(
             ([prevStatus, prevQueue], [currStatus, currQueue]) =>
               prevStatus.isPlaying === currStatus.isPlaying &&
-              prevStatus.seekTime === currStatus.seekTime,
+              prevStatus.seekTime === currStatus.seekTime &&
+              prevStatus.queueIndex === currStatus.queueIndex,
           ),
         )
         .subscribe(([songStatus, queuedSongs]) => {
@@ -95,36 +104,50 @@ export class ControlsComponent
    * @param queue
    */
   initSong(
-    songStatus: { isPlaying: boolean; seekTime: number },
+    songStatus: { isPlaying: boolean; seekTime: number; queueIndex: number },
     queue: Song[],
   ): void {
     console.log(this.queue);
     console.log('seek time:', songStatus.seekTime);
     if (songStatus.isPlaying === true) {
-      if (this.currentSong) {
+      this.pauseOnLoaded = false;
+      if (this.currentSong && this.queueIndex === songStatus.queueIndex) {
         // i believe this is executed when the websocket broadcast play on a paused song
         const song = this.getAudioElement();
         if (songStatus.seekTime !== undefined) {
           song.currentTime = songStatus.seekTime;
+          console.log('after seeked time', song.currentTime);
         }
         song.play();
       } else {
+        this.queueIndex = songStatus.queueIndex;
         if (queue.length > 0) {
           if (songStatus.seekTime !== undefined) {
             this.seekTime = songStatus.seekTime;
           }
 
           // after this gets executed the onloadeddata event should trigger which would seek the song
-          this.currentSong = queue[0];
-          this.queue.splice(0, 1);
-          this.store.dispatch(
-            DashboardActions.storeQueue({ queue: this.queue }),
-          );
+          this.currentSong = queue[this.queueIndex];
         }
       }
     } else if (songStatus.isPlaying === false) {
-      // this is used for other people listening to the room
-      this.getAudioElement().pause();
+      this.pauseOnLoaded = true;
+      console.log('wanting to pause the song');
+      if (
+        this.currentSong === undefined ||
+        this.queueIndex !== songStatus.queueIndex
+      ) {
+        this.queueIndex = songStatus.queueIndex;
+        // need to set the current song, pause, then seek to the given time
+        if (songStatus.seekTime !== undefined) {
+          this.seekTime = songStatus.seekTime;
+        }
+        this.currentSong = this.queue[this.queueIndex];
+      } else {
+        const song = this.getAudioElement();
+        song.pause();
+        song.currentTime = songStatus.seekTime;
+      }
     }
   }
 
@@ -145,69 +168,102 @@ export class ControlsComponent
   onPlay(): void {
     // check if there is an existing song
     if (this.currentSong) {
-      console.log('if statement');
       // resume the song
       // dispatch an action telling user
       const song = this.getAudioElement();
       song.play();
       this.store.dispatch(
-        DashboardActions.createPlaySongEvent({ something: {} }),
+        DashboardActions.createPlaySongEvent({ timestamp: song.currentTime }),
       );
     } else {
-      console.log('else');
-      // check if there is a song on the queue to pop
       this.onNext(true);
     }
   }
-
-  onReplay(): void {
-    const song = this.getAudioElement();
-    if (song.currentTime >= 10) {
-      song.currentTime -= 10;
-    } else {
-      song.currentTime = 0;
-    }
-  }
-
-  onForward(): void {
-    const song = this.getAudioElement();
-    if (song.duration - song.currentTime >= 10) {
-      song.currentTime += 10;
-    } else {
-      song.currentTime = song.duration;
-    }
-  }
-
-  onPause(): void {
-    const song = this.getAudioElement();
-    song.pause();
-    this.store.dispatch(
-      DashboardActions.createPauseSongEvent({ something: {} }),
-    );
-  }
-
-  onPrevious(): void {}
 
   /**
    * Gets called when song automatically finishes
    * or when user presses next or when user presses play with no current song
    */
   onNext(triggerEvent: boolean): void {
-    // check if there even exists a song waiting on the queue
-    if (this.queue && this.queue.length > 0) {
-      this.currentSong = this.queue[0];
-      this.queue.splice(0, 1);
-      this.store.dispatch(DashboardActions.storeQueue({ queue: this.queue }));
-
+    if (this.queueIndex + 1 < this.queue.length) {
+      // there exists a song on the queue ready to be played
       if (triggerEvent) {
+        // user generated event
         this.store.dispatch(
-          DashboardActions.createPlaySongEvent({ something: {} }),
+          DashboardActions.createNextSongEvent({
+            timestamp: 0,
+            isPlaying: !this.isPaused,
+            queueIndex: this.queueIndex + 1,
+          }),
+        );
+      } else {
+        // on ended function turns it to true, need to turn it back off
+        this.isPaused = false;
+        this.store.dispatch(
+          DashboardActions.setSongStatus({
+            isPlaying: !this.isPaused,
+            queueIndex: this.queueIndex + 1,
+            seekTime: 0,
+          }),
         );
       }
     } else {
       // clear the current song
       this.currentSong = undefined;
     }
+  }
+
+  onReplay(): void {
+    const song = this.getAudioElement();
+    let timestamp: number;
+    if (song.currentTime >= 10) {
+      timestamp = song.currentTime - 10;
+    } else {
+      timestamp = 0;
+    }
+    this.store.dispatch(
+      DashboardActions.createReplaySongEvent({
+        timestamp,
+        isPlaying: !this.isPaused,
+      }),
+    );
+  }
+
+  onForward(): void {
+    const song = this.getAudioElement();
+    let timestamp: number;
+    if (song.duration - song.currentTime >= 10) {
+      timestamp = song.currentTime + 10;
+    } else {
+      timestamp = song.duration;
+    }
+    this.store.dispatch(
+      DashboardActions.createForwardSongEvent({
+        timestamp,
+        isPlaying: !this.isPaused,
+      }),
+    );
+  }
+
+  onPause(): void {
+    const song = this.getAudioElement();
+    song.pause();
+    this.store.dispatch(
+      DashboardActions.createPauseSongEvent({ timestamp: song.currentTime }),
+    );
+  }
+
+  /**
+   * Listen to the previous song in the queue
+   */
+  onPrevious(): void {
+    this.store.dispatch(
+      DashboardActions.createPreviousSongEvent({
+        timestamp: 0,
+        isPlaying: !this.isPaused,
+        queueIndex: this.queueIndex - 1,
+      }),
+    );
   }
 
   /**
@@ -220,17 +276,37 @@ export class ControlsComponent
 
   onUploadChange(event: Event): void {
     // tslint:disable-next-line: no-string-literal
-    const tune: File = event.target['files'][0];
-    this.store.dispatch(DashboardActions.createTune({ tune }));
+    const tunes: FileList = event.target['files'];
+    this.store.dispatch(DashboardActions.createTunes({ tunes }));
   }
 
   onQueueClick(): void {
     this.matDialog.open(QueueComponent, {});
   }
 
+  /**
+   * This function duplicates the code to alleviate a race condition bug
+   * @param event
+   */
   onLoadedData(event: Event): void {
     console.log('song is loaded', event);
     this.getAudioElement().currentTime = this.seekTime;
-    this.seekTime = 0;
+    console.log('on load start time 1', this.getAudioElement().currentTime);
+
+    if (this.pauseOnLoaded) {
+      // this is used for other people listening to the room
+      console.log('in the fucking pause method');
+      this.getAudioElement().pause();
+    }
+
+    setTimeout(() => {
+      if (!this.pauseOnLoaded) {
+        this.getAudioElement().currentTime = this.seekTime + 1;
+      } else {
+        this.getAudioElement().currentTime = this.seekTime;
+      }
+      console.log('on load start time 2', this.getAudioElement().currentTime);
+      this.seekTime = 0;
+    }, 1000);
   }
 }

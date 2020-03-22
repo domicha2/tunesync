@@ -9,6 +9,7 @@ import {
   tap,
   withLatestFrom,
   concatMap,
+  mergeMap,
 } from 'rxjs/operators';
 
 import * as DashboardActions from './dashboard.actions';
@@ -22,7 +23,10 @@ import { AppState } from '../../app.module';
 import { Store, select } from '@ngrx/store';
 import { selectUserAndRoom } from '../../app.selectors';
 import { MainScreenService } from '../main-screen/main-screen.service';
-import { selectActiveRoom } from './dashboard.selectors';
+import {
+  selectActiveRoom,
+  selectQueueIndexAndRoom,
+} from './dashboard.selectors';
 import { selectUserId } from '../../auth/auth.selectors';
 import { ControlsService } from '../controls/controls.service';
 
@@ -94,18 +98,18 @@ export class DashboardEffects {
     ),
   );
 
-  removeUserFromRoom$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(DashboardActions.removeUserFromRoom),
-        switchMap(action =>
-          this.usersService.removeUserFromRoom(action.membershipId).pipe(
-            tap(response => console.log(response)),
-            catchError(() => EMPTY),
-          ),
+  getTuneSyncEvent$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardActions.getTuneSyncEvent),
+      switchMap(action =>
+        this.roomsService.getTuneSyncEvent(action.roomId).pipe(
+          map(response => ({
+            type: DashboardActions.setTuneSyncEvent.type,
+            tuneSyncEvent: response,
+          })),
         ),
       ),
-    { dispatch: false },
+    ),
   );
 
   getEventsByRoom$ = createEffect(() =>
@@ -123,19 +127,40 @@ export class DashboardEffects {
     ),
   );
 
-  createTune$ = createEffect(
+  createTunes$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(DashboardActions.createTune),
+        ofType(DashboardActions.createTunes),
         switchMap(action =>
           this.controlsService
-            .createTune(action.tune)
+            .createTunes(action.tunes)
             .pipe(
-              tap(response => console.log('create tune response: ', response)),
+              tap(response => console.log('create tunes response: ', response)),
             ),
         ),
       ),
     { dispatch: false },
+  );
+
+  removeUserFromRoom$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardActions.removeUserFromRoom),
+      concatMap(action =>
+        of(action).pipe(
+          withLatestFrom(this.store.pipe(select(selectActiveRoom))),
+        ),
+      ),
+      switchMap(([action, room]) =>
+        this.usersService.removeUserFromRoom(room, action.userId).pipe(
+          tap(response => console.log(response)),
+          map(response => ({
+            type: DashboardActions.getUsersByRoom.type,
+            roomId: room,
+          })),
+          catchError(() => EMPTY),
+        ),
+      ),
+    ),
   );
 
   createMessage$ = createEffect(
@@ -186,11 +211,19 @@ export class DashboardEffects {
       ofType(DashboardActions.createRoom),
       switchMap(action =>
         this.roomsService.createRoom(action.room).pipe(
-          map(response => ({
-            type: DashboardActions.createInviteUsersEvent.type,
-            roomId: response.id,
-            users: action.users,
-          })),
+          mergeMap(response => {
+            if (action.users === null || action.users.length === 0) {
+              return [{ type: DashboardActions.getRooms.type }];
+            }
+            return [
+              {
+                type: DashboardActions.createInviteUsersEvent.type,
+                users: action.users,
+                roomId: response.id,
+              },
+              { type: DashboardActions.getRooms.type },
+            ];
+          }),
         ),
       ),
     ),
@@ -210,19 +243,71 @@ export class DashboardEffects {
   );
 
   /* Controls Effects */
+  createChangeSongEvent$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(
+          DashboardActions.createPreviousSongEvent,
+          DashboardActions.createNextSongEvent,
+        ),
+        concatMap(action =>
+          of(action).pipe(
+            withLatestFrom(this.store.pipe(select(selectQueueIndexAndRoom))),
+          ),
+        ),
+        switchMap(([action, data]) =>
+          this.controlsService
+            .createSeekSongEvent(
+              data.room,
+              action.queueIndex,
+              action.timestamp,
+              action.isPlaying,
+            )
+            .pipe(tap(response => console.log('change song res: ', response))),
+        ),
+      ),
+    { dispatch: false },
+  );
+
+  createSeekSongEvent$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(
+          DashboardActions.createForwardSongEvent,
+          DashboardActions.createReplaySongEvent,
+        ),
+        concatMap(action =>
+          of(action).pipe(
+            withLatestFrom(this.store.pipe(select(selectQueueIndexAndRoom))),
+          ),
+        ),
+        switchMap(([action, data]) =>
+          this.controlsService
+            .createSeekSongEvent(
+              data.room,
+              data.index,
+              action.timestamp,
+              action.isPlaying,
+            )
+            .pipe(tap(response => console.log('seek song: ', response))),
+        ),
+      ),
+    { dispatch: false },
+  );
+
   createPlaySongEvent$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(DashboardActions.createPlaySongEvent),
         concatMap(action =>
           of(action).pipe(
-            withLatestFrom(this.store.pipe(select(selectActiveRoom))),
+            withLatestFrom(this.store.pipe(select(selectQueueIndexAndRoom))),
           ),
         ),
         tap(data => console.log(data)),
-        switchMap(([action, roomId]) =>
+        switchMap(([action, data]) =>
           this.controlsService
-            .createPlaySongEvent(roomId)
+            .createPlaySongEvent(data.room, data.index, action.timestamp)
             .pipe(tap(response => console.log(response))),
         ),
       ),
@@ -235,17 +320,31 @@ export class DashboardEffects {
         ofType(DashboardActions.createPauseSongEvent),
         concatMap(action =>
           of(action).pipe(
-            withLatestFrom(this.store.pipe(select(selectActiveRoom))),
+            withLatestFrom(this.store.pipe(select(selectQueueIndexAndRoom))),
           ),
         ),
         tap(data => console.log('in the pause song effect')),
-        switchMap(([action, roomId]) =>
+        switchMap(([action, data]) =>
           this.controlsService
-            .createPauseSongEvent(roomId)
+            .createPauseSongEvent(data.room, data.index, action.timestamp)
             .pipe(tap(response => console.log(response))),
         ),
       ),
     { dispatch: false },
+  );
+
+  createInviteResponseEvent$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardActions.createInviteResponseEvent),
+      switchMap(action =>
+        this.usersService
+          .createInviteResponseEvent(action.roomId, action.response)
+          .pipe(
+            tap(response => console.log(response)),
+            map(() => ({ type: DashboardActions.getRooms.type })),
+          ),
+      ),
+    ),
   );
 
   constructor(
