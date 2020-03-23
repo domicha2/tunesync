@@ -17,6 +17,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from .serializers import *  # we literally need everything
 from rest_framework.parsers import MultiPartParser
+from rest_framework import status
 from django.http import HttpResponse
 
 from django.db.models import F, Q, Subquery, Value, CharField
@@ -100,7 +101,9 @@ class UserViewSet(viewsets.ViewSet):
             token, created = Token.objects.get_or_create(user=user)
             return Response({"token": token.key, "user_id": user.pk})
         else:
-            return Response("invalid credentials", status=401)
+            return Response(
+                {"details": "invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
+            )
 
     @action(methods=["get"], detail=False)
     def whoami(self, request):
@@ -158,7 +161,9 @@ class EventViewSet(viewsets.ViewSet):
                 event.save()
                 serializer = EventSerializer(event)
                 return Response(serializer.data)
-        return Response(status=400)
+        return Response(
+            {"details": "Incorrect content in args"}, status=status.HTTP_400_BAD_REQUEST
+        )
 
     def handle_PO(self, request, event, **kw):
         """
@@ -222,21 +227,53 @@ class EventViewSet(viewsets.ViewSet):
         args = request.data["args"]
         if "modify_queue" in args:
             if not self.validate_MQ(args["modify_queue"]):
-                print("here")
-                return Response(status=400)
+                event.delete()
+                return Response(
+                    {"details": "Incorrect content in args"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             result = []
             for song_id in args["modify_queue"]["queue"]:
-                tune = Tune.objects.filter(pk=song_id).values()
-                result.append([song_id, tune[0]["length"], tune[0]["name"]])
+                try:
+                    tune = Tune.objects.get(pk=song_id)
+                    result.append([song_id, tune.length, tune.name])
+                except:
+                    event.delete()
+                    return Response(
+                        {"details": "song {} does not exist".format(song_id)},
+                        status.HTTP_400_BAD_REQUEST,
+                    )
+            result = {"queue": result}
             tunesync.modify_queue = result
         if "play" in args:
             if not self.validate_PL(args["play"]):
-                print("no here")
-                return Response(status=400)
+                event.delete()
+                return Response(
+                    {"details": "Incorrect content in args"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            last_tunesync = TuneSync.get_tune_sync(event.room.id)
+            if last_tunesync["last_modify_queue"]:
+                queue = last_tunesync["last_modify_queue"]["modify_queue"]["queue"]
+                if (
+                    len(queue) < args["play"]["queue_index"]
+                    or args["play"]["queue_index"] < 0
+                ):
+                    event.delete()
+                    return Response(
+                        {"details": "Invalid song index for queue"},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+            else:
+                event.delete()
+                return Response(
+                    {"details": "There are no songs in queue to play"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             tunesync.play = args["play"]
         tunesync.save()
         result = TuneSync.get_tune_sync(event.room.id)
-        return Response(result, status=200)
+        return Response(result, status=status.HTTP_200_OK)
 
     def validate_U(self, args):
         event_type = args["type"]
@@ -253,13 +290,29 @@ class EventViewSet(viewsets.ViewSet):
         return False
 
     def handle_U_I(self, args, event, request, **kw):
+        added_users = []
         for user in args["users"]:
-            system_room = Room.objects.get(system_user__id=user)
+            try:
+                system_room = Room.objects.get(system_user__id=user)
+            except:
+                return (
+                    {"details": "user {} does not exist".format(user)},
+                    status.HTTP_400_BAD_REQUEST,
+                )
             u_obj = User.objects.get(pk=user)
+            membership = Membership.objects.filter(user=u_obj, room=event.room)
+            if membership:
+                return (
+                    {"details": "user {} is already invited".format(user)},
+                    status.HTTP_400_BAD_REQUEST,
+                )
             membership = Membership(room=event.room, user=u_obj, state="P", role="R")
-            membership.save()
+            user = {"membership": membership, "system_room": system_room}
+            added_users.append(user)
+        for user in added_users:
+            user["membership"].save()
             invite_event = Event(
-                room=system_room,
+                room=user["system_room"],
                 author=request.user,
                 event_type="U",
                 args={
@@ -269,7 +322,7 @@ class EventViewSet(viewsets.ViewSet):
                 },
             )
             invite_event.save()
-        return 200
+        return (None, status.HTTP_200_OK)
 
     def handle_U_J(self, args, event, request, **kw):
         user = request.user
@@ -281,10 +334,13 @@ class EventViewSet(viewsets.ViewSet):
             membership = Membership.objects.get(room=event.room, user=user)
             membership.state = "R"
             membership.save()
-        return 200
+        return (None, status.HTTP_200_OK)
 
     def handle_U_K(self, args, event, request, **kw):
         user = request.user
+        kicked_user = Membership.objects.filter(room=event.room, user__id=args["user"])
+        if not kicked_user:
+            return ({"details": "user is not in the room"}, status.HTTP_400_BAD_REQUEST)
         system_room = Room.objects.get(system_user__id=args["user"])
         kick_event = Event(
             author=user,
@@ -295,27 +351,34 @@ class EventViewSet(viewsets.ViewSet):
         # let them know they've been kicked lol
         kick_event.save()
         # delete user from room
-        Membership.objects.get(room=event.room, user__id=args["user"]).delete()
-        return 200
+        kicked_user.delete()
+        return (None, status.HTTP_200_OK)
 
     def handle_U_C(self, args, event, **kw):
-        membership = Membership.objects.get(user__id=args["user"], room=event.room)
-        membership.role = args["role"]
-        membership.save()
-        return 200
+        membership = Membership.objects.filter(user__id=args["user"], room=event.room)
+        if not membership:
+            return ({"details": "user is not in the room"}, status.HTTP_400_BAD_REQUEST)
+        membership[0].role = args["role"]
+        membership[0].save()
+        return (None, status.HTTP_200_OK)
 
     def handle_U(self, request, event, **kw):
         args = request.data["args"]
         if "type" in args:
             if args["type"] in {"K", "I", "J", "L", "C"}:
                 if self.validate_U(args):
-                    print("here")
-                    event.save()
                     handle_event = getattr(self, "handle_U_" + args["type"])
                     result = handle_event(args, event, request=request)
-                    serializer = EventSerializer(event)
-                    return Response(serializer.data, status=result)
-        return Response(status=400)
+                    if result[1] >= 400:
+                        data = result[0]
+                    else:
+                        event.save()
+                        serializer = EventSerializer(event)
+                        data = serializer.data
+                    return Response(data, status=result[1])
+        return Response(
+            {"details": "Incorrect content in args"}, status=status.HTTP_400_BAD_REQUEST
+        )
 
     def validate_PO(self, args):
         if "action":
@@ -336,7 +399,9 @@ class EventViewSet(viewsets.ViewSet):
             skip = int(request.query_params["skip"])
             limit = int(request.query_params["limit"])
         except:
-            return Response(status=400)
+            return Response(
+                {"details": "Missing query params"}, status=status.HTTP_400_BAD_REQUEST
+            )
         response_data = (
             Event.objects.filter(room__pk=room_id, event_type=event_type)
             .order_by("-creation_time")
@@ -348,10 +413,11 @@ class EventViewSet(viewsets.ViewSet):
     def create(self, request):
         if not set(request.data) <= {"room", "args", "event_type", "parent_event"}:
             return Response(status=400)
-        try:
-            room = Room.objects.get(pk=request.data["room"])
-        except:
-            return Response(status=400)
+        room = Room.objects.get(pk=request.data["room"])
+        if not room:
+            return Response(
+                {"details": "room does not exist"}, status=status.HTTP_400_BAD_REQUEST
+            )
         event = Event(
             author=request.user,
             room=room,
@@ -359,8 +425,14 @@ class EventViewSet(viewsets.ViewSet):
             args=request.data["args"],
         )
         if "parent_event" in request.data:
-            parent_event = Event.objects.filter(pk=request.data["parent_event"])
-            event.parent_event = parent_event[0]
+            parent_event = Event.is_valid_parent(room, request.data["parent_event"])
+            if parent_event:
+                event.parent_event = parent_event
+            else:
+                return Response(
+                    {"details": "invalid parent event"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         handle_event = getattr(self, "handle_" + event.event_type)
         result = handle_event(request, event)
         return result

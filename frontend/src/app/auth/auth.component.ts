@@ -10,6 +10,7 @@ import * as DashboardActions from '../dashboard/store/dashboard.actions';
 
 import { AppState } from '../app.module';
 import { selectToken } from './auth.selectors';
+import { WebSocketService } from '../dashboard/web-socket.service';
 
 @Component({
   selector: 'app-auth',
@@ -24,7 +25,11 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   subscription = new Subscription();
 
-  constructor(private router: Router, private store: Store<AppState>) {}
+  constructor(
+    private webSocketService: WebSocketService,
+    private router: Router,
+    private store: Store<AppState>,
+  ) {}
 
   ngOnInit(): void {
     this.subscription.add(
@@ -36,6 +41,7 @@ export class AuthComponent implements OnInit, OnDestroy {
 
           // make a request to get a list of rooms for the user to go into
           this.store.dispatch(DashboardActions.getRooms());
+          this.webSocketService.createWebSocket(token);
           this.router.navigate(['/dashboard']);
         }
       }),

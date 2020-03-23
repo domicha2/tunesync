@@ -58,6 +58,12 @@ class Event(models.Model):
     class Meta:
         indexes = [models.Index(fields=["room", "event_type", "creation_time"])]
 
+    def is_valid_parent(room, parent_event_id):
+        """
+        returns valid parent event. None otherwise
+        """
+        return Event.objects.get(room=room, pk=parent_event_id)
+
 
 class TuneSync(models.Model):
     event = models.OneToOneField(Event, on_delete=models.CASCADE, primary_key=True)
@@ -115,10 +121,10 @@ class Vote(models.Model):
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     agree = models.BooleanField()
-    unique_together = ["poll", "user"]
 
     class Meta:
         indexes = [models.Index(fields=["poll", "user"])]
+        unique_together = ("poll", "user")
 
 
 class Tune(models.Model):
@@ -149,6 +155,7 @@ class Membership(models.Model):
 
     class Meta:
         indexes = [models.Index(fields=["room", "user"])]
+        unique_together = ("room", "user")
 
     def get_membership(room_id, user):
         """
@@ -174,9 +181,6 @@ def update_event_listeners(sender, instance, **kwargs):
     if instance.event_type == "T":
         return
 
-    room = instance.room
-    group_name = "event-room-{}".format(room.id)
-
     message = {
         "room_id": instance.room.id,
         "event_id": instance.id,
@@ -187,27 +191,33 @@ def update_event_listeners(sender, instance, **kwargs):
         "args": instance.args,
         "username": instance.author.username,
     }
-
     channel_layer = channels.layers.get_channel_layer()
 
-    async_to_sync(channel_layer.group_send)(
-        group_name, {"type": "user_notify_event", "text": message}
-    )
+    room = instance.room
+    users_in_room = Membership.objects.filter(room=room, state="A")
+    for user in users_in_room:
+        group_name = "user-{}".format(user.user_id)
+
+        async_to_sync(channel_layer.group_send)(
+            group_name, {"type": "user_notify_event", "text": message}
+        )
 
 
 @receiver(post_save, sender=TuneSync, dispatch_uid="update_tunesync_listeners")
 def update_tunesync_listeners(sender, instance, **kwargs):
-    room = instance.event.room.id
+    room = instance.event.room
 
-    tunesync = TuneSync.get_tune_sync(room)
-    group_name = "event-room-{}".format(room)
-
+    tunesync = TuneSync.get_tune_sync(room.id)
     channel_layer = channels.layers.get_channel_layer()
+
     if "play_time" in tunesync and tunesync["play_time"] is not None:
         tunesync["play_time"] = tunesync["play_time"].isoformat()
 
-    async_to_sync(channel_layer.group_send)(
-        group_name, {"type": "user_notify_event", "text": tunesync}
-    )
+    users_in_room = Membership.objects.filter(room=room, state="A")
+    for user in users_in_room:
+        group_name = "user-{}".format(user.user_id)
+        async_to_sync(channel_layer.group_send)(
+            group_name, {"type": "user_notify_event", "text": tunesync}
+        )
     # need end point for websocket token
     # signed with hmacs
