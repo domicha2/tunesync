@@ -5,43 +5,6 @@ export interface Song {
   // TODO: add other meta data about song
 }
 
-export interface TuneSyncEvent {
-  last_modify_queue: QueueState | null;
-  last_play: PlayState | null;
-  play_time: string;
-}
-
-export interface QueueState {
-  event_id: number;
-  // [song id, length, name]
-  modify_queue: [number, number, string][];
-  play: any;
-}
-
-export interface PlayState {
-  event_id: number;
-  modify_queue: any;
-  play: {
-    queue_index: number;
-    is_playing: boolean;
-    timestamp: number;
-  };
-}
-
-export interface TuneSyncEventWS {
-  last_modify_queue: {
-    event_id: number;
-    play: { queue_index: number; is_playing: boolean; timestamp: number };
-    modify_queue: [number, number, string][];
-  };
-  last_play: {
-    event_id: number;
-    play: { queue_index: number; is_playing: boolean; timestamp: number };
-    modify_queue: [number, number, string][];
-  };
-  play_time: string;
-}
-
 export enum UserChangeAction {
   Invite = 'I',
   Kick = 'K',
@@ -113,4 +76,24 @@ export interface Message {
   content: string;
   userId: number;
   roomId: number;
+}
+
+export interface TuneSyncEvent {
+  last_modify_queue: QueueState | null;
+  last_play: PlayState | null;
+  play_time: string;
+  room: number;
+}
+
+export interface PlayState {
+  event_id: number;
+  queue_index: number;
+  is_playing: boolean;
+  timestamp: number;
+}
+
+export interface QueueState {
+  event_id: number;
+  // [song id, length, name]
+  queue: [number, number, string][];
 }
