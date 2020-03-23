@@ -227,6 +227,7 @@ class EventViewSet(viewsets.ViewSet):
         else:
             return False
 
+    # TODO: This is ugly. Refractor into multiple functions if time allows
     def handle_T(self, request, event):
         """
         Returns status code to use
@@ -265,7 +266,7 @@ class EventViewSet(viewsets.ViewSet):
             if last_tunesync["last_modify_queue"]:
                 queue = last_tunesync["last_modify_queue"]["queue"]
                 if (
-                    len(queue) < args["play"]["queue_index"]
+                    len(queue) - 1 < args["play"]["queue_index"]
                     or args["play"]["queue_index"] < 0
                 ):
                     event.delete()
