@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-ver = "0.8.11"
+ver = "1.0.0"
 setup(
     name="tunesync",
     version=ver,
@@ -21,6 +21,7 @@ setup(
         "psycopg2",
         "mutagen",
         "django-filter",
+        "djangorestframework-filters",
     ],
     classifiers=["Programming Language :: Python :: 3 :: Only"],
 )
