@@ -79,7 +79,7 @@ class TuneSync(models.Model):
             .values()
         )
         if tunesync:
-            event_id = tunesync[0]["event_id"]
+            event_id = int(tunesync[0]["event_id"])
             tunesync = tunesync[0]["modify_queue"]
             tunesync["event_id"] = event_id
         else:
@@ -91,7 +91,7 @@ class TuneSync(models.Model):
             .values()
         )
         if tunesync:
-            event_id = tunesync[0]["event_id"]
+            event_id = int(tunesync[0]["event_id"])
             tunesync = tunesync[0]["play"]
             tunesync["event_id"] = event_id
             play_time = Event.objects.filter(pk=event_id).values()[0]["creation_time"]
