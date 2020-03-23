@@ -71,7 +71,7 @@ class DjOrAbove(BasePermission):
 
     def has_permission(self, request, view):
         if is_event_type(request, view, "T"):
-            membership = Membership.get_membership(room_id, request.user)
+            membership = Membership.get_membership(request.data["room"], request.user)
             return membership[0]["role"] == "A" or membership[0]["role"] == "D"
         return True
 

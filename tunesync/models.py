@@ -58,6 +58,12 @@ class Event(models.Model):
     class Meta:
         indexes = [models.Index(fields=["room", "event_type", "creation_time"])]
 
+    def is_valid_parent(room, parent_event_id):
+        """
+        returns valid parent event. None otherwise
+        """
+        return Event.objects.get(room=room, pk=parent_event_id)
+
 
 class TuneSync(models.Model):
     event = models.OneToOneField(Event, on_delete=models.CASCADE, primary_key=True)
@@ -114,10 +120,10 @@ class Vote(models.Model):
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     agree = models.BooleanField()
-    unique_together = ["poll", "user"]
 
     class Meta:
         indexes = [models.Index(fields=["poll", "user"])]
+        unique_together = ("poll", "user")
 
 
 class Tune(models.Model):
@@ -148,6 +154,7 @@ class Membership(models.Model):
 
     class Meta:
         indexes = [models.Index(fields=["room", "user"])]
+        unique_together = ("room", "user")
 
     def get_membership(room_id, user):
         """
