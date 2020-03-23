@@ -8,6 +8,7 @@ import {
   selectEvents,
   selectTuneSyncEvent,
   selectActiveRoomName,
+  selectActiveRoom,
 } from '../store/dashboard.selectors';
 import {
   AppEvent,
@@ -24,6 +25,7 @@ import { distinctUntilChanged, filter } from 'rxjs/operators';
 
 import * as moment from 'moment';
 import { WebSocketService } from '../web-socket.service';
+import { NotificationsService } from '../notifications.service';
 
 @Component({
   selector: 'app-main-screen',
@@ -35,8 +37,10 @@ export class MainScreenComponent implements OnInit, OnDestroy {
   events: AppEvent[] = [];
   userId: number;
   activeRoomName: string;
+  activeRoomId: number;
 
   constructor(
+    private notificationsService: NotificationsService,
     private webSocketService: WebSocketService,
     private store: Store<AppState>,
   ) {}
@@ -50,6 +54,12 @@ export class MainScreenComponent implements OnInit, OnDestroy {
       this.store
         .select(selectActiveRoomName)
         .subscribe(name => (this.activeRoomName = name)),
+    );
+
+    this.subscription.add(
+      this.store
+        .select(selectActiveRoom)
+        .subscribe(roomId => (this.activeRoomId = roomId)),
     );
 
     this.subscription.add(
@@ -91,7 +101,16 @@ export class MainScreenComponent implements OnInit, OnDestroy {
   handleWebSocketMessage(data): void {
     const event: AppEvent = JSON.parse(data);
     console.log('payload from websocket: ', event);
+    if (event.room_id !== this.activeRoomId) {
+      // the associated room does not match the active room add a notification
+      this.notificationsService.notificationsSubject.next({
+        roomId: event.room_id,
+        action: 'increment',
+      });
+      return;
+    }
     if (event.event_id || event['last_modify_queue']) {
+      // the associated room matches the active room continue
       switch (event.event_type) {
         // !TUNESYNC EVENT
         case undefined:
