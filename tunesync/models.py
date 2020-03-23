@@ -180,9 +180,6 @@ def update_event_listeners(sender, instance, **kwargs):
     if instance.event_type == "T":
         return
 
-    room = instance.room
-    group_name = "event-room-{}".format(room.id)
-
     message = {
         "room_id": instance.room.id,
         "event_id": instance.id,
@@ -193,27 +190,33 @@ def update_event_listeners(sender, instance, **kwargs):
         "args": instance.args,
         "username": instance.author.username,
     }
-
     channel_layer = channels.layers.get_channel_layer()
 
-    async_to_sync(channel_layer.group_send)(
-        group_name, {"type": "user_notify_event", "text": message}
-    )
+    room = instance.room
+    users_in_room = Membership.objects.filter(room=room, state="A")
+    for user in users_in_room:
+        group_name = "user-{}".format(user.user_id)
+
+        async_to_sync(channel_layer.group_send)(
+            group_name, {"type": "user_notify_event", "text": message}
+        )
 
 
 @receiver(post_save, sender=TuneSync, dispatch_uid="update_tunesync_listeners")
 def update_tunesync_listeners(sender, instance, **kwargs):
-    room = instance.event.room.id
+    room = instance.event.room
 
-    tunesync = TuneSync.get_tune_sync(room)
-    group_name = "event-room-{}".format(room)
-
+    tunesync = TuneSync.get_tune_sync(room.id)
     channel_layer = channels.layers.get_channel_layer()
+
     if "play_time" in tunesync and tunesync["play_time"] is not None:
         tunesync["play_time"] = tunesync["play_time"].isoformat()
 
-    async_to_sync(channel_layer.group_send)(
-        group_name, {"type": "user_notify_event", "text": tunesync}
-    )
+    users_in_room = Membership.objects.filter(room=room, state="A")
+    for user in users_in_room:
+        group_name = "user-{}".format(user.user_id)
+        async_to_sync(channel_layer.group_send)(
+            group_name, {"type": "user_notify_event", "text": tunesync}
+        )
     # need end point for websocket token
     # signed with hmacs
