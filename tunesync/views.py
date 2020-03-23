@@ -24,6 +24,8 @@ from django.db.models import F, Q, Subquery, Value, CharField
 from django.contrib.auth import authenticate, login
 import mutagen
 
+from .filters import TuneFilter
+
 
 class IndexPage(TemplateView):
     template_name = "index.html"
@@ -509,6 +511,10 @@ class RoomViewSet(viewsets.ViewSet):
 class TuneViewSet(viewsets.ViewSet):
     permission_classes = [AnonCreateAndUpdateOwnerOnly]
     parser_classes = [MultiPartParser]
+
+    def list(self, request):
+        results = TuneFilter(request.GET, queryset=Product.objects.all())
+        Response(results.values())
 
     @action(url_path="meta", methods=["get"], detail=True)
     def get_meta(self, request, pk=None):

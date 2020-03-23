@@ -20,6 +20,7 @@ setup(
         "django-cors-headers",
         "psycopg2",
         "mutagen",
+        "django-filter",
     ],
     classifiers=["Programming Language :: Python :: 3 :: Only"],
 )
