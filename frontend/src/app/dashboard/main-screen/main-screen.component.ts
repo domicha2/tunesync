@@ -103,6 +103,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
     console.log('payload from websocket: ', event);
     if (event.room_id !== this.activeRoomId) {
       // the associated room does not match the active room add a notification
+      // TODO: consider what events should trigger a notification
       this.notificationsService.notificationsSubject.next({
         roomId: event.room_id,
         action: 'increment',
