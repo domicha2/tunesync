@@ -6,11 +6,12 @@ from django.contrib.auth.models import User
 from rest_framework import viewsets
 from .permissions import (
     AnonCreateAndUpdateOwnerOnly,
-    InRoomOnly,
+    InRoomOnlyEvents,
     DjOrAbove,
     RoomAdminOnly,
     JoinPendingOnly,
     UploaderOnly,
+    InRoomOnly,
 )
 from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token
@@ -138,7 +139,7 @@ class UserViewSet(viewsets.ViewSet):
 
 class EventViewSet(viewsets.ViewSet):
 
-    permission_classes = [InRoomOnly, DjOrAbove, RoomAdminOnly, JoinPendingOnly]
+    permission_classes = [InRoomOnlyEvents, DjOrAbove, RoomAdminOnly, JoinPendingOnly]
 
     def validate_PL(self, args):
         if set(args.keys()) >= {"queue_index", "is_playing", "timestamp"}:
@@ -450,7 +451,7 @@ class RoomViewSet(viewsets.ViewSet):
     """
     """
 
-    permission_classes = [UploaderOnly]
+    permission_classes = [UploaderOnly, InRoomOnly]
 
     # GET
     def list(self, request):

@@ -175,6 +175,13 @@ class Membership(models.Model):
         else:
             return False
 
+    def is_in_room(room_id, user):
+        membership = Membership.get_membership(room_id, user)
+        if membership:
+            return membership[0]["state"] == "P" or membership[0]["state"] == "A"
+        else:
+            return False
+
 
 @receiver(post_save, sender=Event, dispatch_uid="update_event_listeners")
 def update_event_listeners(sender, instance, **kwargs):

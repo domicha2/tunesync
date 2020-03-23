@@ -31,7 +31,7 @@ class AnonCreateAndUpdateOwnerOnly(BasePermission):
         )
 
 
-class InRoomOnly(BasePermission):
+class InRoomOnlyEvents(BasePermission):
     """
     Users must be in the room to actually do anything 
     """
@@ -47,11 +47,7 @@ class InRoomOnly(BasePermission):
                 room_id = request.data["room"]
             else:
                 return False
-        membership = Membership.get_membership(room_id, request.user)
-        if membership:
-            return membership[0]["state"] == "P" or membership[0]["state"] == "A"
-        else:
-            return False
+        return Membership.is_in_room(room_id, request.user)
 
 
 def is_event_type(request, view, event):
@@ -62,6 +58,14 @@ def is_event_type(request, view, event):
             return False
         return event_type == event
     return False
+
+
+class InRoomOnly(BasePermission):
+    def has_permission(self, request, view):
+        if view.action in {"tunesync", "events"}:
+            room_id = view.kwargs["pk"]
+            return Membership.is_in_room(room_id, request.user)
+        return True
 
 
 class DjOrAbove(BasePermission):
@@ -101,7 +105,6 @@ class JoinPendingOnly(BasePermission):
             try:
                 if request.data["args"]["type"] == "J":
                     state = Membership.get_membership(room_id, request.user)[0]["state"]
-                    print(state)
                     return state == "P"
             except:
                 return False
