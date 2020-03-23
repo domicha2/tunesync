@@ -230,10 +230,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
               'initial diff',
               queue[i].length - playEvent.timestamp < difference,
             );
-            console.log(
-              'init differe',
-              queue[i].length - playEvent.timestamp,
-            );
+            console.log('init differe', queue[i].length - playEvent.timestamp);
             if (queue[i].length - playEvent.timestamp < difference) {
               console.log('in the if statement some how');
               // remaining time in the first song can be subtracted
