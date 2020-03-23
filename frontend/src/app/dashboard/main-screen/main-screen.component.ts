@@ -3,11 +3,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 
-import { environment } from '../../../environments/environment';
 import { AppState } from '../../app.module';
 import {
   selectEvents,
-  selectActiveRoom,
   selectTuneSyncEvent,
   selectActiveRoomName,
 } from '../store/dashboard.selectors';
@@ -26,6 +24,7 @@ import * as DashboardActions from '../store/dashboard.actions';
 import { distinctUntilChanged, filter } from 'rxjs/operators';
 
 import * as moment from 'moment';
+import { WebSocketService } from '../web-socket.service';
 
 @Component({
   selector: 'app-main-screen',
@@ -35,13 +34,79 @@ import * as moment from 'moment';
 export class MainScreenComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
   events: AppEvent[] = [];
-  webSocket: WebSocket;
   userId: number;
   activeRoomName: string;
 
-  constructor(private store: Store<AppState>) {}
+  constructor(
+    private webSocketService: WebSocketService,
+    private store: Store<AppState>,
+  ) {}
 
   ngOnInit(): void {
+    this.webSocketService.messageSubject.subscribe(data => {
+      const event: AppEvent = JSON.parse(data);
+      console.log('payload from websocket: ', event);
+      if (event.event_id || event['last_modify_queue']) {
+        switch (event.event_type) {
+          // !TUNESYNC EVENT
+          case undefined:
+            console.log('dealing with tunesync event');
+            // determine what type of event it was
+            // if it is playing the dispatch set song stat
+            // if it is modifying the queue, need to dispatch a new queue
+            const tuneSyncEvent = {
+              last_modify_queue: event['last_modify_queue'],
+              last_play: event['last_play'],
+              play_time: event['play_time'],
+            } as TuneSyncEventWS;
+            if (
+              tuneSyncEvent.last_play === null ||
+              tuneSyncEvent.last_modify_queue.event_id >
+                tuneSyncEvent.last_play.event_id
+            ) {
+              // the  DJ made a modify queue event
+              // need to dispatch new queue into my store
+              this.store.dispatch(
+                DashboardActions.storeQueue({
+                  queue: tuneSyncEvent.last_modify_queue.modify_queue.map(
+                    ([id, length, name]) => ({ id, length, name }),
+                  ),
+                }),
+              );
+            } else {
+              // the DJ made a play event
+              console.log('dj made a play event');
+              // ! could have race condition but handleTuneSync function has the same design
+              this.store.dispatch(
+                DashboardActions.setSongStatus({
+                  isPlaying: tuneSyncEvent.last_play.play.is_playing,
+                  seekTime: tuneSyncEvent.last_play.play.timestamp,
+                  queueIndex: tuneSyncEvent.last_play.play.queue_index,
+                }),
+              );
+            }
+            break;
+          case EventType.UserChange:
+            if (this.activeRoomName === 'System Room') {
+              this.events.push(event);
+            }
+            break;
+          case EventType.Messaging:
+            this.events.push(event);
+            break;
+          default:
+            console.error('bad event type');
+            break;
+        }
+        setTimeout(() => {
+          const item = document.querySelector('mat-list-item:last-child');
+          if (item) {
+            item.scrollIntoView();
+          }
+        }, 500);
+      }
+    });
+
     this.subscription.add(
       this.store
         .select(selectActiveRoomName)
@@ -60,12 +125,6 @@ export class MainScreenComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.store.select(selectUserId).subscribe((userId: number) => {
         this.userId = userId;
-      }),
-    );
-
-    this.subscription.add(
-      this.store.select(selectActiveRoom).subscribe((roomId: number) => {
-        this.createWebSocket(roomId);
       }),
     );
 
@@ -114,97 +173,6 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         el.scrollIntoView();
       }
     }, 500);
-  }
-
-  createWebSocket(roomId: number): void {
-    // check if room id has been set
-    if (roomId !== undefined) {
-      // check if there is already a connection
-      if (this.webSocket && this.webSocket.readyState === WebSocket.OPEN) {
-        // clear connection
-        this.webSocket.close();
-      }
-
-      this.webSocket = new WebSocket(
-        `${environment.webSocketUrl}?room_id=${roomId}`,
-      );
-
-      this.webSocket.onopen = (event: Event) => {
-        console.log('connected to web socket');
-      };
-
-      this.webSocket.onmessage = (messageEvent: MessageEvent) => {
-        const event: AppEvent = JSON.parse(messageEvent.data);
-        console.log('payload from websocket: ', event);
-        if (event.event_id || event['last_modify_queue']) {
-          switch (event.event_type) {
-            // !TUNESYNC EVENT
-            case undefined:
-              console.log('dealing with tunesync event');
-              // determine what type of event it was
-              // if it is playing the dispatch set song stat
-              // if it is modifying the queue, need to dispatch a new queue
-              const tuneSyncEvent = {
-                last_modify_queue: event['last_modify_queue'],
-                last_play: event['last_play'],
-                play_time: event['play_time'],
-              } as TuneSyncEventWS;
-              if (
-                tuneSyncEvent.last_play === null ||
-                tuneSyncEvent.last_modify_queue.event_id >
-                  tuneSyncEvent.last_play.event_id
-              ) {
-                // the  DJ made a modify queue event
-                // need to dispatch new queue into my store
-                this.store.dispatch(
-                  DashboardActions.storeQueue({
-                    queue: tuneSyncEvent.last_modify_queue.modify_queue.map(
-                      ([id, length, name]) => ({ id, length, name }),
-                    ),
-                  }),
-                );
-              } else {
-                // the DJ made a play event
-                console.log('dj made a play event');
-                // ! could have race condition but handleTuneSync function has the same design
-                this.store.dispatch(
-                  DashboardActions.setSongStatus({
-                    isPlaying: tuneSyncEvent.last_play.play.is_playing,
-                    seekTime: tuneSyncEvent.last_play.play.timestamp,
-                    queueIndex: tuneSyncEvent.last_play.play.queue_index,
-                  }),
-                );
-              }
-              break;
-            case EventType.UserChange:
-              if (this.activeRoomName === 'System Room') {
-                this.events.push(event);
-              }
-              break;
-            case EventType.Messaging:
-              this.events.push(event);
-              break;
-            default:
-              console.error('bad event type');
-              break;
-          }
-          setTimeout(() => {
-            const item = document.querySelector('mat-list-item:last-child');
-            if (item) {
-              item.scrollIntoView();
-            }
-          }, 500);
-        }
-      };
-
-      this.webSocket.onerror = (event: Event) => {
-        console.log('there was an error with the websocket');
-      };
-
-      this.webSocket.onclose = (closedEvent: CloseEvent) => {
-        console.log('disconnected from web socket');
-      };
-    }
   }
 
   handleTuneSyncEvent(tuneSyncEvent: TuneSyncEvent): void {

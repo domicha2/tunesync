@@ -188,11 +188,11 @@ def update_event_listeners(sender, instance, **kwargs):
     room = instance.room
     users_in_room = Membership.objects.filter(room=room, state="A")
     for user in users_in_room:
-        group_name = "user-{}".format(user.id)
+        group_name = "user-{}".format(user.user_id)
 
-    async_to_sync(channel_layer.group_send)(
-        group_name, {"type": "user_notify_event", "text": message}
-    )
+        async_to_sync(channel_layer.group_send)(
+            group_name, {"type": "user_notify_event", "text": message}
+        )
 
 
 @receiver(post_save, sender=TuneSync, dispatch_uid="update_tunesync_listeners")
@@ -207,7 +207,7 @@ def update_tunesync_listeners(sender, instance, **kwargs):
 
     users_in_room = Membership.objects.filter(room=room, state="A")
     for user in users_in_room:
-        group_name = "user-{}".format(user.id)
+        group_name = "user-{}".format(user.user_id)
         async_to_sync(channel_layer.group_send)(
             group_name, {"type": "user_notify_event", "text": tunesync}
         )

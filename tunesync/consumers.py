@@ -18,12 +18,12 @@ class EventConsumer(JsonWebsocketConsumer):
         self.accept()
 
         params = parse.parse_qs(self.scope["query_string"])
-        room_id = params.get(b"token", (None,))[0]
+        token = params.get(b"token", (None,))[0]
         token = token.decode("utf-8")
         user = Token.objects.get(key=token)
 
         if user:
-            self.group_name = "user-{}".format(user.id)
+            self.group_name = "user-{}".format(user.user_id)
         else:
             self.close()
         async_to_sync(self.channel_layer.group_add)(self.group_name, self.channel_name)
