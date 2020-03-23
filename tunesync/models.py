@@ -99,7 +99,7 @@ class TuneSync(models.Model):
             tunesync = None
         result["last_play"] = tunesync
         result["play_time"] = play_time
-        result["room"] = pk
+        result["room_id"] = pk
         return result
 
 
@@ -172,6 +172,13 @@ class Membership(models.Model):
         result = Membership.objects.filter(user=user, room_id=room_id).values()
         if result:
             return result[0]["role"] == "A"
+        else:
+            return False
+
+    def is_in_room(room_id, user):
+        membership = Membership.get_membership(room_id, user)
+        if membership:
+            return membership[0]["state"] == "P" or membership[0]["state"] == "A"
         else:
             return False
 
