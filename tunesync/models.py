@@ -62,11 +62,11 @@ class Event(models.Model):
         """
         returns valid parent event. None otherwise
         """
-        return Event.objects.get(room=room, pk=parent_event_id)
+        return Event.objects.filter(room=room, pk=parent_event_id)
 
 
 class TuneSync(models.Model):
-    event = models.OneToOneField(Event, on_delete=models.CASCADE, primary_key=True)
+    event = models.OneToOneField(Event, on_delete=models.DO_NOTHING, primary_key=True)
     play = JSONField(null=True, blank=True)
     modify_queue = JSONField(null=True, blank=True)
 
@@ -79,7 +79,7 @@ class TuneSync(models.Model):
             .values()
         )
         if tunesync:
-            tunesync = tunesync[0]
+            tunesync = tunesync[0]["modify_queue"]
         else:
             tunesync = None
         result["last_modify_queue"] = tunesync
@@ -89,14 +89,14 @@ class TuneSync(models.Model):
             .values()
         )
         if tunesync:
-            tunesync = tunesync[0]
-            play_time = Event.objects.filter(pk=tunesync["event_id"]).values()[0][
-                "creation_time"
-            ]
+            event_id = tunesync[0]["event_id"]
+            tunesync = tunesync[0]["play"]
+            play_time = Event.objects.filter(pk=event_id).values()[0]["creation_time"]
         else:
             tunesync = None
         result["last_play"] = tunesync
         result["play_time"] = play_time
+        result["room"] = pk
         return result
 
 
@@ -106,7 +106,7 @@ class Poll(models.Model):
     PLAY = "PL"
     ACTIONS = [(KICK, "Kick"), (MODIFY_QUEUE, "Modify Queue"), (PLAY, "Play")]
     # TODO:
-    event = models.OneToOneField(Event, on_delete=models.CASCADE, primary_key=True)
+    event = models.OneToOneField(Event, on_delete=models.DO_NOTHING, primary_key=True)
     action = models.CharField(max_length=2, choices=ACTIONS)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
@@ -117,7 +117,7 @@ class Poll(models.Model):
 
 
 class Vote(models.Model):
-    event = models.OneToOneField(Event, on_delete=models.CASCADE)
+    event = models.OneToOneField(Event, on_delete=models.DO_NOTHING)
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     agree = models.BooleanField()

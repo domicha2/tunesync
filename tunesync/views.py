@@ -62,9 +62,15 @@ class UserViewSet(viewsets.ViewSet):
 
     # POST
     def create(self, request):
-        u = User.objects.create_user(
-            username=request.data["username"], password=request.data["password"]
-        )
+        try:
+            u = User.objects.create_user(
+                username=request.data["username"], password=request.data["password"]
+            )
+        except:
+            return Response(
+                {"details": "username already exists"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         serializer = UserSerializer(u)
         room = Room(title="System Room", creator=u, system_user=u)
         room.save()
@@ -254,7 +260,7 @@ class EventViewSet(viewsets.ViewSet):
                 )
             last_tunesync = TuneSync.get_tune_sync(event.room.id)
             if last_tunesync["last_modify_queue"]:
-                queue = last_tunesync["last_modify_queue"]["modify_queue"]["queue"]
+                queue = last_tunesync["last_modify_queue"]["queue"]
                 if (
                     len(queue) < args["play"]["queue_index"]
                     or args["play"]["queue_index"] < 0
@@ -427,7 +433,7 @@ class EventViewSet(viewsets.ViewSet):
         if "parent_event" in request.data:
             parent_event = Event.is_valid_parent(room, request.data["parent_event"])
             if parent_event:
-                event.parent_event = parent_event
+                event.parent_event = parent_event[0]
             else:
                 return Response(
                     {"details": "invalid parent event"},
