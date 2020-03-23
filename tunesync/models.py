@@ -99,7 +99,7 @@ class TuneSync(models.Model):
             tunesync = None
         result["last_play"] = tunesync
         result["play_time"] = play_time
-        result["room"] = pk
+        result["room_id"] = pk
         return result
 
 
