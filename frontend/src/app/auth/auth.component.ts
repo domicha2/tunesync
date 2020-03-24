@@ -51,8 +51,6 @@ export class AuthComponent implements OnInit, OnDestroy {
         }
       }),
     );
-
-    document.querySelector('title').innerText = 'TuneSync - Auth';
   }
 
   ngOnDestroy(): void {
