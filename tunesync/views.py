@@ -71,7 +71,7 @@ class UserViewSet(viewsets.ViewSet):
             )
         except:
             return Response(
-                {"details": "username already exists"},
+                {"details": "Username already exists"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         serializer = UserSerializer(u)
@@ -117,7 +117,7 @@ class UserViewSet(viewsets.ViewSet):
             return Response({"token": token.key, "user_id": user.pk})
         else:
             return Response(
-                {"details": "invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
+                {"details": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
             )
 
     @action(methods=["get"], detail=False)
