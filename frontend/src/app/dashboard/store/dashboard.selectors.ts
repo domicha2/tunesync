@@ -99,3 +99,8 @@ export const selectActiveRoomName = createSelector(
   (dashboard: DashboardState) =>
     dashboard ? dashboard.activeRoomName : undefined,
 );
+
+export const selectUserRole = createSelector(
+  (state: AppState) => state.dashboard,
+  (dashboard: DashboardState) => (dashboard ? dashboard.userRole : undefined),
+);

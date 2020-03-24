@@ -156,3 +156,8 @@ export const createRoleChangeEvent = createAction(
   '[Users Component] Create Role Change Event',
   props<{ userId: number; role: Role }>(),
 );
+
+export const setUserRole = createAction(
+  '[Users API] Set User Role',
+  props<{ userRole: Role }>(),
+);

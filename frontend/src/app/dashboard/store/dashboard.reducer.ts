@@ -1,6 +1,6 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import { User as AuthUser } from '../../auth/auth.models';
-import { AppEvent, Room, Song, User } from '../dashboard.models';
+import { AppEvent, Role, Room, Song, User } from '../dashboard.models';
 import * as DashboardActions from './dashboard.actions';
 
 export interface DashboardState {
@@ -20,6 +20,7 @@ export interface DashboardState {
   lastPlayEvent: any;
   queueIndex: number;
   tuneSyncEvent: any;
+  userRole: Role;
 }
 
 export const initialState: DashboardState = undefined;
@@ -97,6 +98,12 @@ const reducer = createReducer(
     return {
       ...state,
       tuneSyncEvent: action.tuneSyncEvent,
+    };
+  }),
+  on(DashboardActions.setUserRole, (state, action) => {
+    return {
+      ...state,
+      userRole: action.userRole,
     };
   }),
 );

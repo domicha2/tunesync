@@ -6,11 +6,11 @@ import {
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { AppState } from '../../app.module';
 import { Role, User } from '../dashboard.models';
 import * as DashboardActions from '../store/dashboard.actions';
-import { selectUsers } from '../store/dashboard.selectors';
+import { selectUserRole, selectUsers } from '../store/dashboard.selectors';
 import { InviteComponent } from './invite/invite.component';
 import { KickUserComponent } from './kick-user/kick-user.component';
 
@@ -28,9 +28,13 @@ export class UsersComponent implements OnInit, OnDestroy {
     regular: [] as User[],
   };
 
+  userRole$: Observable<Role>;
+
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
+    this.userRole$ = this.store.select(selectUserRole);
+
     this.subscription.add(
       this.store.select(selectUsers).subscribe((users: User[]) => {
         // clear existing list of users

@@ -18,7 +18,12 @@
       [cdkDropListData]="users.admin"
       (cdkDropListDropped)="drop($event, 'A')"
     >
-      <div class="list-el" *ngFor="let user of users.admin" cdkDrag>
+      <div
+        class="list-el"
+        *ngFor="let user of users.admin"
+        cdkDrag
+        [cdkDragDisabled]="(userRole$ | async) !== 'A'"
+      >
         <h3>{{ user.name }}</h3>
       </div>
     </div>
@@ -30,7 +35,12 @@
       [cdkDropListData]="users.dj"
       (cdkDropListDropped)="drop($event, 'D')"
     >
-      <div class="list-el" *ngFor="let user of users.dj" cdkDrag>
+      <div
+        class="list-el"
+        *ngFor="let user of users.dj"
+        cdkDrag
+        [cdkDragDisabled]="(userRole$ | async) !== 'A'"
+      >
         <h3>{{ user.name }}</h3>
       </div>
     </div>
@@ -42,9 +52,15 @@
       [cdkDropListData]="users.regular"
       (cdkDropListDropped)="drop($event, 'R')"
     >
-      <div class="list-el row" *ngFor="let user of users.regular" cdkDrag>
+      <div
+        class="list-el row"
+        *ngFor="let user of users.regular"
+        cdkDrag
+        [cdkDragDisabled]="(userRole$ | async) !== 'A'"
+      >
         <h3>{{ user.name }}</h3>
         <button
+          *ngIf="(userRole$ | async) === 'A'"
           mat-icon-button
           matTooltip="Kick user"
           (click)="onKickUser(user)"

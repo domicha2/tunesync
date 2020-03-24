@@ -83,12 +83,18 @@ export class DashboardEffects {
   getUsersByRoom$ = createEffect(() =>
     this.actions$.pipe(
       ofType(DashboardActions.getUsersByRoom),
-      switchMap(action =>
+      concatMap(action =>
+        of(action).pipe(withLatestFrom(this.store.pipe(select(selectUserId)))),
+      ),
+      switchMap(([action, userId]) =>
         this.usersService.getUsersByRoom(action.roomId).pipe(
-          map((users: User[]) => ({
-            type: DashboardActions.storeUsers.type,
-            users,
-          })),
+          mergeMap((users: User[]) => {
+            const userRole = users.find(user => user.userId === userId).role;
+            return [
+              { type: DashboardActions.storeUsers.type, users },
+              { type: DashboardActions.setUserRole.type, userRole },
+            ];
+          }),
           catchError(() => EMPTY),
         ),
       ),
