@@ -59,6 +59,10 @@ export class UsersComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
+  onSignOut(): void {
+    window.location.href = '/';
+  }
+
   onKickUser(user: User): void {
     this.dialog.open(KickUserComponent, {
       width: 'fit-content',
