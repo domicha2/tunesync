@@ -9,8 +9,12 @@
     </button>
   </div>
 
-  <mat-accordion [multi]="true" cdkDropListGroup>
-    <mat-expansion-panel [expanded]="true">
+  <mat-accordion displayMode="flat" [multi]="true" cdkDropListGroup>
+    <mat-expansion-panel
+      [expanded]="true"
+      #adminPanel
+      [ngClass]="adminPanel.expanded ? 'opened' : ''"
+    >
       <mat-expansion-panel-header>
         <h2>Admin</h2>
       </mat-expansion-panel-header>
@@ -32,7 +36,11 @@
       </div>
     </mat-expansion-panel>
 
-    <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel
+      [expanded]="true"
+      #djPanel
+      [ngClass]="djPanel.expanded ? 'opened' : ''"
+    >
       <mat-expansion-panel-header>
         <h2>DJ</h2>
       </mat-expansion-panel-header>
@@ -54,7 +62,11 @@
       </div>
     </mat-expansion-panel>
 
-    <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel
+      [expanded]="true"
+      #regularPanel
+      [ngClass]="regularPanel.expanded ? 'opened' : ''"
+    >
       <mat-expansion-panel-header>
         <h2>Regular</h2>
       </mat-expansion-panel-header>
