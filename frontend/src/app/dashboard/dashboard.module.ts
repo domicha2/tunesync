@@ -20,11 +20,13 @@ import { NotificationsService } from './notifications.service';
 import { QueueComponent } from './queue/queue.component';
 import { AddRoomComponent } from './rooms/add-room/add-room.component';
 import { RoomsComponent } from './rooms/rooms.component';
+import { InviteComponent } from './users/invite/invite.component';
 import { KickUserComponent } from './users/kick-user/kick-user.component';
 import { UsersComponent } from './users/users.component';
 
 @NgModule({
   declarations: [
+    InviteComponent,
     DashboardComponent,
     RoomsComponent,
     UsersComponent,

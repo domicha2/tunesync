@@ -9,7 +9,9 @@ import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { AppState } from '../../app.module';
 import { Role, User } from '../dashboard.models';
+import * as DashboardActions from '../store/dashboard.actions';
 import { selectUsers } from '../store/dashboard.selectors';
+import { InviteComponent } from './invite/invite.component';
 import { KickUserComponent } from './kick-user/kick-user.component';
 
 @Component({
@@ -67,6 +69,13 @@ export class UsersComponent implements OnInit, OnDestroy {
     this.dialog.open(KickUserComponent, {
       width: 'fit-content',
       data: user,
+    });
+  }
+
+  onInvite(): void {
+    this.store.dispatch(DashboardActions.getAllUsers());
+    this.dialog.open(InviteComponent, {
+      height: '20rem',
     });
   }
 
