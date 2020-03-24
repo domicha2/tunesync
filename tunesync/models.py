@@ -115,6 +115,7 @@ class Poll(models.Model):
     creation_time = models.DateTimeField(auto_now_add=True)
     args = JSONField()
     is_actve = models.BooleanField(default=True)
+    is_successful = models.BooleanField(default=False)
 
     class Meta:
         indexes = [models.Index(fields=["room", "action", "creation_time"])]

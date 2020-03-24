@@ -187,8 +187,7 @@ class EventViewSet(viewsets.ViewSet):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         handle_event = getattr(Handler, "handle_" + event.event_type)
-        print(type(request.user))
-        result = handle_event(request.data, event, user=request.user)
+        result = handle_event(request.data["args"], event, user=request.user)
         return result
 
 
