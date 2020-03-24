@@ -48,7 +48,7 @@
       ></mat-progress-bar>
     </div>
   </div>
-  <div id="song-buttons" class="row">
+  <div *ngIf="(userRole$ | async) !== 'R'" id="song-buttons" class="row">
     <button
       mat-icon-button
       matTooltip="Previous song"

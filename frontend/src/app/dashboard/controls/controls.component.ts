@@ -9,15 +9,16 @@ import {
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { combineLatest, Subscription } from 'rxjs';
+import { combineLatest, Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, filter, tap } from 'rxjs/operators';
 import { AppState } from '../../app.module';
-import { Song } from '../dashboard.models';
+import { Role, Song } from '../dashboard.models';
 import { QueueComponent } from '../queue/queue.component';
 import * as DashboardActions from '../store/dashboard.actions';
 import {
   selectQueuedSongs,
   selectSongStatus,
+  selectUserRole,
 } from '../store/dashboard.selectors';
 
 @Component({
@@ -41,6 +42,8 @@ export class ControlsComponent
   pauseOnLoaded: boolean;
   queueIndex = -1;
 
+  userRole$: Observable<Role>;
+
   constructor(
     private cdr: ChangeDetectorRef,
     private store: Store<AppState>,
@@ -48,6 +51,8 @@ export class ControlsComponent
   ) {}
 
   ngOnInit(): void {
+    this.userRole$ = this.store.select(selectUserRole);
+
     /**
      * if song status changes, make sure there exists a queue
      * if song status changes again thats fine
