@@ -154,7 +154,7 @@ export const createInviteResponseEvent = createAction(
 
 export const createRoleChangeEvent = createAction(
   '[Users Component] Create Role Change Event',
-  props<{ userId: number; role: Role }>(),
+  props<{ userId: number; role: 'A' | 'D' | 'R' }>(),
 );
 
 export const setUserRole = createAction(

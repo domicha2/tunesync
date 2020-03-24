@@ -10,7 +10,7 @@ export class UsersService {
   createRoleChangeEvent(
     userId: number,
     roomId: number,
-    role: Role,
+    role: 'A' | 'D' | 'R',
   ): Observable<any> {
     return this.httpWrapperService.post('/events/', {
       room: roomId,

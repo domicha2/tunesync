@@ -90,7 +90,7 @@ export class UsersComponent implements OnInit, OnDestroy {
    * Must check that the user has admin permissions inside this room
    * Must check that the user is not demoting other admins
    */
-  drop(event: CdkDragDrop<string[]>, role: Role): void {
+  drop(event: CdkDragDrop<string[]>, role: 'A' | 'D' | 'R'): void {
     if (event.previousContainer === event.container) {
       // reorder list
       // ! this doesnt need to be a feature
