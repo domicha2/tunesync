@@ -4,4 +4,8 @@ div#main-screen-wrapper {
   ::ng-deep mat-list-item.current-user > div.mat-list-item-content {
     justify-content: flex-end;
   }
+
+  mat-list-item {
+    height: fit-content;
+  }
 }
