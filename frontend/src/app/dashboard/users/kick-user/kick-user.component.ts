@@ -1,11 +1,9 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-
 import { Store } from '@ngrx/store';
-
 import { AppState } from '../../../app.module';
-import * as DashboardActions from '../../store/dashboard.actions';
 import { User } from '../../dashboard.models';
+import * as DashboardActions from '../../store/dashboard.actions';
 
 @Component({
   selector: 'app-kick-user',

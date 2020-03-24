@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-
 import { Observable } from 'rxjs';
-
 import { HttpWrapperService } from '../../http-wrapper.service';
 import { EventType, UserChangeAction } from '../dashboard.models';
 

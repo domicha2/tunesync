@@ -1,16 +1,13 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-
-import { Store, select } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
-
-import * as AuthActions from './auth.actions';
-import * as DashboardActions from '../dashboard/store/dashboard.actions';
-
 import { AppState } from '../app.module';
-import { selectToken } from './auth.selectors';
+import * as DashboardActions from '../dashboard/store/dashboard.actions';
 import { WebSocketService } from '../dashboard/web-socket.service';
+import * as AuthActions from './auth.actions';
+import { selectToken } from './auth.selectors';
 
 @Component({
   selector: 'app-auth',

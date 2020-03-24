@@ -1,34 +1,31 @@
 import { Injectable } from '@angular/core';
-
 import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { select, Store } from '@ngrx/store';
 import { EMPTY, of } from 'rxjs';
 import {
-  map,
-  switchMap,
   catchError,
+  concatMap,
+  map,
+  mergeMap,
+  switchMap,
   tap,
   withLatestFrom,
-  concatMap,
-  mergeMap,
 } from 'rxjs/operators';
-
-import * as DashboardActions from './dashboard.actions';
+import { AppState } from '../../app.module';
+import { selectUserAndRoom } from '../../app.selectors';
+import { selectUserId } from '../../auth/auth.selectors';
+import { ControlsService } from '../controls/controls.service';
+import { AppEvent, Room, Song, User } from '../dashboard.models';
+import { MainScreenService } from '../main-screen/main-screen.service';
+import { MessagingService } from '../messaging/messaging.service';
 import { QueueService } from '../queue/queue.service';
 import { RoomsService } from '../rooms/rooms.service';
 import { UsersService } from '../users/users.service';
-import { Song, Room, User, AppEvent } from '../dashboard.models';
-import { User as AuthUser } from '../../auth/auth.models';
-import { MessagingService } from '../messaging/messaging.service';
-import { AppState } from '../../app.module';
-import { Store, select } from '@ngrx/store';
-import { selectUserAndRoom } from '../../app.selectors';
-import { MainScreenService } from '../main-screen/main-screen.service';
+import * as DashboardActions from './dashboard.actions';
 import {
   selectActiveRoom,
   selectQueueIndexAndRoom,
 } from './dashboard.selectors';
-import { selectUserId } from '../../auth/auth.selectors';
-import { ControlsService } from '../controls/controls.service';
 
 @Injectable()
 export class DashboardEffects {

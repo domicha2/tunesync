@@ -1,31 +1,26 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-
-import { Subscription } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-
+import * as moment from 'moment';
+import { Subscription } from 'rxjs';
+import { distinctUntilChanged, filter } from 'rxjs/operators';
 import { AppState } from '../../app.module';
-import {
-  selectEvents,
-  selectTuneSyncEvent,
-  selectActiveRoomName,
-  selectActiveRoom,
-} from '../store/dashboard.selectors';
+import { selectUserId } from '../../auth/auth.selectors';
 import {
   AppEvent,
   EventType,
-  ModifyQueueEvent,
-  PlayEvent,
-  TuneSyncEvent,
-  QueueState,
   PlayState,
+  QueueState,
+  TuneSyncEvent,
 } from '../dashboard.models';
-import { selectUserId } from '../../auth/auth.selectors';
-import * as DashboardActions from '../store/dashboard.actions';
-import { distinctUntilChanged, filter } from 'rxjs/operators';
-
-import * as moment from 'moment';
-import { WebSocketService } from '../web-socket.service';
 import { NotificationsService } from '../notifications.service';
+import * as DashboardActions from '../store/dashboard.actions';
+import {
+  selectActiveRoom,
+  selectActiveRoomName,
+  selectEvents,
+  selectTuneSyncEvent,
+} from '../store/dashboard.selectors';
+import { WebSocketService } from '../web-socket.service';
 
 @Component({
   selector: 'app-main-screen',

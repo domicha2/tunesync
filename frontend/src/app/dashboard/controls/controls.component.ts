@@ -1,27 +1,24 @@
 import {
-  Component,
-  OnInit,
-  OnDestroy,
-  ViewChild,
-  ElementRef,
-  ChangeDetectorRef,
   AfterContentChecked,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-
 import { Store } from '@ngrx/store';
-import { Subscription, combineLatest } from 'rxjs';
-
+import { combineLatest, Subscription } from 'rxjs';
+import { distinctUntilChanged, filter, tap } from 'rxjs/operators';
+import { AppState } from '../../app.module';
+import { Song } from '../dashboard.models';
+import { QueueComponent } from '../queue/queue.component';
 import * as DashboardActions from '../store/dashboard.actions';
 import {
   selectQueuedSongs,
   selectSongStatus,
-  selectQueueIndex,
 } from '../store/dashboard.selectors';
-import { AppState } from '../../app.module';
-import { Song } from '../dashboard.models';
-import { QueueComponent } from '../queue/queue.component';
-import { tap, filter, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-controls',

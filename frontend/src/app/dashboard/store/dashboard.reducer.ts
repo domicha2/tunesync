@@ -1,8 +1,7 @@
-import { createReducer, on, Action } from '@ngrx/store';
-
-import * as DashboardActions from './dashboard.actions';
-import { Song, Room, User, AppEvent } from '../dashboard.models';
+import { Action, createReducer, on } from '@ngrx/store';
 import { User as AuthUser } from '../../auth/auth.models';
+import { AppEvent, Room, Song, User } from '../dashboard.models';
+import * as DashboardActions from './dashboard.actions';
 
 export interface DashboardState {
   queuedSongs: Song[];
