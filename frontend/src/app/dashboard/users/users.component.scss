@@ -4,6 +4,10 @@ div#users-wrapper {
   div#top-bar {
     justify-content: space-between;
     height: 5%;
+
+    h1 {
+      margin-right: 0.5rem !important;
+    }
   }
 
   mat-accordion {
@@ -11,6 +15,10 @@ div#users-wrapper {
     flex-direction: column;
 
     height: 90%;
+
+    mat-expansion-panel-header h2 {
+      margin-bottom: 0 !important;
+    }
 
     > mat-expansion-panel.opened {
       flex-grow: 1;
