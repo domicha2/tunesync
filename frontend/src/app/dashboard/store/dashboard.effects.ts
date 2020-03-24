@@ -149,8 +149,7 @@ export class DashboardEffects {
       ),
       switchMap(([action, room]) =>
         this.usersService.removeUserFromRoom(room, action.userId).pipe(
-          tap(response => console.log(response)),
-          map(response => ({
+          map(() => ({
             type: DashboardActions.getUsersByRoom.type,
             roomId: room,
           })),
@@ -169,7 +168,6 @@ export class DashboardEffects {
             withLatestFrom(this.store.pipe(select(selectUserAndRoom))),
           ),
         ),
-        tap(([action, userAndRoom]) => console.log(action, userAndRoom)),
         switchMap(([action, userAndRoom]) =>
           this.messagingService
             .createMessage({
@@ -301,7 +299,6 @@ export class DashboardEffects {
             withLatestFrom(this.store.pipe(select(selectQueueIndexAndRoom))),
           ),
         ),
-        tap(data => console.log(data)),
         switchMap(([action, data]) =>
           this.controlsService
             .createPlaySongEvent(data.room, data.index, action.timestamp)
@@ -320,7 +317,6 @@ export class DashboardEffects {
             withLatestFrom(this.store.pipe(select(selectQueueIndexAndRoom))),
           ),
         ),
-        tap(data => console.log('in the pause song effect')),
         switchMap(([action, data]) =>
           this.controlsService
             .createPauseSongEvent(data.room, data.index, action.timestamp)
@@ -336,10 +332,7 @@ export class DashboardEffects {
       switchMap(action =>
         this.usersService
           .createInviteResponseEvent(action.roomId, action.response)
-          .pipe(
-            tap(response => console.log(response)),
-            map(() => ({ type: DashboardActions.getRooms.type })),
-          ),
+          .pipe(map(() => ({ type: DashboardActions.getRooms.type }))),
       ),
     ),
   );
