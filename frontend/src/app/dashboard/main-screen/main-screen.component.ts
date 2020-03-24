@@ -11,6 +11,7 @@ import {
   PlayState,
   QueueState,
   TuneSyncEvent,
+  UserChangeAction,
 } from '../dashboard.models';
 import { NotificationsService } from '../notifications.service';
 import * as DashboardActions from '../store/dashboard.actions';
@@ -147,6 +148,10 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         case EventType.UserChange:
           if (this.activeRoomName === 'System Room') {
             this.events.push(event);
+          } else if (event.args['type'] === UserChangeAction.RoleChange) {
+            this.store.dispatch(
+              DashboardActions.getUsersByRoom({ roomId: this.activeRoomId }),
+            );
           }
           break;
         case EventType.Messaging:
