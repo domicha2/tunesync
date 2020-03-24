@@ -1,3 +1,37 @@
+div#users-wrapper {
+  height: 100%;
+
+  div#top-bar {
+    justify-content: space-between;
+    height: 5%;
+  }
+
+  mat-accordion {
+    height: 90%;
+
+    mat-expansion-panel div.list-container {
+      min-height: 10rem;
+      border: 1px solid white;
+      border-radius: 0.5rem;
+
+      div.list-el {
+        margin-bottom: 0 !important;
+        border: {
+          top: none;
+          bottom: 1px solid white;
+          left: none;
+          right: none;
+        }
+        border-radius: 0;
+
+        &:last-child {
+          border: none !important;
+        }
+      }
+    }
+  }
+}
+
 h3 {
   margin-bottom: 0;
 }
@@ -7,18 +41,4 @@ div#regular-users {
     justify-content: space-between;
     align-items: center;
   }
-}
-
-div.list-wrapper > div {
-  min-height: 10rem;
-  border: 1px solid white;
-  border-radius: 0.5rem;
-}
-
-div#top-bar {
-  justify-content: space-between;
-}
-
-div.list-wrapper div.list-el {
-  margin-bottom: 0 !important;
 }
