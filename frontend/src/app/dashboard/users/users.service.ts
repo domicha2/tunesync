@@ -1,11 +1,27 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpWrapperService } from '../../http-wrapper.service';
-import { EventType, UserChangeAction } from '../dashboard.models';
+import { EventType, Role, UserChangeAction } from '../dashboard.models';
 
 @Injectable({ providedIn: 'root' })
 export class UsersService {
   constructor(private httpWrapperService: HttpWrapperService) {}
+
+  createRoleChangeEvent(
+    userId: number,
+    roomId: number,
+    role: 'A' | 'D' | 'R',
+  ): Observable<any> {
+    return this.httpWrapperService.post('/events/', {
+      room: roomId,
+      args: {
+        type: 'C',
+        user: userId,
+        role,
+      },
+      event_type: EventType.UserChange,
+    });
+  }
 
   getAllUsers(): Observable<any> {
     return this.httpWrapperService.get('/users/?limit=100');
