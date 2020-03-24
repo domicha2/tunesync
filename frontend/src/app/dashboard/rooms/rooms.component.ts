@@ -1,15 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-
-import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-
+import { Subscription } from 'rxjs';
 import { AppState } from '../../app.module';
-import { Room, Role } from '../dashboard.models';
-import { selectRooms } from '../store/dashboard.selectors';
-import * as DashboardActions from '../store/dashboard.actions';
-import { AddRoomComponent } from './add-room/add-room.component';
+import { Role, Room } from '../dashboard.models';
 import { NotificationsService } from '../notifications.service';
+import * as DashboardActions from '../store/dashboard.actions';
+import { selectRooms } from '../store/dashboard.selectors';
+import { AddRoomComponent } from './add-room/add-room.component';
 
 @Component({
   selector: 'app-rooms',

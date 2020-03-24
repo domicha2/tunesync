@@ -1,27 +1,24 @@
 import {
-  Component,
-  OnInit,
-  OnDestroy,
-  ViewChild,
-  ElementRef,
-  ChangeDetectorRef,
   AfterContentChecked,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-
 import { Store } from '@ngrx/store';
-import { Subscription, combineLatest } from 'rxjs';
-
+import { combineLatest, Subscription } from 'rxjs';
+import { distinctUntilChanged, filter, tap } from 'rxjs/operators';
+import { AppState } from '../../app.module';
+import { Song } from '../dashboard.models';
+import { QueueComponent } from '../queue/queue.component';
 import * as DashboardActions from '../store/dashboard.actions';
 import {
   selectQueuedSongs,
   selectSongStatus,
-  selectQueueIndex,
 } from '../store/dashboard.selectors';
-import { AppState } from '../../app.module';
-import { Song } from '../dashboard.models';
-import { QueueComponent } from '../queue/queue.component';
-import { tap, filter, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-controls',
@@ -57,24 +54,24 @@ export class ControlsComponent
      * if queue changes, dont update (can check if song status is distinct)
      */
     this.subscription.add(
-      combineLatest(
-        this.store.select(selectSongStatus).pipe(
-          tap(data => console.log('song status', data)),
-          filter(
-            status =>
-              typeof status.isPlaying === 'boolean' &&
-              typeof status.queueIndex === 'number',
+      combineLatest([
+        this.store
+          .select(selectSongStatus)
+          .pipe(
+            filter(
+              status =>
+                typeof status.isPlaying === 'boolean' &&
+                typeof status.queueIndex === 'number',
+            ),
           ),
-        ),
         this.store.select(selectQueuedSongs).pipe(
           filter(songs => songs !== null && songs !== undefined),
           tap((queue: Song[]) => {
             this.queue = queue;
             console.count('queued songs sub');
-            console.log(queue);
           }),
         ),
-      )
+      ])
         .pipe(
           distinctUntilChanged(
             ([prevStatus, prevQueue], [currStatus, currQueue]) =>
@@ -84,7 +81,6 @@ export class ControlsComponent
           ),
         )
         .subscribe(([songStatus, queuedSongs]) => {
-          console.log('in the big subscribe callback');
           this.initSong(songStatus, queuedSongs);
         }),
     );
@@ -100,15 +96,11 @@ export class ControlsComponent
 
   /**
    * Called whenever the song status changes (pause or play or seeked)
-   * @param songStatus
-   * @param queue
    */
   initSong(
     songStatus: { isPlaying: boolean; seekTime: number; queueIndex: number },
     queue: Song[],
   ): void {
-    console.log(this.queue);
-    console.log('seek time:', songStatus.seekTime);
     if (songStatus.isPlaying === true) {
       this.pauseOnLoaded = false;
       if (this.currentSong && this.queueIndex === songStatus.queueIndex) {
@@ -116,7 +108,6 @@ export class ControlsComponent
         const song = this.getAudioElement();
         if (songStatus.seekTime !== undefined) {
           song.currentTime = songStatus.seekTime;
-          console.log('after seeked time', song.currentTime);
         }
         song.play();
       } else {
@@ -132,7 +123,6 @@ export class ControlsComponent
       }
     } else if (songStatus.isPlaying === false) {
       this.pauseOnLoaded = true;
-      console.log('wanting to pause the song');
       if (
         this.currentSong === undefined ||
         this.queueIndex !== songStatus.queueIndex
@@ -270,7 +260,6 @@ export class ControlsComponent
    * Auto-click the next song button for the user
    */
   onEnded(event: Event): void {
-    console.log(event);
     this.onNext(false);
   }
 
@@ -286,16 +275,12 @@ export class ControlsComponent
 
   /**
    * This function duplicates the code to alleviate a race condition bug
-   * @param event
    */
   onLoadedData(event: Event): void {
-    console.log('song is loaded', event);
     this.getAudioElement().currentTime = this.seekTime;
-    console.log('on load start time 1', this.getAudioElement().currentTime);
 
     if (this.pauseOnLoaded) {
       // this is used for other people listening to the room
-      console.log('in the fucking pause method');
       this.getAudioElement().pause();
     }
 
@@ -305,7 +290,6 @@ export class ControlsComponent
       } else {
         this.getAudioElement().currentTime = this.seekTime;
       }
-      console.log('on load start time 2', this.getAudioElement().currentTime);
       this.seekTime = 0;
     }, 1000);
   }

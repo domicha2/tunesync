@@ -1,7 +1,11 @@
 import { createAction, props } from '@ngrx/store';
-
-import { Song, User, Room, AppEvent } from '../dashboard.models';
-import { User as AuthUser } from '../dashboard.models';
+import {
+  AppEvent,
+  Room,
+  Song,
+  User as AuthUser,
+  User,
+} from '../dashboard.models';
 
 export const resetState = createAction('[Rooms Component] Reset State');
 

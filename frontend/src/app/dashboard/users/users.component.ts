@@ -1,18 +1,16 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import {
   CdkDragDrop,
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
-
-import { Subscription } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-
-import { KickUserComponent } from './kick-user/kick-user.component';
+import { Subscription } from 'rxjs';
 import { AppState } from '../../app.module';
+import { Role, User } from '../dashboard.models';
 import { selectUsers } from '../store/dashboard.selectors';
-import { User, Role } from '../dashboard.models';
+import { KickUserComponent } from './kick-user/kick-user.component';
 
 @Component({
   selector: 'app-users',

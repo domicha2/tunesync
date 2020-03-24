@@ -1,23 +1,19 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
 import {
   CdkDragDrop,
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
-
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
-
+import { filter } from 'rxjs/operators';
 import { AppState } from '../../app.module';
-
+import { Song } from '../dashboard.models';
+import * as DashboardActions from '../store/dashboard.actions';
 import {
-  selectQueuedSongs,
   selectAvailableSongs,
   selectQueueIndexAndSongs,
 } from '../store/dashboard.selectors';
-import * as DashboardActions from '../store/dashboard.actions';
-import { Song } from '../dashboard.models';
-import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-queue',
