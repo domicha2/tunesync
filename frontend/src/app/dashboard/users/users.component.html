@@ -1,5 +1,11 @@
 <div id="users-wrapper" class="column">
-  <h1>Users</h1>
+  <div id="top-bar" class="row">
+    <h1>Users</h1>
+    <button mat-icon-button (click)="onSignOut()">
+      <mat-icon>exit_to_app</mat-icon>
+    </button>
+  </div>
+
   <div class="list-wrapper column" cdkDropListGroup>
     <h2>Admin</h2>
     <div
