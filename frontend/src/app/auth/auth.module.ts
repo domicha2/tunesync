@@ -4,11 +4,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AuthComponent } from './auth.component';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [AuthComponent],
   imports: [
     ReactiveFormsModule,
+    CommonModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,

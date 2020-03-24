@@ -1,6 +1,7 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { EMPTY } from 'rxjs';
+import { of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import * as AuthActions from './auth.actions';
 import { AuthService } from './auth.service';
@@ -25,7 +26,12 @@ export class AuthEffects {
                 username: credentials.username,
               },
             })),
-            catchError(() => EMPTY),
+            catchError((error: HttpErrorResponse) =>
+              of({
+                type: AuthActions.setAuthError.type,
+                details: error.error.details,
+              }),
+            ),
           ),
       ),
     ),
@@ -42,8 +48,20 @@ export class AuthEffects {
           })
           .pipe(
             // TODO: ideally should just dispatch an action to signify successful sign up
-            map(user => ({ type: AuthActions.storeUser.type, payload: user })),
-            catchError(() => EMPTY),
+            map(user => ({
+              type: AuthActions.storeUser.type,
+              user: {
+                userId: user.user_id,
+                token: user.token,
+                username: credentials.username,
+              },
+            })),
+            catchError((error: HttpErrorResponse) =>
+              of({
+                type: AuthActions.setAuthError.type,
+                details: error.error.details,
+              }),
+            ),
           ),
       ),
     ),

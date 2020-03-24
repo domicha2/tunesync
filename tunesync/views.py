@@ -71,7 +71,7 @@ class UserViewSet(viewsets.ViewSet):
             )
         except:
             return Response(
-                {"details": "username already exists"},
+                {"details": "Username already exists"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         serializer = UserSerializer(u)
@@ -79,7 +79,13 @@ class UserViewSet(viewsets.ViewSet):
         room.save()
         membership = Membership(user=u, room=room, state="A", role="A")
         membership.save()
-        return Response(serializer.data)
+
+        token = Token.objects.create(user=u)
+        response = {
+            "token": token.key,
+            "user_id": u.pk
+        }
+        return Response(response)
 
     # GET BY PK
     def retrieve(self, request, pk=None):
@@ -107,11 +113,11 @@ class UserViewSet(viewsets.ViewSet):
         )
         if user:
             # get or create a token
-            token, created = Token.objects.get_or_create(user=user)
+            token = Token.objects.get(user=user)
             return Response({"token": token.key, "user_id": user.pk})
         else:
             return Response(
-                {"details": "invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
+                {"details": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
             )
 
     @action(methods=["get"], detail=False)

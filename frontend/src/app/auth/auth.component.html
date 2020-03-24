@@ -15,6 +15,10 @@
     </mat-form-field>
   </form>
 
+  <p id="error-message" *ngIf="errorMessage !== undefined">
+    {{ errorMessage }}
+  </p>
+
   <div id="buttons" class="row">
     <button mat-raised-button (click)="onSignUp()">Sign Up</button>
     <button mat-raised-button (click)="onSignIn()">Sign In</button>

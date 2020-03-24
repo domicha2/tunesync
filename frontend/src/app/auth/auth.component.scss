@@ -23,4 +23,9 @@ div#page-wrapper {
   div#buttons {
     justify-content: center;
   }
+
+  p#error-message {
+    color: red;
+    text-align: center;
+  }
 }

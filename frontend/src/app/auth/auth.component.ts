@@ -7,7 +7,7 @@ import { AppState } from '../app.module';
 import * as DashboardActions from '../dashboard/store/dashboard.actions';
 import { WebSocketService } from '../dashboard/web-socket.service';
 import * as AuthActions from './auth.actions';
-import { selectToken } from './auth.selectors';
+import { selectErrorMessage, selectToken } from './auth.selectors';
 
 @Component({
   selector: 'app-auth',
@@ -22,6 +22,8 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   subscription = new Subscription();
 
+  errorMessage: string;
+
   constructor(
     private webSocketService: WebSocketService,
     private router: Router,
@@ -29,6 +31,12 @@ export class AuthComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.subscription.add(
+      this.store
+        .select(selectErrorMessage)
+        .subscribe(errorMessage => (this.errorMessage = errorMessage)),
+    );
+
     this.subscription.add(
       this.store.pipe(select(selectToken)).subscribe(token => {
         if (token) {
@@ -43,8 +51,6 @@ export class AuthComponent implements OnInit, OnDestroy {
         }
       }),
     );
-
-    document.querySelector('title').innerText = 'TuneSync - Auth';
   }
 
   ngOnDestroy(): void {
