@@ -18,3 +18,7 @@ div.list-wrapper > div {
 div#top-bar {
   justify-content: space-between;
 }
+
+div.list-wrapper div.list-el {
+  margin-bottom: 0 !important;
+}
