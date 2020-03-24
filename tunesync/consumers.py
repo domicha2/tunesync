@@ -3,6 +3,8 @@ import channels
 from tunesync.models import Event
 from asgiref.sync import async_to_sync
 from urllib import parse
+from rest_framework.authtoken.models import Token
+
 
 # import urlparse
 
@@ -16,13 +18,14 @@ class EventConsumer(JsonWebsocketConsumer):
         self.accept()
 
         params = parse.parse_qs(self.scope["query_string"])
-        room_id = params.get(b"room_id", (None,))[0]
+        token = params.get(b"token", (None,))[0]
+        token = token.decode("utf-8")
+        user = Token.objects.get(key=token)
 
-        if not room_id:
-            # self.send("no room_id was sent")
+        if user:
+            self.group_name = "user-{}".format(user.user_id)
+        else:
             self.close()
-
-        self.group_name = "event-room-{}".format(room_id.decode("utf-8"))
         async_to_sync(self.channel_layer.group_add)(self.group_name, self.channel_name)
 
         # self.send("you are connected " + " " + self.group_name)

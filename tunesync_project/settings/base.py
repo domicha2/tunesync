@@ -97,7 +97,8 @@ class BaseSettings(DjangoDefaults):
         "corsheaders",
         "channels",
         "rest_framework.authtoken",
-        "django.contrib.sites"
+        "django.contrib.sites",
+        "rest_framework_filters",
         # "captcha",
     ]
 
@@ -137,6 +138,9 @@ class BaseSettings(DjangoDefaults):
     CORS_ORIGIN_ALLOW_ALL = True
 
     REST_FRAMEWORK = {
+        "DEFAULT_FILTER_BACKENDS": (
+            "django_filters.rest_framework.DjangoFilterBackend"
+        ),
         "DEFAULT_AUTHENTICATION_CLASSES": (
             "rest_framework.authentication.TokenAuthentication",
         ),

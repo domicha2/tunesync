@@ -39,7 +39,8 @@ export const selectEvents = createSelector(
 
 export const selectActiveRoom = createSelector(
   (state: AppState) => state.dashboard,
-  (dashboard: DashboardState) => dashboard && dashboard.activeRoomId,
+  (dashboard: DashboardState) =>
+    dashboard ? dashboard.activeRoomId : undefined,
 );
 
 export const selectAllUsers = createSelector(

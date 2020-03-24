@@ -58,7 +58,7 @@ How to start a poll to play a song
     args: {
         action: "PL"
         timestamp: 11.5
-        song_id: 2
+        queue_index: 2
         is_playing: True
     }
 }
@@ -123,3 +123,14 @@ how to leave :
     }
 }   
 
+How to vote in a poll
+
+{
+    room:1, 
+    author:1,
+    event_type: "V"
+    parent_event: 15 # this is the event_id of the poll event that you are voting against.
+    args: {
+        agree: True
+    }
+}

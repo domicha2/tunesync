@@ -13,6 +13,7 @@
         *ngFor="let room of rooms.admin"
         [ngClass]="{ active: activeRoom === room }"
         (click)="onRoomClick(room)"
+        [matBadge]="notifications[room.id]"
       >
         {{ room.title }}
       </div>
@@ -24,6 +25,7 @@
         *ngFor="let room of rooms.dj"
         [ngClass]="{ active: activeRoom === room }"
         (click)="onRoomClick(room)"
+        [matBadge]="notifications[room.id]"
       >
         {{ room.title }}
       </div>
@@ -35,6 +37,7 @@
         *ngFor="let room of rooms.regular"
         [ngClass]="{ active: activeRoom === room }"
         (click)="onRoomClick(room)"
+        [matBadge]="notifications[room.id]"
       >
         {{ room.title }}
       </div>

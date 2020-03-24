@@ -58,9 +58,15 @@ class Event(models.Model):
     class Meta:
         indexes = [models.Index(fields=["room", "event_type", "creation_time"])]
 
+    def is_valid_parent(room, parent_event_id):
+        """
+        returns valid parent event. None otherwise
+        """
+        return Event.objects.filter(room=room, pk=parent_event_id)
+
 
 class TuneSync(models.Model):
-    event = models.OneToOneField(Event, on_delete=models.CASCADE, primary_key=True)
+    event = models.OneToOneField(Event, on_delete=models.DO_NOTHING, primary_key=True)
     play = JSONField(null=True, blank=True)
     modify_queue = JSONField(null=True, blank=True)
 
@@ -73,7 +79,9 @@ class TuneSync(models.Model):
             .values()
         )
         if tunesync:
-            tunesync = tunesync[0]
+            event_id = int(tunesync[0]["event_id"])
+            tunesync = tunesync[0]["modify_queue"]
+            tunesync["event_id"] = event_id
         else:
             tunesync = None
         result["last_modify_queue"] = tunesync
@@ -83,14 +91,15 @@ class TuneSync(models.Model):
             .values()
         )
         if tunesync:
-            tunesync = tunesync[0]
-            play_time = Event.objects.filter(pk=tunesync["event_id"]).values()[0][
-                "creation_time"
-            ]
+            event_id = int(tunesync[0]["event_id"])
+            tunesync = tunesync[0]["play"]
+            tunesync["event_id"] = event_id
+            play_time = Event.objects.filter(pk=event_id).values()[0]["creation_time"]
         else:
             tunesync = None
         result["last_play"] = tunesync
         result["play_time"] = play_time
+        result["room_id"] = pk
         return result
 
 
@@ -100,7 +109,7 @@ class Poll(models.Model):
     PLAY = "PL"
     ACTIONS = [(KICK, "Kick"), (MODIFY_QUEUE, "Modify Queue"), (PLAY, "Play")]
     # TODO:
-    event = models.OneToOneField(Event, on_delete=models.CASCADE, primary_key=True)
+    event = models.OneToOneField(Event, on_delete=models.DO_NOTHING, primary_key=True)
     action = models.CharField(max_length=2, choices=ACTIONS)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
@@ -111,13 +120,14 @@ class Poll(models.Model):
 
 
 class Vote(models.Model):
+    event = models.OneToOneField(Event, on_delete=models.DO_NOTHING)
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     agree = models.BooleanField()
-    unique_together = ["poll", "user"]
 
     class Meta:
         indexes = [models.Index(fields=["poll", "user"])]
+        unique_together = ("poll", "user")
 
 
 class Tune(models.Model):
@@ -148,6 +158,29 @@ class Membership(models.Model):
 
     class Meta:
         indexes = [models.Index(fields=["room", "user"])]
+        unique_together = ("room", "user")
+
+    def get_membership(room_id, user):
+        """
+        room_id: int
+        user: user instance
+        """
+        result = Membership.objects.filter(user=user, room_id=room_id).values()
+        return result
+
+    def is_admin(room_id, user):
+        result = Membership.objects.filter(user=user, room_id=room_id).values()
+        if result:
+            return result[0]["role"] == "A"
+        else:
+            return False
+
+    def is_in_room(room_id, user):
+        membership = Membership.get_membership(room_id, user)
+        if membership:
+            return membership[0]["state"] == "P" or membership[0]["state"] == "A"
+        else:
+            return False
 
 
 @receiver(post_save, sender=Event, dispatch_uid="update_event_listeners")
@@ -157,9 +190,6 @@ def update_event_listeners(sender, instance, **kwargs):
     """
     if instance.event_type == "T":
         return
-
-    room = instance.room
-    group_name = "event-room-{}".format(room.id)
 
     message = {
         "room_id": instance.room.id,
@@ -171,27 +201,33 @@ def update_event_listeners(sender, instance, **kwargs):
         "args": instance.args,
         "username": instance.author.username,
     }
-
     channel_layer = channels.layers.get_channel_layer()
 
-    async_to_sync(channel_layer.group_send)(
-        group_name, {"type": "user_notify_event", "text": message}
-    )
+    room = instance.room
+    users_in_room = Membership.objects.filter(room=room, state="A")
+    for user in users_in_room:
+        group_name = "user-{}".format(user.user_id)
+
+        async_to_sync(channel_layer.group_send)(
+            group_name, {"type": "user_notify_event", "text": message}
+        )
 
 
 @receiver(post_save, sender=TuneSync, dispatch_uid="update_tunesync_listeners")
 def update_tunesync_listeners(sender, instance, **kwargs):
-    room = instance.event.room.id
+    room = instance.event.room
 
-    tunesync = TuneSync.get_tune_sync(room)
-    group_name = "event-room-{}".format(room)
-
+    tunesync = TuneSync.get_tune_sync(room.id)
     channel_layer = channels.layers.get_channel_layer()
+
     if "play_time" in tunesync and tunesync["play_time"] is not None:
         tunesync["play_time"] = tunesync["play_time"].isoformat()
 
-    async_to_sync(channel_layer.group_send)(
-        group_name, {"type": "user_notify_event", "text": tunesync}
-    )
+    users_in_room = Membership.objects.filter(room=room, state="A")
+    for user in users_in_room:
+        group_name = "user-{}".format(user.user_id)
+        async_to_sync(channel_layer.group_send)(
+            group_name, {"type": "user_notify_event", "text": tunesync}
+        )
     # need end point for websocket token
     # signed with hmacs

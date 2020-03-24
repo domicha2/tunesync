@@ -9,6 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatListModule } from '@angular/material/list';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
+import { MatBadgeModule } from '@angular/material/badge';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -21,6 +22,7 @@ import { MainScreenComponent } from './main-screen/main-screen.component';
 import { QueueComponent } from './queue/queue.component';
 import { KickUserComponent } from './users/kick-user/kick-user.component';
 import { AddRoomComponent } from './rooms/add-room/add-room.component';
+import { NotificationsService } from './notifications.service';
 
 @NgModule({
   declarations: [
@@ -40,6 +42,7 @@ import { AddRoomComponent } from './rooms/add-room/add-room.component';
     CommonModule,
     DragDropModule,
     MatDialogModule,
+    MatBadgeModule,
     MatListModule,
     MatFormFieldModule,
     MatInputModule,
@@ -49,5 +52,6 @@ import { AddRoomComponent } from './rooms/add-room/add-room.component';
     MatIconModule,
     MatSelectModule,
   ],
+  providers: [NotificationsService],
 })
 export class DashboardModule {}
