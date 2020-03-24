@@ -1,6 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 import {
   AppEvent,
+  Role,
   Room,
   Song,
   User as AuthUser,
@@ -138,6 +139,7 @@ export const storeEvents = createAction(
 export const getAllUsers = createAction('[Rooms Component] Get All Users');
 export const storeAllUsers = createAction(
   '[Users API] Store All Users',
+  // ! the import is pointing to the wrong interface
   props<{ allUsers: AuthUser[] }>(),
 );
 export const createInviteUsersEvent = createAction(
@@ -148,4 +150,9 @@ export const createInviteUsersEvent = createAction(
 export const createInviteResponseEvent = createAction(
   '[Main Screen Component] Create Invite Response Event',
   props<{ roomId: number; response: 'A' | 'R' }>(),
+);
+
+export const createRoleChangeEvent = createAction(
+  '[Users Component] Create Role Change Event',
+  props<{ userId: number; role: Role }>(),
 );

@@ -79,20 +79,35 @@ export class UsersComponent implements OnInit, OnDestroy {
     });
   }
 
-  drop(event: CdkDragDrop<string[]>): void {
+  /**
+   * Calls endpoint to update a user's role
+   * Must check that the user has admin permissions inside this room
+   * Must check that the user is not demoting other admins
+   */
+  drop(event: CdkDragDrop<string[]>, role: Role): void {
     if (event.previousContainer === event.container) {
       // reorder list
+      // ! this doesnt need to be a feature
       moveItemInArray(
         event.container.data,
         event.previousIndex,
         event.currentIndex,
       );
     } else {
+      // user got placed into a new group of users
+      // validate that this action is okay
+      const user = event.previousContainer.data[event.previousIndex];
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,
         event.previousIndex,
         event.currentIndex,
+      );
+      this.store.dispatch(
+        DashboardActions.createRoleChangeEvent({
+          userId: user['userId'],
+          role,
+        }),
       );
     }
   }

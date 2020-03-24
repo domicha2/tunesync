@@ -337,6 +337,24 @@ export class DashboardEffects {
     ),
   );
 
+  createRoleChangeEvent$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardActions.createRoleChangeEvent),
+      concatMap(action =>
+        of(action).pipe(
+          withLatestFrom(this.store.pipe(select(selectActiveRoom))),
+        ),
+      ),
+      switchMap(([action, roomId]) =>
+        this.usersService
+          .createRoleChangeEvent(action.userId, roomId, action.role)
+          .pipe(
+            map(() => ({ type: DashboardActions.getUsersByRoom.type, roomId })),
+          ),
+      ),
+    ),
+  );
+
   constructor(
     private actions$: Actions,
     private store: Store<AppState>,

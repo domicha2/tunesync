@@ -16,7 +16,7 @@
       class="column"
       cdkDropList
       [cdkDropListData]="users.admin"
-      (cdkDropListDropped)="drop($event)"
+      (cdkDropListDropped)="drop($event, 'A')"
     >
       <div class="list-el" *ngFor="let user of users.admin" cdkDrag>
         <h3>{{ user.name }}</h3>
@@ -28,7 +28,7 @@
       class="column"
       cdkDropList
       [cdkDropListData]="users.dj"
-      (cdkDropListDropped)="drop($event)"
+      (cdkDropListDropped)="drop($event, 'D')"
     >
       <div class="list-el" *ngFor="let user of users.dj" cdkDrag>
         <h3>{{ user.name }}</h3>
@@ -40,7 +40,7 @@
       class="column"
       cdkDropList
       [cdkDropListData]="users.regular"
-      (cdkDropListDropped)="drop($event)"
+      (cdkDropListDropped)="drop($event, 'R')"
     >
       <div class="list-el row" *ngFor="let user of users.regular" cdkDrag>
         <h3>{{ user.name }}</h3>
