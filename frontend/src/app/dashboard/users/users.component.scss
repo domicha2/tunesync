@@ -1,3 +1,58 @@
+div#users-wrapper {
+  height: 100%;
+
+  div#top-bar {
+    justify-content: space-between;
+    height: 5%;
+
+    h1 {
+      margin-right: 0.5rem !important;
+    }
+  }
+
+  mat-accordion {
+    display: flex;
+    flex-direction: column;
+
+    height: 90%;
+
+    mat-expansion-panel-header h2 {
+      margin-bottom: 0 !important;
+    }
+
+    > mat-expansion-panel.opened {
+      flex-grow: 1;
+    }
+
+    ::ng-deep mat-expansion-panel .mat-expansion-panel-content {
+      max-height: 65%;
+      overflow-y: scroll;
+    }
+
+    mat-expansion-panel div.list-container {
+      min-height: 7.5rem;
+      border: 1px solid white;
+      border-radius: 0.5rem;
+
+      div.list-el {
+        height: 1.5rem;
+        margin-bottom: 0 !important;
+        border: {
+          top: none;
+          bottom: 1px solid white;
+          left: none;
+          right: none;
+        }
+        border-radius: 0;
+
+        &:last-child {
+          border: none !important;
+        }
+      }
+    }
+  }
+}
+
 h3 {
   margin-bottom: 0;
 }
@@ -7,14 +62,4 @@ div#regular-users {
     justify-content: space-between;
     align-items: center;
   }
-}
-
-div.list-wrapper > div {
-  min-height: 10rem;
-  border: 1px solid white;
-  border-radius: 0.5rem;
-}
-
-div#top-bar {
-  justify-content: space-between;
 }
