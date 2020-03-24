@@ -99,6 +99,7 @@ class BaseSettings(DjangoDefaults):
         "rest_framework.authtoken",
         "django.contrib.sites",
         "rest_framework_filters",
+        "background_task",
         # "captcha",
     ]
 

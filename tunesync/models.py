@@ -114,9 +114,22 @@ class Poll(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
     args = JSONField()
+    is_actve = models.BooleanField(default=True)
 
     class Meta:
         indexes = [models.Index(fields=["room", "action", "creation_time"])]
+
+    @property
+    def vote_percentage(self):
+        users = Membership.objects.filter(room=self.room)
+        votes_agreed = Vote.objects.filter(poll=self, agree=True)
+        if users:
+            return len(votes_agreed) / len(users)
+        else:
+            return 0
+
+    def is_majority(self):
+        return self.vote_percentage > 0.5
 
 
 class Vote(models.Model):

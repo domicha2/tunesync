@@ -27,6 +27,8 @@ import mutagen
 
 from .filters import TuneFilter
 
+from .task import PollTask
+
 
 class IndexPage(TemplateView):
     template_name = "index.html"

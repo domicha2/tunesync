@@ -22,6 +22,7 @@ setup(
         "mutagen",
         "django-filter",
         "djangorestframework-filters",
+        "django-background-tasks",
     ],
     classifiers=["Programming Language :: Python :: 3 :: Only"],
 )
