@@ -55,20 +55,20 @@ export class ControlsComponent
      */
     this.subscription.add(
       combineLatest([
-        this.store.select(selectSongStatus).pipe(
-          tap(data => console.log('song status', data)),
-          filter(
-            status =>
-              typeof status.isPlaying === 'boolean' &&
-              typeof status.queueIndex === 'number',
+        this.store
+          .select(selectSongStatus)
+          .pipe(
+            filter(
+              status =>
+                typeof status.isPlaying === 'boolean' &&
+                typeof status.queueIndex === 'number',
+            ),
           ),
-        ),
         this.store.select(selectQueuedSongs).pipe(
           filter(songs => songs !== null && songs !== undefined),
           tap((queue: Song[]) => {
             this.queue = queue;
             console.count('queued songs sub');
-            console.log(queue);
           }),
         ),
       ])
@@ -81,7 +81,6 @@ export class ControlsComponent
           ),
         )
         .subscribe(([songStatus, queuedSongs]) => {
-          console.log('in the big subscribe callback');
           this.initSong(songStatus, queuedSongs);
         }),
     );
@@ -267,7 +266,6 @@ export class ControlsComponent
    * Auto-click the next song button for the user
    */
   onEnded(event: Event): void {
-    console.log(event);
     this.onNext(false);
   }
 
@@ -292,7 +290,6 @@ export class ControlsComponent
 
     if (this.pauseOnLoaded) {
       // this is used for other people listening to the room
-      console.log('in the fucking pause method');
       this.getAudioElement().pause();
     }
 
