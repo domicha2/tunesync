@@ -54,7 +54,7 @@ export class ControlsComponent
      * if queue changes, dont update (can check if song status is distinct)
      */
     this.subscription.add(
-      combineLatest(
+      combineLatest([
         this.store.select(selectSongStatus).pipe(
           tap(data => console.log('song status', data)),
           filter(
@@ -71,7 +71,7 @@ export class ControlsComponent
             console.log(queue);
           }),
         ),
-      )
+      ])
         .pipe(
           distinctUntilChanged(
             ([prevStatus, prevQueue], [currStatus, currQueue]) =>
