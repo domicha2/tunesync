@@ -7,7 +7,7 @@ from rest_framework_filters import RelatedFilter
 class UserFilter(FilterSet):
     class Meta:
         model = User
-        fields = {"username": ["iexact", "exact"]}
+        fields = {"username": ["icontains", "exact"]}
 
 
 class TuneFilter(FilterSet):
