@@ -196,6 +196,21 @@ class EventViewSet(viewsets.ViewSet):
         result = handle_event(request.data["args"], event, user=request.user)
         return result
 
+    # DELETE
+    def destroy(self, request):
+        if "event_id" not in request.data:
+            return Response(status=400)
+        event = Event.objects.filter(id = request.data["event_id"])
+        if event:
+            event.isDeleted = True
+            event.save()
+            return Response(status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response(
+                {"details": "invalid event id"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
 
 class RoomViewSet(viewsets.ViewSet):
     """
