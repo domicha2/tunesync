@@ -5,7 +5,67 @@
       <mat-icon>add_circle</mat-icon>
     </button>
   </div>
-  <div class="list-wrapper column">
+
+  <mat-accordion displayMode="flat" [multi]="true">
+    <mat-expansion-panel
+      [expanded]="true"
+      #adminPanel
+      [ngClass]="adminPanel.expanded ? 'opened' : ''"
+    >
+      <mat-expansion-panel-header>
+        <h2>Admin</h2>
+      </mat-expansion-panel-header>
+      <div
+        class="list-el"
+        *ngFor="let room of rooms.admin"
+        [ngClass]="{ active: activeRoom === room }"
+        (click)="onRoomClick(room)"
+        [matBadge]="notifications[room.id]"
+      >
+        {{ room.title }}
+      </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel
+      [expanded]="true"
+      #djPanel
+      [ngClass]="djPanel.expanded ? 'opened' : ''"
+    >
+      <mat-expansion-panel-header>
+        <h2>DJ</h2>
+      </mat-expansion-panel-header>
+      <div
+        class="list-el"
+        *ngFor="let room of rooms.dj"
+        [ngClass]="{ active: activeRoom === room }"
+        (click)="onRoomClick(room)"
+        [matBadge]="notifications[room.id]"
+      >
+        {{ room.title }}
+      </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel
+      [expanded]="true"
+      #regularPanel
+      [ngClass]="regularPanel.expanded ? 'opened' : ''"
+    >
+      <mat-expansion-panel-header>
+        <h2>Regular</h2>
+      </mat-expansion-panel-header>
+      <div
+        class="list-el"
+        *ngFor="let room of rooms.regular"
+        [ngClass]="{ active: activeRoom === room }"
+        (click)="onRoomClick(room)"
+        [matBadge]="notifications[room.id]"
+      >
+        {{ room.title }}
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+
+  <!-- <div class="list-wrapper column">
     <div id="admin-rooms" class="column">
       <h2>Admin</h2>
       <div
@@ -42,5 +102,5 @@
         {{ room.title }}
       </div>
     </div>
-  </div>
+  </div> -->
 </div>
