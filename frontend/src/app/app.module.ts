@@ -1,5 +1,5 @@
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { ErrorHandler, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { EffectsModule } from '@ngrx/effects';
@@ -18,6 +18,7 @@ import {
   DashboardState,
 } from './dashboard/store/dashboard.reducer';
 import { HttpAuthInterceptor } from './http-auth-interceptor';
+import { SentryErrorHandler } from './sentry-error-handler';
 
 export interface AppState {
   auth: AuthState;
@@ -42,6 +43,7 @@ export interface AppState {
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: HttpAuthInterceptor, multi: true },
+    { provide: ErrorHandler, useClass: SentryErrorHandler },
   ],
   bootstrap: [AppComponent],
 })
