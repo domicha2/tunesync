@@ -27,6 +27,7 @@
     </mat-expansion-panel>
 
     <mat-expansion-panel
+      *ngIf="rooms.dj.length !== 0"
       [expanded]="true"
       #djPanel
       [ngClass]="djPanel.expanded ? 'opened' : ''"
@@ -46,6 +47,7 @@
     </mat-expansion-panel>
 
     <mat-expansion-panel
+      *ngIf="rooms.regular.length !== 0"
       [expanded]="true"
       #regularPanel
       [ngClass]="regularPanel.expanded ? 'opened' : ''"
