@@ -51,16 +51,16 @@ export class UsersService {
     roomId: number,
     response: 'A' | 'R',
   ): Observable<any> {
-    let is_accepted: boolean;
+    let isAccepted: boolean;
     if (response === 'A') {
-      is_accepted = true;
+      isAccepted = true;
     } else if (response === 'R') {
-      is_accepted = false;
+      isAccepted = false;
     }
     return this.httpWrapperService.post('/events/', {
       event_type: EventType.UserChange,
       room: roomId,
-      args: { type: 'J', is_accepted },
+      args: { type: 'J', is_accepted: isAccepted },
     });
   }
 }
