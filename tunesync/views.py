@@ -197,8 +197,10 @@ class EventViewSet(viewsets.ViewSet):
         return result
 
     # DELETE
-    def destroy(self, pk=None):
+    def destroy(self, request, pk=None):
         event = Event.objects.filter(id = pk)[0]
+        # NOTE: without the [0], there's a QuerySet issue again
+        # NOTE: but with it, we get a 500 instead of 400 for non-existant ids
         if event:
             event.isDeleted = True
             event.save()
