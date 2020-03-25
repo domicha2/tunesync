@@ -217,8 +217,13 @@ export class MainScreenComponent implements OnInit, OnDestroy {
     }
     if (tuneSyncEvent.last_play === null) {
       // no last play state
-      this.store.dispatch(DashboardActions.setQueueIndex({ queueIndex: -1 }));
-      // ! what shouldni do?
+      this.store.dispatch(
+        DashboardActions.setSongStatus({
+          isPlaying: false,
+          seekTime: 0,
+          queueIndex: -1,
+        }),
+      );
     } else {
       playEvent = tuneSyncEvent.last_play as PlayState;
     }
