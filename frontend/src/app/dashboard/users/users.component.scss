@@ -11,24 +11,6 @@ div#users-wrapper {
   }
 
   mat-accordion {
-    display: flex;
-    flex-direction: column;
-
-    height: 90%;
-
-    mat-expansion-panel-header h2 {
-      margin-bottom: 0 !important;
-    }
-
-    > mat-expansion-panel.opened {
-      flex-grow: 1;
-    }
-
-    ::ng-deep mat-expansion-panel .mat-expansion-panel-content {
-      max-height: 65%;
-      overflow-y: scroll;
-    }
-
     mat-expansion-panel div.list-container {
       min-height: 7.5rem;
       border: 1px solid white;
