@@ -50,3 +50,31 @@ a {
   border-radius: 0.5rem;
   padding: 0.5rem;
 }
+
+mat-accordion {
+  display: flex;
+  flex-direction: column;
+
+  height: 90%;
+
+  mat-expansion-panel-header h2 {
+    margin-bottom: 0 !important;
+  }
+
+  > mat-expansion-panel.opened {
+    flex-grow: 1;
+  }
+
+  mat-expansion-panel .mat-expansion-panel-content {
+    overflow-y: scroll;
+  }
+
+  mat-expansion-panel {
+    display: flex !important;
+    flex-direction: column !important;
+
+    .mat-expansion-panel-content {
+      flex-grow: 1 !important;
+    }
+  }
+}
