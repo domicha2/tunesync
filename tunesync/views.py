@@ -197,8 +197,8 @@ class EventViewSet(viewsets.ViewSet):
         return result
 
     # DELETE
-    def destroy(self, pk):
-        event = Event.objects.filter(pk = pk)
+    def destroy(self, pk=None):
+        event = Event.objects.filter(id = pk)[0]
         if event:
             event.isDeleted = True
             event.save()
@@ -313,16 +313,16 @@ class TuneViewSet(viewsets.ViewSet):
         return Response(result)
 
     # PATCH
-    def partial_update(self, pk, request):
+    def partial_update(self, request, pk=None):
         # Check if given tune is even in the db
-        tune = Tune.objects.filter(id = pk)
+        tune = Tune.objects.filter(id = pk)[0]
         if tune:
             if "tune_name" in request.data:
                 tune.name = request.data["tune_name"]
             if "tune_artist" in request.data:
                 tune.artist = request.data["tune_artist"]
             if "tune_album" in request.data:
-                tune.album = request.data["tune_artist"]
+                tune.album = request.data["tune_album"]
             tune.save()
             serializer = TuneSerializer(tune)
             return Response(serializer.data)
