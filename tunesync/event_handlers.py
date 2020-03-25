@@ -185,11 +185,18 @@ class Handler:
         Handler for the voting on any polls in a room
         """
         if not Handler.validate_V(args):
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"details": "missing arguments"}, status=status.HTTP_400_BAD_REQUEST
+            )
         # save event to Event table
+        poll = Poll.objects.filter(event=event.parent_event)[0]
+        if not poll.is_active:
+            return Response(
+                {"details": "This vote is already completed"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         event.save()
         agree_field = args["agree"]
-        poll = Poll.objects.filter(event=event.parent_event)[0]
         vote_event = Vote.objects.update_or_create(
             poll=poll, user=user, defaults={"event": event, "agree": agree_field}
         )
@@ -271,14 +278,20 @@ class Handler:
         return (None, status.HTTP_200_OK)
 
     def handle_U_J(args, event, user, **kw):
+        system_room = Room.objects.get(system_user=user)
+        system_event = Event(author=user, room=system_room, event_type="M")
+        system_event_args = {"room": event.room.id}
         if args["is_accepted"]:
             membership = Membership.objects.get(room=event.room, user=user)
             membership.state = "A"
-            membership.save()
+            system_event_args["is_accepted"] = True
         else:
             membership = Membership.objects.get(room=event.room, user=user)
             membership.state = "R"
-            membership.save()
+            system_event_args["is_accepted"] = False
+        system_event.args = system_event_args
+        system_event.save()
+        membership.save()
         return (None, status.HTTP_200_OK)
 
     def handle_U_K(args, event, user, **kw):
