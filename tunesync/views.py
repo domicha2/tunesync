@@ -314,6 +314,28 @@ class TuneViewSet(viewsets.ViewSet):
             result.append(serializer.data)
         return Response(result)
 
+    # PATCH
+    def partial_update(self, request):
+        if "tune_id" not in request.data:
+            return Response(status=400)
+        # Check if given tune is even in the db
+        tune = Tune.objects.filter(id = request.data["tune_id"])
+        if tune:
+            if "tune_name" in request.data:
+                tune.name = request.data["tune_name"]
+            if "tune_artist" in request.data:
+                tune.artist = request.data["tune_artist"]
+            if "tune_album" in request.data:
+                tune.album = request.data["tune_artist"]
+            tune.save()
+            serializer = TuneSerializer(tune)
+            return Response(serializer.data)
+        else:
+            return Response(
+                {"details": "invalid tune id"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
     # READ
     def list(self, request):
         tunes = Tune.objects.values("id", "name", "length").order_by("name")
