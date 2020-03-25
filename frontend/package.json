@@ -2,6 +2,7 @@
   "name": "frontend",
   "version": "0.0.0",
   "scripts": {
+    "pwa": "clear; ng build --prod; http-server -p 8080 -c-1 dist/frontend",
     "start-host": "clear; ng serve --host 0.0.0.0 -c host",
     "ng": "ng",
     "start": "ng serve",
@@ -22,6 +23,7 @@
     "@angular/platform-browser": "~9.0.7",
     "@angular/platform-browser-dynamic": "~9.0.7",
     "@angular/router": "~9.0.7",
+    "@angular/service-worker": "~9.0.7",
     "@ngrx/effects": "^9.0.0",
     "@ngrx/store": "^9.0.0",
     "@ngrx/store-devtools": "^9.0.0",
