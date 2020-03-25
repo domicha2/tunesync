@@ -147,7 +147,7 @@ class UserViewSet(viewsets.ViewSet):
 
 class EventViewSet(viewsets.ViewSet):
 
-    permission_classes = [InRoomOnlyEvents, DjOrAbove, RoomAdminOnly, JoinPendingOnly]
+    # permission_classes = [InRoomOnlyEvents, DjOrAbove, RoomAdminOnly, JoinPendingOnly]
 
     # GET
     def list(self, request):
@@ -197,10 +197,8 @@ class EventViewSet(viewsets.ViewSet):
         return result
 
     # DELETE
-    def destroy(self, request):
-        if "event_id" not in request.data:
-            return Response(status=400)
-        event = Event.objects.filter(id = request.data["event_id"])
+    def destroy(self, pk):
+        event = Event.objects.filter(pk = pk)
         if event:
             event.isDeleted = True
             event.save()
@@ -275,7 +273,7 @@ class RoomViewSet(viewsets.ViewSet):
 
 
 class TuneViewSet(viewsets.ViewSet):
-    permission_classes = [AnonCreateAndUpdateOwnerOnly]
+    # permission_classes = [AnonCreateAndUpdateOwnerOnly]
     parser_classes = [MultiPartParser]
 
     def list(self, request):
@@ -315,11 +313,9 @@ class TuneViewSet(viewsets.ViewSet):
         return Response(result)
 
     # PATCH
-    def partial_update(self, request):
-        if "tune_id" not in request.data:
-            return Response(status=400)
+    def partial_update(self, pk, request):
         # Check if given tune is even in the db
-        tune = Tune.objects.filter(id = request.data["tune_id"])
+        tune = Tune.objects.filter(id = pk)
         if tune:
             if "tune_name" in request.data:
                 tune.name = request.data["tune_name"]
