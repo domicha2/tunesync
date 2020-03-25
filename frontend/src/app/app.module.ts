@@ -19,6 +19,8 @@ import {
 } from './dashboard/store/dashboard.reducer';
 import { HttpAuthInterceptor } from './http-auth-interceptor';
 import { SentryErrorHandler } from './sentry-error-handler';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 export interface AppState {
   auth: AuthState;
@@ -40,6 +42,7 @@ export interface AppState {
       maxAge: 50,
     }),
     EffectsModule.forRoot([AuthEffects, DashboardEffects]),
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: HttpAuthInterceptor, multi: true },
