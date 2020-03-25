@@ -14,6 +14,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ControlsComponent } from './controls/controls.component';
+import { SongUrlPipe } from './controls/song-url.pipe';
 import { DashboardComponent } from './dashboard.component';
 import { MainScreenComponent } from './main-screen/main-screen.component';
 import { MessagingComponent } from './messaging/messaging.component';
@@ -27,6 +28,7 @@ import { UsersComponent } from './users/users.component';
 
 @NgModule({
   declarations: [
+    SongUrlPipe,
     InviteComponent,
     DashboardComponent,
     RoomsComponent,
