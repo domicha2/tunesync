@@ -23,6 +23,7 @@ setup(
         "django-filter",
         "djangorestframework-filters",
         "sentry-sdk",
+        "django-background-tasks",
     ],
     classifiers=["Programming Language :: Python :: 3 :: Only"],
 )
