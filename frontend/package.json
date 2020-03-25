@@ -2,6 +2,7 @@
   "name": "frontend",
   "version": "0.0.0",
   "scripts": {
+    "start-host": "clear; ng serve --host 0.0.0.0 -c host",
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
