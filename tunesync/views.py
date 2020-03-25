@@ -198,10 +198,9 @@ class EventViewSet(viewsets.ViewSet):
 
     # DELETE
     def destroy(self, request, pk=None):
-        event = Event.objects.filter(id = pk)[0]
-        # NOTE: without the [0], there's a QuerySet issue again
-        # NOTE: but with it, we get a 500 instead of 400 for non-existant ids
+        event = Event.objects.filter(id = pk)
         if event:
+            event = event[0]
             event.isDeleted = True
             event.save()
             return Response(status=status.HTTP_202_ACCEPTED)
@@ -317,10 +316,9 @@ class TuneViewSet(viewsets.ViewSet):
     # PATCH
     def partial_update(self, request, pk=None):
         # Check if given tune is even in the db
-        tune = Tune.objects.filter(id = pk)[0]
-        # NOTE: without the [0], there's a QuerySet issue again
-        # NOTE: but with it, we get a 500 instead of 400 for non-existant ids
+        tune = Tune.objects.filter(id = pk)
         if tune:
+            tune = tune[0]
             if "tune_name" in request.data:
                 tune.name = request.data["tune_name"]
             if "tune_artist" in request.data:
