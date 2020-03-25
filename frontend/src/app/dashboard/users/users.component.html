@@ -1,15 +1,117 @@
 <div id="users-wrapper" class="column">
-  <h1>Users</h1>
-  <div class="list-wrapper column" cdkDropListGroup>
+  <div id="top-bar" class="row">
+    <h1>Users</h1>
+    <button mat-icon-button (click)="onInvite()" matTooltip="Add users to room">
+      <mat-icon>add_circle</mat-icon>
+    </button>
+    <button mat-icon-button (click)="onSignOut()" matTooltip="Sign out">
+      <mat-icon>exit_to_app</mat-icon>
+    </button>
+  </div>
+
+  <mat-accordion displayMode="flat" [multi]="true" cdkDropListGroup>
+    <mat-expansion-panel
+      [expanded]="true"
+      #adminPanel
+      [ngClass]="adminPanel.expanded ? 'opened' : ''"
+    >
+      <mat-expansion-panel-header>
+        <h2>Admin</h2>
+      </mat-expansion-panel-header>
+      <div
+        id="admin-users"
+        class="column list-container"
+        cdkDropList
+        [cdkDropListData]="users.admin"
+        (cdkDropListDropped)="drop($event, 'A')"
+      >
+        <div
+          class="list-el"
+          *ngFor="let user of users.admin"
+          cdkDrag
+          [cdkDragDisabled]="(userRole$ | async) !== 'A'"
+        >
+          <h3>{{ user.name }}</h3>
+        </div>
+      </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel
+      [expanded]="true"
+      #djPanel
+      [ngClass]="djPanel.expanded ? 'opened' : ''"
+    >
+      <mat-expansion-panel-header>
+        <h2>DJ</h2>
+      </mat-expansion-panel-header>
+      <div
+        id="dj-users"
+        class="column list-container"
+        cdkDropList
+        [cdkDropListData]="users.dj"
+        (cdkDropListDropped)="drop($event, 'D')"
+      >
+        <div
+          class="list-el"
+          *ngFor="let user of users.dj"
+          cdkDrag
+          [cdkDragDisabled]="(userRole$ | async) !== 'A'"
+        >
+          <h3>{{ user.name }}</h3>
+        </div>
+      </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel
+      [expanded]="true"
+      #regularPanel
+      [ngClass]="regularPanel.expanded ? 'opened' : ''"
+    >
+      <mat-expansion-panel-header>
+        <h2>Regular</h2>
+      </mat-expansion-panel-header>
+      <div
+        id="regular-users"
+        class="column list-container"
+        cdkDropList
+        [cdkDropListData]="users.regular"
+        (cdkDropListDropped)="drop($event, 'R')"
+      >
+        <div
+          class="list-el row"
+          *ngFor="let user of users.regular"
+          cdkDrag
+          [cdkDragDisabled]="(userRole$ | async) !== 'A'"
+        >
+          <h3>{{ user.name }}</h3>
+          <button
+            *ngIf="(userRole$ | async) === 'A'"
+            mat-icon-button
+            matTooltip="Kick user"
+            (click)="onKickUser(user)"
+          >
+            <mat-icon>delete_forever</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+
+  <!-- <div class="list-wrapper column" cdkDropListGroup>
     <h2>Admin</h2>
     <div
       id="admin-users"
       class="column"
       cdkDropList
       [cdkDropListData]="users.admin"
-      (cdkDropListDropped)="drop($event)"
+      (cdkDropListDropped)="drop($event, 'A')"
     >
-      <div class="list-el" *ngFor="let user of users.admin" cdkDrag>
+      <div
+        class="list-el"
+        *ngFor="let user of users.admin"
+        cdkDrag
+        [cdkDragDisabled]="(userRole$ | async) !== 'A'"
+      >
         <h3>{{ user.name }}</h3>
       </div>
     </div>
@@ -19,9 +121,14 @@
       class="column"
       cdkDropList
       [cdkDropListData]="users.dj"
-      (cdkDropListDropped)="drop($event)"
+      (cdkDropListDropped)="drop($event, 'D')"
     >
-      <div class="list-el" *ngFor="let user of users.dj" cdkDrag>
+      <div
+        class="list-el"
+        *ngFor="let user of users.dj"
+        cdkDrag
+        [cdkDragDisabled]="(userRole$ | async) !== 'A'"
+      >
         <h3>{{ user.name }}</h3>
       </div>
     </div>
@@ -31,11 +138,17 @@
       class="column"
       cdkDropList
       [cdkDropListData]="users.regular"
-      (cdkDropListDropped)="drop($event)"
+      (cdkDropListDropped)="drop($event, 'R')"
     >
-      <div class="list-el row" *ngFor="let user of users.regular" cdkDrag>
+      <div
+        class="list-el row"
+        *ngFor="let user of users.regular"
+        cdkDrag
+        [cdkDragDisabled]="(userRole$ | async) !== 'A'"
+      >
         <h3>{{ user.name }}</h3>
         <button
+          *ngIf="(userRole$ | async) === 'A'"
           mat-icon-button
           matTooltip="Kick user"
           (click)="onKickUser(user)"
@@ -44,5 +157,5 @@
         </button>
       </div>
     </div>
-  </div>
+  </div> -->
 </div>

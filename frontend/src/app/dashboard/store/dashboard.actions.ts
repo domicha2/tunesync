@@ -1,7 +1,12 @@
 import { createAction, props } from '@ngrx/store';
-
-import { Song, User, Room, AppEvent } from '../dashboard.models';
-import { User as AuthUser } from '../dashboard.models';
+import {
+  AppEvent,
+  Role,
+  Room,
+  Song,
+  User as AuthUser,
+  User,
+} from '../dashboard.models';
 
 export const resetState = createAction('[Rooms Component] Reset State');
 
@@ -134,6 +139,7 @@ export const storeEvents = createAction(
 export const getAllUsers = createAction('[Rooms Component] Get All Users');
 export const storeAllUsers = createAction(
   '[Users API] Store All Users',
+  // ! the import is pointing to the wrong interface
   props<{ allUsers: AuthUser[] }>(),
 );
 export const createInviteUsersEvent = createAction(
@@ -144,4 +150,14 @@ export const createInviteUsersEvent = createAction(
 export const createInviteResponseEvent = createAction(
   '[Main Screen Component] Create Invite Response Event',
   props<{ roomId: number; response: 'A' | 'R' }>(),
+);
+
+export const createRoleChangeEvent = createAction(
+  '[Users Component] Create Role Change Event',
+  props<{ userId: number; role: 'A' | 'D' | 'R' }>(),
+);
+
+export const setUserRole = createAction(
+  '[Users API] Set User Role',
+  props<{ userRole: Role }>(),
 );

@@ -1,5 +1,4 @@
 import { createAction, props } from '@ngrx/store';
-
 import { Credentials, User } from './auth.models';
 
 export const signIn = createAction(
@@ -11,3 +10,8 @@ export const signUp = createAction(
   props<Credentials>(),
 );
 export const storeUser = createAction('[Auth API] Store User', props<User>());
+
+export const setAuthError = createAction(
+  '[Auth API] Set Auth Error',
+  props<{ details: string }>(),
+);

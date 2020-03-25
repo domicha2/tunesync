@@ -1,16 +1,14 @@
-import { Injectable } from '@angular/core';
 import {
-  HttpInterceptor,
-  HttpHandler,
   HttpEvent,
+  HttpHandler,
+  HttpInterceptor,
   HttpRequest,
 } from '@angular/common/http';
-
-import { Observable } from 'rxjs';
+import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-
+import { Observable } from 'rxjs';
+import { first, switchMap } from 'rxjs/operators';
 import { AppState } from './app.module';
-import { switchMap, first } from 'rxjs/operators';
 import { selectToken } from './auth/auth.selectors';
 
 @Injectable()

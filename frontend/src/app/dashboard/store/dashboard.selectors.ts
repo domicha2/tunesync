@@ -1,5 +1,4 @@
 import { createSelector } from '@ngrx/store';
-
 import { AppState } from '../../app.module';
 import { DashboardState } from './dashboard.reducer';
 
@@ -99,4 +98,9 @@ export const selectActiveRoomName = createSelector(
   (state: AppState) => state.dashboard,
   (dashboard: DashboardState) =>
     dashboard ? dashboard.activeRoomName : undefined,
+);
+
+export const selectUserRole = createSelector(
+  (state: AppState) => state.dashboard,
+  (dashboard: DashboardState) => (dashboard ? dashboard.userRole : undefined),
 );

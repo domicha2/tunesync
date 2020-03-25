@@ -8,6 +8,7 @@ export interface Song {
 export enum UserChangeAction {
   Invite = 'I',
   Kick = 'K',
+  RoleChange = 'C',
 }
 
 export enum EventType {

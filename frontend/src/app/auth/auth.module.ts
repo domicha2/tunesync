@@ -1,17 +1,16 @@
 import { NgModule } from '@angular/core';
-
 import { ReactiveFormsModule } from '@angular/forms';
-
+import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-
 import { AuthComponent } from './auth.component';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [AuthComponent],
   imports: [
     ReactiveFormsModule,
+    CommonModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,

@@ -1,23 +1,20 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
 import {
   CdkDragDrop,
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
-
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Subscription } from 'rxjs';
-
+import { Observable, Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { AppState } from '../../app.module';
-
+import { Role, Song } from '../dashboard.models';
+import * as DashboardActions from '../store/dashboard.actions';
 import {
-  selectQueuedSongs,
   selectAvailableSongs,
   selectQueueIndexAndSongs,
+  selectUserRole,
 } from '../store/dashboard.selectors';
-import * as DashboardActions from '../store/dashboard.actions';
-import { Song } from '../dashboard.models';
-import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-queue',
@@ -32,9 +29,13 @@ export class QueueComponent implements OnInit, OnDestroy {
   availableSongs: Song[] = [];
   songIndex: number;
 
+  userRole$: Observable<Role>;
+
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
+    this.userRole$ = this.store.select(selectUserRole);
+
     this.store.dispatch(DashboardActions.getAvailableSongs());
 
     this.subscription.add(

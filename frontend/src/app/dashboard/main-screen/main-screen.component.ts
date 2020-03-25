@@ -1,31 +1,27 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-
-import { Subscription } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-
+import * as moment from 'moment';
+import { Subscription } from 'rxjs';
+import { distinctUntilChanged, filter } from 'rxjs/operators';
 import { AppState } from '../../app.module';
-import {
-  selectEvents,
-  selectTuneSyncEvent,
-  selectActiveRoomName,
-  selectActiveRoom,
-} from '../store/dashboard.selectors';
+import { selectUserId } from '../../auth/auth.selectors';
 import {
   AppEvent,
   EventType,
-  ModifyQueueEvent,
-  PlayEvent,
-  TuneSyncEvent,
-  QueueState,
   PlayState,
+  QueueState,
+  TuneSyncEvent,
+  UserChangeAction,
 } from '../dashboard.models';
-import { selectUserId } from '../../auth/auth.selectors';
-import * as DashboardActions from '../store/dashboard.actions';
-import { distinctUntilChanged, filter } from 'rxjs/operators';
-
-import * as moment from 'moment';
-import { WebSocketService } from '../web-socket.service';
 import { NotificationsService } from '../notifications.service';
+import * as DashboardActions from '../store/dashboard.actions';
+import {
+  selectActiveRoom,
+  selectActiveRoomName,
+  selectEvents,
+  selectTuneSyncEvent,
+} from '../store/dashboard.selectors';
+import { WebSocketService } from '../web-socket.service';
 
 @Component({
   selector: 'app-main-screen',
@@ -115,7 +111,6 @@ export class MainScreenComponent implements OnInit, OnDestroy {
       switch (event.event_type) {
         // !TUNESYNC EVENT
         case undefined:
-          console.log('dealing with tunesync event');
           // determine what type of event it was
           // if it is playing the dispatch set song stat
           // if it is modifying the queue, need to dispatch a new queue
@@ -140,7 +135,6 @@ export class MainScreenComponent implements OnInit, OnDestroy {
             );
           } else {
             // the DJ made a play event
-            console.log('dj made a play event');
             // ! could have race condition but handleTuneSync function has the same design
             this.store.dispatch(
               DashboardActions.setSongStatus({
@@ -154,6 +148,10 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         case EventType.UserChange:
           if (this.activeRoomName === 'System Room') {
             this.events.push(event);
+          } else if (event.args['type'] === UserChangeAction.RoleChange) {
+            this.store.dispatch(
+              DashboardActions.getUsersByRoom({ roomId: this.activeRoomId }),
+            );
           }
           break;
         case EventType.Messaging:
@@ -176,12 +174,11 @@ export class MainScreenComponent implements OnInit, OnDestroy {
    * refactor later
    */
   handleEventsResponse(events: AppEvent[]): void {
-    console.log(events);
     this.events = events.sort((eventA, eventB) =>
       new Date(eventA.creation_time) > new Date(eventB.creation_time) ? 1 : -1,
     );
     this.events = this.events.filter(event => {
-      //! hard coded refactor if have time
+      // ! hard coded refactor if have time
       if (this.activeRoomName !== 'System Room' && event.event_type === 'U') {
         return false;
       } else if (event.event_type === EventType.TuneSync) {
@@ -221,7 +218,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
     if (tuneSyncEvent.last_play === null) {
       // no last play state
       this.store.dispatch(DashboardActions.setQueueIndex({ queueIndex: -1 }));
-      //! what shouldni do?
+      // ! what shouldni do?
     } else {
       playEvent = tuneSyncEvent.last_play as PlayState;
     }
@@ -247,16 +244,10 @@ export class MainScreenComponent implements OnInit, OnDestroy {
 
         let songIndex: number;
         for (let i = playEvent.queue_index; i < queue.length; i++) {
-          console.log(i);
           if (i === playEvent.queue_index) {
             // first iteration only
-            console.log(
-              'initial diff',
-              queue[i].length - playEvent.timestamp < difference,
-            );
             console.log('init differe', queue[i].length - playEvent.timestamp);
             if (queue[i].length - playEvent.timestamp < difference) {
-              console.log('in the if statement some how');
               // remaining time in the first song can be subtracted
               difference -= queue[i].length - playEvent.timestamp;
             } else {
@@ -302,7 +293,6 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         }
 
         if (songIndex === undefined) {
-          console.log('all songs have finished');
           this.store.dispatch(
             DashboardActions.setSongStatus({
               isPlaying: false,

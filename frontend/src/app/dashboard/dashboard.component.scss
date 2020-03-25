@@ -5,6 +5,7 @@ div#dashboard {
 
   > div {
     margin-right: 0 !important;
+    height: 100%;
   }
 
   div#rooms {
@@ -16,7 +17,6 @@ div#dashboard {
   }
 
   div#middle {
-    height: 100%;
     width: 65%;
     padding: {
       left: 2.5%;
