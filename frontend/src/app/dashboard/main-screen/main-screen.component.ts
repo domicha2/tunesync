@@ -178,7 +178,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
       new Date(eventA.creation_time) > new Date(eventB.creation_time) ? 1 : -1,
     );
     this.events = this.events.filter(event => {
-      //! hard coded refactor if have time
+      // ! hard coded refactor if have time
       if (this.activeRoomName !== 'System Room' && event.event_type === 'U') {
         return false;
       } else if (event.event_type === EventType.TuneSync) {
@@ -218,7 +218,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
     if (tuneSyncEvent.last_play === null) {
       // no last play state
       this.store.dispatch(DashboardActions.setQueueIndex({ queueIndex: -1 }));
-      //! what shouldni do?
+      // ! what shouldni do?
     } else {
       playEvent = tuneSyncEvent.last_play as PlayState;
     }

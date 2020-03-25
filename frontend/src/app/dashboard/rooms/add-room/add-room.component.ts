@@ -18,16 +18,16 @@ export class AddRoomComponent implements OnInit {
   allUsers$: Observable<User[]>;
   users = new FormControl();
 
+  roomForm = new FormGroup({
+    title: new FormControl(),
+    subtitle: new FormControl(),
+  });
+
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
     this.allUsers$ = this.store.select(selectAllUsers);
   }
-
-  roomForm = new FormGroup({
-    title: new FormControl(),
-    subtitle: new FormControl(),
-  });
 
   onAddRoom(): void {
     this.store.dispatch(
