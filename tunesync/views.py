@@ -301,7 +301,11 @@ class TuneViewSet(viewsets.ViewSet):
 
     # READ
     def list(self, request):
-        tunes = Tune.objects.values("id", "name", "length").order_by("name")
+        filter = request.GET.get('filter', None)
+        tunes = Tune.objects
+        if (filter is not None):
+            tunes = tunes.filter(name__icontains=filter)
+        tunes = tunes.values("id", "name", "length").order_by("name")
         return Response(tunes)
 
 

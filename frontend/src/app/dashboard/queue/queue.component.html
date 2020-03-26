@@ -5,6 +5,11 @@
     <h3>You may also reorder the songs in the queue</h3>
   </div>
 
+  <mat-form-field appearance="outline">
+    <mat-label>Filter</mat-label>
+    <input type="text" matInput [formControl]="filterControl" />
+  </mat-form-field>
+
   <div id="song-lists" class="row" cdkDropListGroup>
     <div id="queued-songs">
       <h2>Queued Songs</h2>

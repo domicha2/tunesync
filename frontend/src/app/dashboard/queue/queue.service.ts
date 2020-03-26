@@ -9,8 +9,8 @@ import { EventType } from '../dashboard.models';
 export class QueueService {
   constructor(private httpWrapperService: HttpWrapperService) {}
 
-  getAvailableSongs(): Observable<any> {
-    return this.httpWrapperService.get('/tunes/');
+  getAvailableSongs(filter: string): Observable<any> {
+    return this.httpWrapperService.get('/tunes/?filter=' + filter);
   }
 
   createModifyQueueEvent(queue: number[], roomId: number): Observable<any> {
