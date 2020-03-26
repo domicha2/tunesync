@@ -52,9 +52,9 @@ class UserViewSet(viewsets.ViewSet):
 
         paginator = PageNumberPagination()
         filtered_set = UserFilter(request.GET, queryset=User.objects.all()).qs
-        print(filtered_set)
-        serializer = UserSerializer(filtered_set, many=True)
-        return Response(serializer.data)
+        context = paginator.paginate_queryset(filtered_set, request)
+        serializer = UserSerializer(context, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     # POST
     def create(self, request):
@@ -264,8 +264,11 @@ class TuneViewSet(viewsets.ViewSet):
     parser_classes = [MultiPartParser]
 
     def list(self, request):
-        results = TuneFilter(request.GET, queryset=Tune.objects.all()).qs.values()
-        return Response(results)
+        paginator = PageNumberPagination()
+        filtered_set = TuneFilter(request.GET, queryset=Tune.objects.all()).qs
+        context = paginator.paginate_queryset(filtered_set, request)
+        serializer = TuneSerializer(context, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     @action(url_path="meta", methods=["get"], detail=True)
     def get_meta(self, request, pk=None):

@@ -14,10 +14,9 @@ class BaseSettings(DjangoDefaults):
     sentry_sdk.init(
         dsn="https://ffefad639d374bd6934f00715ed1503a@sentry.io/5173944",
         integrations=[DjangoIntegration()],
-
         # If you wish to associate users to errors (assuming you are using
         # django.contrib.auth) you may enable sending PII data.
-        send_default_pii=True
+        send_default_pii=True,
     )
 
     # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
