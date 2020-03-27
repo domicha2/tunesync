@@ -76,6 +76,9 @@ export const storeQueue = createAction(
 
 export const getAvailableSongs = createAction(
   '[Queue Component] Get Available Songs',
+  props<{
+    filter?: string;
+  }>(),
 );
 
 export const storeAvailableSongs = createAction(
