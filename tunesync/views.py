@@ -1,34 +1,33 @@
-from django.views.generic import TemplateView
-from tunesync.models import Event, Room, Membership, Tune, TuneSync, Poll
-from json import loads, dumps
+from json import dumps, loads
 
+import mutagen
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from rest_framework import viewsets
+from django.db.models import CharField, F, Q, Subquery, Value
+from django.http import HttpResponse
+from django.views.generic import TemplateView
+from django.views.static import serve
+from rest_framework import status, viewsets
+from rest_framework.authtoken.models import Token
+from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.parsers import MultiPartParser
+from rest_framework.response import Response
+
+from tunesync.models import Event, Membership, Poll, Room, Tune, TuneSync
+
+from .event_handlers import Handler, PollTask
+from .filters import TuneFilter, UserFilter
 from .permissions import (
     AnonCreateAndUpdateOwnerOnly,
-    InRoomOnlyEvents,
     DjOrAbove,
-    RoomAdminOnly,
-    JoinPendingOnly,
-    UploaderOnly,
     InRoomOnly,
+    InRoomOnlyEvents,
+    JoinPendingOnly,
+    RoomAdminOnly,
+    UploaderOnly,
 )
-from rest_framework.decorators import action
-from rest_framework.authtoken.models import Token
-from rest_framework.response import Response
 from .serializers import *  # we literally need everything
-from rest_framework.parsers import MultiPartParser
-from rest_framework import status
-from rest_framework.pagination import PageNumberPagination
-from django.http import HttpResponse
-
-from django.db.models import F, Q, Subquery, Value, CharField
-from django.contrib.auth import authenticate, login
-import mutagen
-
-from .filters import TuneFilter, UserFilter
-
-from .event_handlers import PollTask, Handler
 
 
 class IndexPage(TemplateView):
