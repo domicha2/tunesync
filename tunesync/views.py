@@ -234,24 +234,13 @@ class RoomViewSet(viewsets.ViewSet):
     @action(methods=["get"], detail=True)
     def users(self, request, pk=None):
         # get all user in this room
-        print(request.query_params)
-        in_room = bool(request.query_params.get("in_room", True))
-        print(in_room, bool(request.query_params["in_room"]))
-        if in_room:
-            users = (
-                Membership.objects.filter(room=pk, state="A")
-                .values("role", "state")
-                .annotate(
-                    membershipId=F("id"), userId=F("user"), name=F("user__username")
-                )
-                .order_by("role", "state", "name")
-            )
-            return Response(users)
-        else:
-            users = Membership.objects.filter(room=pk, state="A").values("user")
-            print(users, type(users))
-            result = User.objects.exclude(id__in=users).values("id", "users")
-            return Response(users)
+        users = (
+            Membership.objects.filter(room=pk, state="A")
+            .values("role", "state")
+            .annotate(membershipId=F("id"), userId=F("user"), name=F("user__username"))
+            .order_by("role", "state", "name")
+        )
+        return Response(users)
 
     @action(methods=["get"], detail=True)
     def tunesync(self, request, pk=None):

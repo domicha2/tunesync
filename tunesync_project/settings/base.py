@@ -146,6 +146,7 @@ class BaseSettings(DjangoDefaults):
             },
         }
     ]
+    CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 
     CORS_ORIGIN_ALLOW_ALL = True
 
