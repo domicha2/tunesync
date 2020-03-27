@@ -136,7 +136,7 @@ class UserViewSet(viewsets.ViewSet):
 
 class EventViewSet(viewsets.ViewSet):
 
-    permission_classes = [InRoomOnlyEvents, DjOrAbove, RoomAdminOnly, JoinPendingOnly]
+    # permission_classes = [InRoomOnlyEvents, DjOrAbove, RoomAdminOnly, JoinPendingOnly]
 
     # GET
     def list(self, request):
@@ -184,6 +184,20 @@ class EventViewSet(viewsets.ViewSet):
         handle_event = getattr(Handler, "handle_" + event.event_type)
         result = handle_event(request.data["args"], event, user=request.user)
         return result
+
+    # DELETE
+    def destroy(self, request, pk=None):
+        event = Event.objects.filter(id = pk)
+        if event:
+            event = event[0]
+            event.isDeleted = True
+            event.save()
+            return Response(status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response(
+                {"details": "invalid event id"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
 class RoomViewSet(viewsets.ViewSet):
@@ -291,6 +305,31 @@ class TuneViewSet(viewsets.ViewSet):
             result.append(serializer.data)
         return Response(result)
 
+    # PATCH
+    def partial_update(self, request, pk=None):
+        # Check if given tune is even in the db
+        tune = Tune.objects.filter(id = pk)
+        if tune:
+            tune = tune[0]
+            if "tune_name" in request.data:
+                tune.name = request.data["tune_name"]
+            if "tune_artist" in request.data:
+                tune.artist = request.data["tune_artist"]
+            if "tune_album" in request.data:
+                tune.album = request.data["tune_album"]
+            tune.save()
+            serializer = TuneSerializer(tune)
+            return Response(serializer.data)
+        else:
+            return Response(
+                {"details": "invalid tune id"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    # READ
+    def list(self, request):
+        tunes = Tune.objects.values("id", "name", "length").order_by("name")
+        return Response(tunes)
 
 class MembershipViewSet(viewsets.ModelViewSet):
     """
