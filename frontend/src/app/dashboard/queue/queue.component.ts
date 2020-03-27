@@ -4,9 +4,10 @@ import {
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { debounceTime, filter } from 'rxjs/operators';
 import { AppState } from '../../app.module';
 import { Role, Song } from '../dashboard.models';
 import * as DashboardActions from '../store/dashboard.actions';
@@ -31,12 +32,24 @@ export class QueueComponent implements OnInit, OnDestroy {
 
   userRole$: Observable<Role>;
 
+  filterControl = new FormControl();
+
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
+    this.subscription.add(
+      this.filterControl.valueChanges
+        .pipe(debounceTime(250))
+        .subscribe((payload: string) => {
+          this.store.dispatch(
+            DashboardActions.getAvailableSongs({ filter: payload }),
+          );
+        }),
+    );
+
     this.userRole$ = this.store.select(selectUserRole);
 
-    this.store.dispatch(DashboardActions.getAvailableSongs());
+    this.store.dispatch(DashboardActions.getAvailableSongs({ filter: '' }));
 
     this.subscription.add(
       this.store

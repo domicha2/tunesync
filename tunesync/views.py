@@ -19,13 +19,14 @@ from rest_framework.response import Response
 from .serializers import *  # we literally need everything
 from rest_framework.parsers import MultiPartParser
 from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
 from django.http import HttpResponse
 
 from django.db.models import F, Q, Subquery, Value, CharField
 from django.contrib.auth import authenticate, login
 import mutagen
 
-from .filters import TuneFilter
+from .filters import TuneFilter, UserFilter
 
 from .event_handlers import PollTask, Handler
 
@@ -47,23 +48,13 @@ class UserViewSet(viewsets.ViewSet):
 
     # GET
     def list(self, request):
-        if "skip" not in request.query_params:
-            skip = 0
-        else:
-            skip = int(request.query_params["skip"])
+        # https://stackoverflow.com/questions/44048156/django-filter-use-paginations
 
-        if "limit" not in request.query_params:
-            limit = 5
-        else:
-            limit = int(request.query_params["limit"])
-        users = User.objects.exclude(pk=request.user.id).order_by("username")[
-            skip:limit
-        ]
-        result = []
-        for user in users:
-            serializer = UserSerializer(user)
-            result.append(serializer.data)
-        return Response(result)
+        paginator = PageNumberPagination()
+        filtered_set = UserFilter(request.GET, queryset=User.objects.all()).qs
+        context = paginator.paginate_queryset(filtered_set, request)
+        serializer = UserSerializer(context, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     # POST
     def create(self, request):
@@ -83,10 +74,7 @@ class UserViewSet(viewsets.ViewSet):
         membership.save()
 
         token = Token.objects.create(user=u)
-        response = {
-            "token": token.key,
-            "user_id": u.pk
-        }
+        response = {"token": token.key, "user_id": u.pk}
         return Response(response)
 
     # GET BY PK
@@ -134,6 +122,7 @@ class UserViewSet(viewsets.ViewSet):
 
     @action(detail=True, methods=["get"])
     def rooms(self, request, pk=None):
+
         rooms = (
             Membership.objects.filter(user=pk, state="A")
             .annotate(title=F("room__title"), subtitle=F("room__subtitle"))
@@ -171,7 +160,7 @@ class EventViewSet(viewsets.ViewSet):
     # POST
     def create(self, request):
         if not set(request.data) <= {"room", "args", "event_type", "parent_event"}:
-            return Response(status=400)
+            return Response({"details": "bad arguments"}, status=400)
         room = Room.objects.get(pk=request.data["room"])
         if not room:
             return Response(
@@ -274,12 +263,15 @@ class RoomViewSet(viewsets.ViewSet):
 
 
 class TuneViewSet(viewsets.ViewSet):
-    permission_classes = [AnonCreateAndUpdateOwnerOnly]
+    permission_classes = [UploaderOnly]
     parser_classes = [MultiPartParser]
 
     def list(self, request):
-        results = TuneFilter(request.GET, queryset=Product.objects.all())
-        Response(results.values())
+        paginator = PageNumberPagination()
+        filtered_set = TuneFilter(request.GET, queryset=Tune.objects.all()).qs
+        context = paginator.paginate_queryset(filtered_set, request)
+        serializer = TuneSerializer(context, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     @action(url_path="meta", methods=["get"], detail=True)
     def get_meta(self, request, pk=None):
@@ -338,7 +330,6 @@ class TuneViewSet(viewsets.ViewSet):
     def list(self, request):
         tunes = Tune.objects.values("id", "name", "length").order_by("name")
         return Response(tunes)
-
 
 class MembershipViewSet(viewsets.ModelViewSet):
     """

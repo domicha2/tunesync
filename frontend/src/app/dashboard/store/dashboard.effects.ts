@@ -50,8 +50,8 @@ export class DashboardEffects {
   getAvailableSongs$ = createEffect(() =>
     this.actions$.pipe(
       ofType(DashboardActions.getAvailableSongs),
-      switchMap(() =>
-        this.queueService.getAvailableSongs().pipe(
+      switchMap(action =>
+        this.queueService.getAvailableSongs(action.filter).pipe(
           map((availableSongs: Song[]) => ({
             type: DashboardActions.storeAvailableSongs.type,
             availableSongs,

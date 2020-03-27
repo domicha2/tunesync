@@ -137,7 +137,10 @@ export class ControlsComponent
         if (songStatus.seekTime !== undefined) {
           this.seekTime = songStatus.seekTime;
         }
+        // this line can also clear out a song because queue index can be -1
         this.currentSong = this.queue[this.queueIndex];
+        // have to manually set the pause flag since clearing the song doesn't modify it
+        this.isPaused = true;
       } else {
         const song = this.getAudioElement();
         song.pause();
@@ -275,7 +278,10 @@ export class ControlsComponent
   }
 
   onQueueClick(): void {
-    this.matDialog.open(QueueComponent, {});
+    this.matDialog.open(QueueComponent, {
+      height: '75%',
+      width: '75%',
+    });
   }
 
   /**

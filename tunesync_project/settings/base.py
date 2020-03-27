@@ -14,10 +14,9 @@ class BaseSettings(DjangoDefaults):
     sentry_sdk.init(
         dsn="https://ffefad639d374bd6934f00715ed1503a@sentry.io/5173944",
         integrations=[DjangoIntegration()],
-
         # If you wish to associate users to errors (assuming you are using
         # django.contrib.auth) you may enable sending PII data.
-        send_default_pii=True
+        send_default_pii=True,
     )
 
     # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -35,6 +34,7 @@ class BaseSettings(DjangoDefaults):
     FILE_UPLOAD_HANDLERS = [
         "django.core.files.uploadhandler.TemporaryFileUploadHandler"
     ]
+    BACKGROUND_TASK_RUN_ASYNC = True
 
     @property
     def SCHEME(self):
@@ -146,10 +146,13 @@ class BaseSettings(DjangoDefaults):
             },
         }
     ]
+    CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 
     CORS_ORIGIN_ALLOW_ALL = True
 
     REST_FRAMEWORK = {
+        "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+        "PAGE_SIZE": 20,
         "DEFAULT_FILTER_BACKENDS": (
             "django_filters.rest_framework.DjangoFilterBackend"
         ),
@@ -195,3 +198,7 @@ class BaseSettings(DjangoDefaults):
     def INSTALLED_APPS(self):
         return self.PREREQ_APPS + self.PROJECT_APPS
 
+    # FIXME: better storage structure
+    @property
+    def MEDIA_ROOT(self):
+        return self.BASE_DIR
