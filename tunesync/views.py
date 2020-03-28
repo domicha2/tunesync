@@ -326,11 +326,6 @@ class TuneViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    # READ
-    def list(self, request):
-        tunes = Tune.objects.values("id", "name", "length").order_by("name")
-        return Response(tunes)
-
 class MembershipViewSet(viewsets.ModelViewSet):
     """
     Proof of concept viewset using ModelViewSet implementation
