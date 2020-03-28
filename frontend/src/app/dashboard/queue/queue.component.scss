@@ -24,3 +24,11 @@ mat-list.song-list {
 mat-form-field {
   margin-bottom: 0.25rem !important;
 }
+
+div#queue-wrapper {
+  height: 100%;
+
+  div#song-lists {
+    flex-grow: 1;
+  }
+}
