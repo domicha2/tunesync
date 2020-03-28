@@ -6,6 +6,7 @@ import {
   Song,
   User as AuthUser,
   User,
+  Filters,
 } from '../dashboard.models';
 
 export const resetState = createAction('[Rooms Component] Reset State');
@@ -77,7 +78,7 @@ export const storeQueue = createAction(
 export const getAvailableSongs = createAction(
   '[Queue Component] Get Available Songs',
   props<{
-    filter?: string;
+    filters: Filters;
   }>(),
 );
 

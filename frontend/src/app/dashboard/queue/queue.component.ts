@@ -6,10 +6,10 @@ import {
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { Observable, Subscription } from 'rxjs';
-import { debounceTime, filter } from 'rxjs/operators';
+import { combineLatest, Observable, Subscription } from 'rxjs';
+import { debounceTime, filter, map, startWith } from 'rxjs/operators';
 import { AppState } from '../../app.module';
-import { Role, Song } from '../dashboard.models';
+import { Filters, Role, Song } from '../dashboard.models';
 import * as DashboardActions from '../store/dashboard.actions';
 import {
   selectAvailableSongs,
@@ -32,24 +32,33 @@ export class QueueComponent implements OnInit, OnDestroy {
 
   userRole$: Observable<Role>;
 
-  filterControl = new FormControl();
+  nameControl = new FormControl();
+  albumControl = new FormControl();
+  artistControl = new FormControl();
 
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
     this.subscription.add(
-      this.filterControl.valueChanges
-        .pipe(debounceTime(250))
-        .subscribe((payload: string) => {
-          this.store.dispatch(
-            DashboardActions.getAvailableSongs({ filter: payload }),
-          );
+      combineLatest([
+        this.nameControl.valueChanges.pipe(startWith('')),
+        this.albumControl.valueChanges.pipe(startWith('')),
+        this.artistControl.valueChanges.pipe(startWith('')),
+      ])
+        .pipe(
+          debounceTime(250),
+          map(([name, album, artist]) => ({
+            name,
+            album,
+            artist,
+          })),
+        )
+        .subscribe((filters: Filters) => {
+          this.store.dispatch(DashboardActions.getAvailableSongs({ filters }));
         }),
     );
 
     this.userRole$ = this.store.select(selectUserRole);
-
-    this.store.dispatch(DashboardActions.getAvailableSongs({ filter: '' }));
 
     this.subscription.add(
       this.store
