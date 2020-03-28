@@ -144,6 +144,12 @@ class Vote(models.Model):
         unique_together = ("poll", "user")
 
 
+def hash_directory(instance, filename):
+    return "tunes/{0}/{1}/{2}".format(
+        instance.hash_value[0:2], instance.hash_value[2:4], instance.hash_value
+    )
+
+
 class Tune(models.Model):
     name = models.CharField(max_length=300)
     artist = models.CharField(max_length=300, blank=True)
@@ -151,8 +157,8 @@ class Tune(models.Model):
     uploader = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
     length = models.FloatField(blank=True, null=True)  # seconds
     mime = models.CharField(max_length=300, blank=True, null=True)
-    audio_file = models.FileField(upload_to="tunes/", null=True)
-    # need to add the file meta data stuff later
+    audio_file = models.FileField(upload_to=hash_directory, null=True)
+    hash_value = models.CharField(max_length=64)
 
 
 class Membership(models.Model):
