@@ -51,10 +51,10 @@ export class DashboardEffects {
     this.actions$.pipe(
       ofType(DashboardActions.getAvailableSongs),
       switchMap(action =>
-        this.queueService.getAvailableSongs(action.filter).pipe(
-          map((availableSongs: Song[]) => ({
+        this.queueService.getAvailableSongs(action.filters).pipe(
+          map(response => ({
             type: DashboardActions.storeAvailableSongs.type,
-            availableSongs,
+            availableSongs: response.results,
           })),
           catchError(() => EMPTY),
         ),
