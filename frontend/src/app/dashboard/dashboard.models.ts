@@ -5,6 +5,12 @@ export interface Song {
   // TODO: add other meta data about song
 }
 
+export interface Filters {
+  name?: string;
+  album?: string;
+  artist?: string;
+}
+
 export enum UserChangeAction {
   Invite = 'I',
   Kick = 'K',

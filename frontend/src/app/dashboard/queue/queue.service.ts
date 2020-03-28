@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpWrapperService } from '../../http-wrapper.service';
-import { EventType } from '../dashboard.models';
+import { EventType, Filters } from '../dashboard.models';
 
 @Injectable({
   providedIn: 'root',
@@ -9,8 +9,18 @@ import { EventType } from '../dashboard.models';
 export class QueueService {
   constructor(private httpWrapperService: HttpWrapperService) {}
 
-  getAvailableSongs(filter: string): Observable<any> {
-    return this.httpWrapperService.get('/tunes/?filter=' + filter);
+  getAvailableSongs(filters: Filters): Observable<any> {
+    let getParams = '?';
+    for (const key in filters) {
+      if (filters[key] !== '') {
+        getParams += `${key}__icontains=${filters[key]}&`;
+      }
+    }
+    if (getParams === '?') {
+      // no get params
+      getParams = '';
+    }
+    return this.httpWrapperService.get('/tunes/' + getParams);
   }
 
   createModifyQueueEvent(queue: number[], roomId: number): Observable<any> {

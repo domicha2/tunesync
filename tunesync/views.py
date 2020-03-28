@@ -351,7 +351,6 @@ class TuneViewSet(viewsets.ViewSet):
                 {"details": "invalid event id"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-
 class MembershipViewSet(viewsets.ModelViewSet):
     """
     Proof of concept viewset using ModelViewSet implementation

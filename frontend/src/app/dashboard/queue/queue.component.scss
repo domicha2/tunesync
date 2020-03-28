@@ -20,3 +20,15 @@ mat-list.song-list {
   border: 1px solid white;
   border-radius: 0.5rem;
 }
+
+mat-form-field {
+  margin-bottom: 0.25rem !important;
+}
+
+div#queue-wrapper {
+  height: 100%;
+
+  div#song-lists {
+    flex-grow: 1;
+  }
+}
