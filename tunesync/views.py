@@ -1,34 +1,35 @@
-from django.views.generic import TemplateView
-from tunesync.models import Event, Room, Membership, Tune, TuneSync, Poll
-from json import loads, dumps
+from json import dumps, loads
+from hashlib import sha256
+import os
 
+import mutagen
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from rest_framework import viewsets
+from django.db.models import CharField, F, Q, Subquery, Value
+from django.http import HttpResponse
+from django.views.generic import TemplateView
+from django.views.static import serve
+from rest_framework import status, viewsets
+from rest_framework.authtoken.models import Token
+from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.parsers import MultiPartParser
+from rest_framework.response import Response
+
+from tunesync.models import Event, Membership, Poll, Room, Tune, TuneSync
+
+from .event_handlers import Handler, PollTask
+from .filters import TuneFilter, UserFilter
 from .permissions import (
     AnonCreateAndUpdateOwnerOnly,
-    InRoomOnlyEvents,
     DjOrAbove,
-    RoomAdminOnly,
-    JoinPendingOnly,
-    UploaderOnly,
     InRoomOnly,
+    InRoomOnlyEvents,
+    JoinPendingOnly,
+    RoomAdminOnly,
+    UploaderOnly,
 )
-from rest_framework.decorators import action
-from rest_framework.authtoken.models import Token
-from rest_framework.response import Response
 from .serializers import *  # we literally need everything
-from rest_framework.parsers import MultiPartParser
-from rest_framework import status
-from rest_framework.pagination import PageNumberPagination
-from django.http import HttpResponse
-
-from django.db.models import F, Q, Subquery, Value, CharField
-from django.contrib.auth import authenticate, login
-import mutagen
-
-from .filters import TuneFilter, UserFilter
-
-from .event_handlers import PollTask, Handler
 
 
 class IndexPage(TemplateView):
@@ -187,7 +188,7 @@ class EventViewSet(viewsets.ViewSet):
 
     # DELETE
     def destroy(self, request, pk=None):
-        event = Event.objects.filter(id = pk)
+        event = Event.objects.filter(id=pk)
         if event:
             event = event[0]
             event.isDeleted = True
@@ -195,8 +196,7 @@ class EventViewSet(viewsets.ViewSet):
             return Response(status=status.HTTP_202_ACCEPTED)
         else:
             return Response(
-                {"details": "invalid event id"},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"details": "invalid event id"}, status=status.HTTP_400_BAD_REQUEST
             )
 
 
@@ -291,6 +291,13 @@ class TuneViewSet(viewsets.ViewSet):
         result = []
         for song in request.FILES:
             audio = mutagen.File(request.FILES[song], easy=True)
+            hash_value = sha256(request.FILES[song].read()).hexdigest()
+            colliding_songs = Tune.objects.filter(hash_value=hash_value)
+            if colliding_songs:
+                audio_file = colliding_songs[0].audio_file
+            else:
+                # this is so we dont store the same file multiple times but allow users to upload multiple songs
+                audio_file = request.FILES[song]
             tune = Tune(
                 name=audio["title"],
                 artist=audio["artist"],
@@ -298,7 +305,8 @@ class TuneViewSet(viewsets.ViewSet):
                 uploader=request.user,
                 length=audio.info.length,
                 mime=audio.mime[0],
-                audio_file=request.FILES[song],
+                audio_file=audio_file,
+                hash_value=hash_value,
             )
             tune.save()
             serializer = TuneSerializer(tune)
@@ -308,7 +316,7 @@ class TuneViewSet(viewsets.ViewSet):
     # PATCH
     def partial_update(self, request, pk=None):
         # Check if given tune is even in the db
-        tune = Tune.objects.filter(id = pk)
+        tune = Tune.objects.filter(id=pk)
         if tune:
             tune = tune[0]
             if "tune_name" in request.data:
@@ -322,8 +330,25 @@ class TuneViewSet(viewsets.ViewSet):
             return Response(serializer.data)
         else:
             return Response(
-                {"details": "invalid tune id"},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"details": "invalid tune id"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+    # READ
+    def destroy(self, request, pk=None):
+        tune = Tune.objects.filter(id=pk)
+        if tune:
+            tune = tune[0]
+            colliding_tunes = Tune.objects.filter(hash_value=tune.hash_value).exclude(
+                pk=pk
+            )
+            if not colliding_tunes:
+                print(tune.audio_file.path)
+                os.remove(tune.audio_file.path)
+            tune.delete()
+            return Response(status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response(
+                {"details": "invalid event id"}, status=status.HTTP_400_BAD_REQUEST
             )
 
 class MembershipViewSet(viewsets.ModelViewSet):
