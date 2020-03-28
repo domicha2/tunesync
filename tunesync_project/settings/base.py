@@ -198,3 +198,7 @@ class BaseSettings(DjangoDefaults):
     def INSTALLED_APPS(self):
         return self.PREREQ_APPS + self.PROJECT_APPS
 
+    # FIXME: better storage structure
+    @property
+    def MEDIA_ROOT(self):
+        return self.BASE_DIR
