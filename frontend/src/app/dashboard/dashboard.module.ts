@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ControlsComponent } from './controls/controls.component';
@@ -55,6 +56,7 @@ import { UsersComponent } from './users/users.component';
     MatInputModule,
     MatTooltipModule,
     MatProgressBarModule,
+    MatRadioModule,
     MatButtonModule,
     MatIconModule,
     MatSelectModule,
