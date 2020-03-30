@@ -19,6 +19,7 @@ import { DashboardComponent } from './dashboard.component';
 import { MainScreenComponent } from './main-screen/main-screen.component';
 import { MessagingComponent } from './messaging/messaging.component';
 import { NotificationsService } from './notifications.service';
+import { CreatePollComponent } from './poll/create-poll/create-poll.component';
 import { QueueComponent } from './queue/queue.component';
 import { AddRoomComponent } from './rooms/add-room/add-room.component';
 import { RoomsComponent } from './rooms/rooms.component';
@@ -39,6 +40,7 @@ import { UsersComponent } from './users/users.component';
     QueueComponent,
     KickUserComponent,
     AddRoomComponent,
+    CreatePollComponent,
   ],
   imports: [
     ReactiveFormsModule,

@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { AppState } from '../app.module';
+import { CreatePollComponent } from './poll/create-poll/create-poll.component';
 import { selectActiveRoom } from './store/dashboard.selectors';
 
 @Component({
@@ -12,9 +14,16 @@ import { selectActiveRoom } from './store/dashboard.selectors';
 export class DashboardComponent implements OnInit {
   activeRoom$: Observable<number>;
 
-  constructor(private store: Store<AppState>) {}
+  constructor(private matDialog: MatDialog, private store: Store<AppState>) {}
 
   ngOnInit(): void {
     this.activeRoom$ = this.store.select(selectActiveRoom);
+  }
+
+  openCreatePollDialog(): void {
+    this.matDialog.open(CreatePollComponent, {
+      width: '50%',
+      height: '70%',
+    });
   }
 }
