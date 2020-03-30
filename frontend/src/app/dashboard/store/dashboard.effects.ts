@@ -195,9 +195,9 @@ export class DashboardEffects {
       ofType(DashboardActions.getAllUsers),
       switchMap(() =>
         this.usersService.getAllUsers().pipe(
-          map((users: any[]) => ({
+          map(response => ({
             type: DashboardActions.storeAllUsers.type,
-            allUsers: users.map(user => ({
+            allUsers: response.results.map(user => ({
               username: user.username,
               userId: user.id,
             })),
