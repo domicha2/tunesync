@@ -279,7 +279,7 @@ export class ControlsComponent
 
   onQueueClick(): void {
     this.matDialog.open(QueueComponent, {
-      height: '75%',
+      height: '85%',
       width: '65%',
     });
   }
