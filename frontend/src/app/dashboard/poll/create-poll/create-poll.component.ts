@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 import { debounceTime, map, startWith, tap } from 'rxjs/operators';
 import { AppState } from '../../../app.module';
-import { Filters, Role, Song, User } from '../../dashboard.models';
+import { Filters, Role, Song, User, PollType } from '../../dashboard.models';
 import * as DashboardActions from '../../store/dashboard.actions';
 import {
   selectAvailableSongs,
@@ -63,5 +63,18 @@ export class CreatePollComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+  }
+
+  onCreatePoll(): void {
+    // ! mock data
+    this.store.dispatch(
+      DashboardActions.createPoll({
+        pollArgs: {
+          action: PollType.Kick,
+          type: 'K',
+          user: 2,
+        },
+      }),
+    );
   }
 }

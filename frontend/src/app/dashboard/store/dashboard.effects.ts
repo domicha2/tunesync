@@ -18,6 +18,7 @@ import { ControlsService } from '../controls/controls.service';
 import { AppEvent, Room, SYSTEM_USER_ID, User } from '../dashboard.models';
 import { MainScreenService } from '../main-screen/main-screen.service';
 import { MessagingService } from '../messaging/messaging.service';
+import { PollService } from '../poll/poll.service';
 import { QueueService } from '../queue/queue.service';
 import { RoomsService } from '../rooms/rooms.service';
 import { UsersService } from '../users/users.service';
@@ -164,6 +165,21 @@ export class DashboardEffects {
         ),
       ),
     ),
+  );
+
+  createPoll$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(DashboardActions.createPoll),
+        withLatestFrom(this.store.select(selectActiveRoom)),
+        switchMap(([action, room]) =>
+          this.pollService.createPoll(room, action.pollArgs).pipe(
+            tap(response => console.log('createpoll response:' + response)),
+            catchError(() => EMPTY),
+          ),
+        ),
+      ),
+    { dispatch: false },
   );
 
   createMessage$ = createEffect(
@@ -393,5 +409,6 @@ export class DashboardEffects {
     private messagingService: MessagingService,
     private mainScreenService: MainScreenService,
     private controlsService: ControlsService,
+    private pollService: PollService,
   ) {}
 }

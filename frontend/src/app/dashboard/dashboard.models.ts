@@ -19,12 +19,18 @@ export enum UserChangeAction {
   RoleChange = 'C',
 }
 
+export enum PollType {
+  Kick = 'U',
+  AddToQueue = 'MQ',
+}
+
 export enum EventType {
   ModifyQueue = 'MQ',
   Messaging = 'M',
   UserChange = 'U',
   Play = 'PL',
   TuneSync = 'T',
+  CreatePoll = 'PO',
 }
 
 export enum Role {

@@ -11,6 +11,12 @@ import {
 
 export const resetState = createAction('[Rooms Component] Reset State');
 
+/* Poll/Vote */
+export const createPoll = createAction(
+  '[Create Poll Component] Create Poll',
+  props<{ pollArgs: any }>(),
+);
+
 /* Tunes */
 export const getTuneSyncEvent = createAction(
   '[Rooms Component] Get TuneSync Event',
@@ -142,7 +148,7 @@ export const storeEvents = createAction(
 /* Users */
 export const getUsersByUsername = createAction(
   '[Add Room Component] Get Users By Username',
-  props<{ username: string, filterByActiveRoom: boolean }>(),
+  props<{ username: string; filterByActiveRoom: boolean }>(),
 );
 export const storeAllUsers = createAction(
   '[Users API] Store All Users',
