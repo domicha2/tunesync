@@ -31,7 +31,10 @@ export class InviteComponent implements OnInit, OnDestroy {
         .pipe(startWith(''), debounceTime(250))
         .subscribe((username: string) => {
           this.store.dispatch(
-            DashboardActions.getUsersByUsername({ username }),
+            DashboardActions.getUsersByUsername({
+              username,
+              filterByActiveRoom: true,
+            }),
           );
         }),
     );
