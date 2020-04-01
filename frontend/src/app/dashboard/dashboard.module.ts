@@ -27,6 +27,7 @@ import { RoomsComponent } from './rooms/rooms.component';
 import { InviteComponent } from './users/invite/invite.component';
 import { KickUserComponent } from './users/kick-user/kick-user.component';
 import { UsersComponent } from './users/users.component';
+import { PollComponent } from './poll/poll/poll.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +43,7 @@ import { UsersComponent } from './users/users.component';
     KickUserComponent,
     AddRoomComponent,
     CreatePollComponent,
+    PollComponent,
   ],
   imports: [
     ReactiveFormsModule,

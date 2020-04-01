@@ -39,6 +39,9 @@
             </button>
           </div>
         </ng-container>
+        <ng-container *ngSwitchCase="'PO'">
+          <app-poll></app-poll>
+        </ng-container>
         <ng-container *ngSwitchDefault>
           {{ 'Music got adjusted' }}
         </ng-container>
