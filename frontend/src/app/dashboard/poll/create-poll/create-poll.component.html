@@ -24,6 +24,24 @@
     </h1>
 
     <div>{{ regularUsers$ | async }}</div>
+    <div>{{ availableSongs$ | async }}</div>
+
+    <div id="song-filter" class="column">
+      <mat-form-field appearance="outline">
+        <mat-label>Name</mat-label>
+        <input type="text" matInput [formControl]="nameControl" />
+      </mat-form-field>
+    
+      <mat-form-field appearance="outline">
+        <mat-label>Artist</mat-label>
+        <input type="text" matInput [formControl]="artistControl" />
+      </mat-form-field>
+    
+      <mat-form-field appearance="outline">
+        <mat-label>Album</mat-label>
+        <input type="text" matInput [formControl]="albumControl" />
+      </mat-form-field>
+    </div>
   </mat-dialog-content>
   <mat-dialog-actions>
     <h1>Add submit and cancel buttons</h1>
