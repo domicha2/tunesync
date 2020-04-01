@@ -40,7 +40,7 @@
           </div>
         </ng-container>
         <ng-container *ngSwitchCase="'PO'">
-          <app-poll></app-poll>
+          <app-poll [pollId]="event.event_id"></app-poll>
         </ng-container>
         <ng-container *ngSwitchDefault>
           {{ 'Music got adjusted' }}

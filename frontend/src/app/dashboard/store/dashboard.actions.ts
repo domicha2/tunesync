@@ -17,6 +17,11 @@ export const createPoll = createAction(
   props<{ pollArgs: any }>(),
 );
 
+export const createVote = createAction(
+  '[Poll Component] Create Vote',
+  props<{ pollId: number; agree: boolean }>(),
+);
+
 /* Tunes */
 export const getTuneSyncEvent = createAction(
   '[Rooms Component] Get TuneSync Event',

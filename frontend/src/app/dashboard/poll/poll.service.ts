@@ -16,4 +16,15 @@ export class PollService {
       args,
     });
   }
+
+  createVote(room: number, pollId: number, agree: boolean): Observable<any> {
+    return this.httpWrapperService.post('/events/', {
+      room,
+      event_type: EventType.Vote,
+      parent_event: pollId,
+      args: {
+        agree,
+      },
+    });
+  }
 }

@@ -31,6 +31,7 @@ export enum EventType {
   Play = 'PL',
   TuneSync = 'T',
   CreatePoll = 'PO',
+  Vote = 'V',
 }
 
 export enum Role {

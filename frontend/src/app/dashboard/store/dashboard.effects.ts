@@ -182,6 +182,21 @@ export class DashboardEffects {
     { dispatch: false },
   );
 
+  createVote$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(DashboardActions.createVote),
+        withLatestFrom(this.store.select(selectActiveRoom)),
+        switchMap(([action, room]) =>
+          this.pollService.createVote(room, action.pollId, action.agree).pipe(
+            tap(response => console.log('create vote response:' + response)),
+            catchError(() => EMPTY),
+          ),
+        ),
+      ),
+    { dispatch: false },
+  );
+
   createMessage$ = createEffect(
     () =>
       this.actions$.pipe(
