@@ -114,7 +114,7 @@ class Poll(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
     args = JSONField()
-    is_actve = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
     is_successful = models.BooleanField(default=False)
 
     class Meta:
