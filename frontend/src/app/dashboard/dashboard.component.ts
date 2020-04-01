@@ -3,8 +3,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { AppState } from '../app.module';
+import { Role } from './dashboard.models';
 import { CreatePollComponent } from './poll/create-poll/create-poll.component';
-import { selectActiveRoom } from './store/dashboard.selectors';
+import { selectActiveRoom, selectUserRole } from './store/dashboard.selectors';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,11 +14,13 @@ import { selectActiveRoom } from './store/dashboard.selectors';
 })
 export class DashboardComponent implements OnInit {
   activeRoom$: Observable<number>;
+  userRole$: Observable<Role>;
 
   constructor(private matDialog: MatDialog, private store: Store<AppState>) {}
 
   ngOnInit(): void {
     this.activeRoom$ = this.store.select(selectActiveRoom);
+    this.userRole$ = this.store.select(selectUserRole);
   }
 
   openCreatePollDialog(): void {
