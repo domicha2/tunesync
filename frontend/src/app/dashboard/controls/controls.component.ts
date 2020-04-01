@@ -12,7 +12,7 @@ import { Store } from '@ngrx/store';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, filter, tap } from 'rxjs/operators';
 import { AppState } from '../../app.module';
-import { Role, Song } from '../dashboard.models';
+import { Role, Song, FileList2 } from '../dashboard.models';
 import { QueueComponent } from '../queue/queue.component';
 import * as DashboardActions from '../store/dashboard.actions';
 import {
@@ -273,13 +273,19 @@ export class ControlsComponent
 
   onUploadChange(event: Event): void {
     // tslint:disable-next-line: no-string-literal
-    const tunes: FileList = event.target['files'];
+    const files: FileList = event.target['files'];
+    const tunes: FileList2 = {
+      length: files.length,
+    };
+    for (let i = 0; i < tunes.length; i++) {
+      tunes[i] = files.item(i);
+    }
     this.store.dispatch(DashboardActions.createTunes({ tunes }));
   }
 
   onQueueClick(): void {
     this.matDialog.open(QueueComponent, {
-      height: '75%',
+      height: '85%',
       width: '65%',
     });
   }

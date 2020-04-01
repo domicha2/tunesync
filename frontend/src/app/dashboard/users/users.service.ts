@@ -23,8 +23,10 @@ export class UsersService {
     });
   }
 
-  getAllUsers(): Observable<any> {
-    return this.httpWrapperService.get('/users/?limit=100');
+  getUsersByUsername(username: string): Observable<any> {
+    return this.httpWrapperService.get(
+      `/users/?username__icontains=${username}`,
+    );
   }
 
   createInviteUsersEvent(users: number[], roomId: number): Observable<any> {

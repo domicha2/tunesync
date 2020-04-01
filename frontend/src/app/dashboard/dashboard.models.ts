@@ -1,3 +1,5 @@
+export const SYSTEM_USER_ID = 1;
+
 export interface Song {
   id: number;
   name: string;
@@ -9,6 +11,13 @@ export interface Filters {
   name?: string;
   album?: string;
   artist?: string;
+}
+
+// original FileList has a function field which screws over ngrx
+// otherwise this is the same minus the function (item)
+export interface FileList2 {
+  length: number;
+  [key: number]: File;
 }
 
 export enum UserChangeAction {

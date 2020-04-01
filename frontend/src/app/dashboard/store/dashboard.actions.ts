@@ -7,6 +7,7 @@ import {
   User as AuthUser,
   User,
   Filters,
+  FileList2,
 } from '../dashboard.models';
 
 export const resetState = createAction('[Rooms Component] Reset State');
@@ -62,7 +63,7 @@ export const setSongStatus = createAction(
 
 export const createTunes = createAction(
   '[Controls Component] Create Tunes',
-  props<{ tunes: FileList }>(),
+  props<{ tunes: FileList2 }>(),
 );
 
 export const createModifyQueueEvent = createAction(
@@ -140,7 +141,10 @@ export const storeEvents = createAction(
 );
 
 /* Users */
-export const getAllUsers = createAction('[Rooms Component] Get All Users');
+export const getUsersByUsername = createAction(
+  '[Add Room Component] Get Users By Username',
+  props<{ username: string, filterByActiveRoom: boolean }>(),
+);
 export const storeAllUsers = createAction(
   '[Users API] Store All Users',
   // ! the import is pointing to the wrong interface

@@ -1,7 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { Subscription, Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
+import { debounceTime, startWith } from 'rxjs/operators';
 import { AppState } from '../../../app.module';
 import { User } from '../../../auth/auth.models';
 import * as DashboardActions from '../../store/dashboard.actions';
@@ -17,6 +18,7 @@ import {
 })
 export class InviteComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
+  usernameControl = new FormControl('');
   users = new FormControl();
   activeRoomId: number;
   allUsers$: Observable<User[]>;
@@ -24,6 +26,19 @@ export class InviteComponent implements OnInit, OnDestroy {
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
+    this.subscription.add(
+      this.usernameControl.valueChanges
+        .pipe(startWith(''), debounceTime(250))
+        .subscribe((username: string) => {
+          this.store.dispatch(
+            DashboardActions.getUsersByUsername({
+              username,
+              filterByActiveRoom: true,
+            }),
+          );
+        }),
+    );
+
     this.subscription.add(
       this.store
         .select(selectActiveRoom)

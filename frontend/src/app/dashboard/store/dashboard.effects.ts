@@ -15,7 +15,7 @@ import { AppState } from '../../app.module';
 import { selectUserAndRoom } from '../../app.selectors';
 import { selectUserId } from '../../auth/auth.selectors';
 import { ControlsService } from '../controls/controls.service';
-import { AppEvent, Room, Song, User } from '../dashboard.models';
+import { AppEvent, Room, SYSTEM_USER_ID, User } from '../dashboard.models';
 import { MainScreenService } from '../main-screen/main-screen.service';
 import { MessagingService } from '../messaging/messaging.service';
 import { QueueService } from '../queue/queue.service';
@@ -25,6 +25,7 @@ import * as DashboardActions from './dashboard.actions';
 import {
   selectActiveRoom,
   selectQueueIndexAndRoom,
+  selectUsers,
 } from './dashboard.selectors';
 
 @Injectable()
@@ -190,17 +191,39 @@ export class DashboardEffects {
     { dispatch: false },
   );
 
-  getAllUsers$ = createEffect(() =>
+  getUsersByUsername$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(DashboardActions.getAllUsers),
-      switchMap(() =>
-        this.usersService.getAllUsers().pipe(
-          map((users: any[]) => ({
+      ofType(DashboardActions.getUsersByUsername),
+      withLatestFrom(
+        this.store.select(selectUserId),
+        this.store.select(selectUsers),
+      ),
+      switchMap(([action, userId, roomUsers]) =>
+        this.usersService.getUsersByUsername(action.username).pipe(
+          map(response => ({
             type: DashboardActions.storeAllUsers.type,
-            allUsers: users.map(user => ({
-              username: user.username,
-              userId: user.id,
-            })),
+            allUsers: response.results
+              .filter(resUser => {
+                if (resUser.id === SYSTEM_USER_ID) {
+                  return false;
+                }
+                if (action.filterByActiveRoom === false) {
+                  // do not want to filter because we are creating new room
+                  // however we should filter out the the current user
+                  return resUser.id !== userId;
+                } else {
+                  // check that the user is not already in the room
+                  return (
+                    roomUsers.find(
+                      roomUser => roomUser.userId === resUser.id,
+                    ) === undefined
+                  );
+                }
+              })
+              .map(user => ({
+                username: user.username,
+                userId: user.id,
+              })),
           })),
         ),
       ),

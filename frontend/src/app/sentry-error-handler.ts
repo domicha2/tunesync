@@ -4,7 +4,7 @@ import { captureException, showReportDialog } from '@sentry/browser';
 @Injectable()
 export class SentryErrorHandler implements ErrorHandler {
   handleError(error: any): void {
-    const eventId = captureException(error.originalError || error);
-    showReportDialog({ eventId });
+    console.error(error);
+    captureException(error.originalError || error);
   }
 }
