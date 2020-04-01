@@ -80,7 +80,7 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   onInvite(): void {
     this.dialog.open(InviteComponent, {
-      height: '20rem',
+      height: 'fit-content',
     });
   }
 
