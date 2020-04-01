@@ -190,11 +190,11 @@ export class DashboardEffects {
     { dispatch: false },
   );
 
-  getAllUsers$ = createEffect(() =>
+  getUsersByUsername$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(DashboardActions.getAllUsers),
-      switchMap(() =>
-        this.usersService.getAllUsers().pipe(
+      ofType(DashboardActions.getUsersByUsername),
+      switchMap(action =>
+        this.usersService.getUsersByUsername(action.username).pipe(
           map(response => ({
             type: DashboardActions.storeAllUsers.type,
             allUsers: response.results.map(user => ({

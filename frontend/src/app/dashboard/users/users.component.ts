@@ -79,7 +79,6 @@ export class UsersComponent implements OnInit, OnDestroy {
   }
 
   onInvite(): void {
-    this.store.dispatch(DashboardActions.getAllUsers());
     this.dialog.open(InviteComponent, {
       height: '20rem',
     });
