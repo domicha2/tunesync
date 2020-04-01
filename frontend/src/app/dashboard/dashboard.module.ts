@@ -21,13 +21,14 @@ import { MainScreenComponent } from './main-screen/main-screen.component';
 import { MessagingComponent } from './messaging/messaging.component';
 import { NotificationsService } from './notifications.service';
 import { CreatePollComponent } from './poll/create-poll/create-poll.component';
+import { PollResultsComponent } from './poll/poll-results/poll-results.component';
+import { PollComponent } from './poll/poll/poll.component';
 import { QueueComponent } from './queue/queue.component';
 import { AddRoomComponent } from './rooms/add-room/add-room.component';
 import { RoomsComponent } from './rooms/rooms.component';
 import { InviteComponent } from './users/invite/invite.component';
 import { KickUserComponent } from './users/kick-user/kick-user.component';
 import { UsersComponent } from './users/users.component';
-import { PollComponent } from './poll/poll/poll.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +45,7 @@ import { PollComponent } from './poll/poll/poll.component';
     AddRoomComponent,
     CreatePollComponent,
     PollComponent,
+    PollResultsComponent,
   ],
   imports: [
     ReactiveFormsModule,
