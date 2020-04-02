@@ -153,6 +153,18 @@ export class MainScreenComponent implements OnInit, OnDestroy {
             this.store.dispatch(
               DashboardActions.getUsersByRoom({ roomId: this.activeRoomId }),
             );
+          } else if (event.args['type'] === UserChangeAction.Join) {
+            if (event.args.is_accepted === true) {
+              // need to update the users list to show the new user
+              this.store.dispatch(
+                DashboardActions.getUsersByRoom({ roomId: this.activeRoomId }),
+              );
+
+              // ? convert the event to a message event for cosmetic effects
+              event.event_type = EventType.Messaging;
+              event.args.content = 'joined the room';
+              this.events.push(event);
+            }
           }
           break;
         case EventType.Messaging:
@@ -168,7 +180,9 @@ export class MainScreenComponent implements OnInit, OnDestroy {
             const inviteEvent = this.events[inviteEventIndex];
             const message = `You have ${
               event.args.is_accepted ? 'accepted' : 'rejected'
-            } the invite to ${inviteEvent.args.room_name} from ${inviteEvent.username}`;
+            } the invite to ${inviteEvent.args.room_name} from ${
+              inviteEvent.username
+            }`;
             const newJoinEvent: AppEvent = {
               ...event,
               args: {
@@ -205,6 +219,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
       new Date(eventA.creation_time) > new Date(eventB.creation_time) ? 1 : -1,
     );
     this.events = this.events.filter(event => {
+      // ? revisit user change events (join/kick/role change to be displayed)
       if (
         this.activeRoomName !== PERSONAL_ROOM_NAME &&
         event.event_type === EventType.UserChange
@@ -235,7 +250,9 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         eventsToDelete.push(inviteEvent.event_id);
         const message = `You have ${
           outerEvent.args.is_accepted ? 'accepted' : 'rejected'
-        } the invite to ${inviteEvent.args.room_name} from ${inviteEvent.username}`;
+        } the invite to ${inviteEvent.args.room_name} from ${
+          inviteEvent.username
+        }`;
         const newJoinEvent: AppEvent = {
           ...outerEvent,
           args: {

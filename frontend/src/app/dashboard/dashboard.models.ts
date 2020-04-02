@@ -25,6 +25,7 @@ export enum UserChangeAction {
   Invite = 'I',
   Kick = 'K',
   RoleChange = 'C',
+  Join = 'J',
 }
 
 export enum EventType {
