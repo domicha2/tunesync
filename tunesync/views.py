@@ -284,20 +284,27 @@ class TuneViewSet(viewsets.ViewSet):
         tune = Tune.objects.get(pk=pk)
         with open(tune.audio_file.path, "rb") as f:
             file_data = f.read()
-        return HttpResponse(file_data, content_type=tune.mime)
+        response = HttpResponse(file_data, content_type=tune.mime)
+        response["Accept-Ranges"] = "bytes"
+        return response
 
     # post
     def create(self, request):
         result = []
         for song in request.FILES:
-            audio = mutagen.File(request.FILES[song], easy=True)
-            hash_value = sha256(request.FILES[song].read()).hexdigest()
+            file = request.FILES[song]
+            audio = mutagen.File(file, easy=True)
+            file.seek(0)
+            hash_object = sha256()
+            for chunk in file.chunks():
+                hash_object.update(chunk)
+            hash_value = hash_object.hexdigest()
             colliding_songs = Tune.objects.filter(hash_value=hash_value)
             if colliding_songs:
                 audio_file = colliding_songs[0].audio_file
             else:
                 # this is so we dont store the same file multiple times but allow users to upload multiple songs
-                audio_file = request.FILES[song]
+                audio_file = file
             tune = Tune(
                 name=audio["title"],
                 artist=audio["artist"],
@@ -350,6 +357,7 @@ class TuneViewSet(viewsets.ViewSet):
             return Response(
                 {"details": "invalid event id"}, status=status.HTTP_400_BAD_REQUEST
             )
+
 
 class MembershipViewSet(viewsets.ModelViewSet):
     """
