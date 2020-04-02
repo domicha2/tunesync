@@ -1,4 +1,5 @@
 export const SYSTEM_USER_ID = 1;
+export const PERSONAL_ROOM_NAME = 'Personal Room';
 
 export interface Song {
   id: number;
@@ -24,6 +25,7 @@ export enum UserChangeAction {
   Invite = 'I',
   Kick = 'K',
   RoleChange = 'C',
+  Join = 'J',
 }
 
 export enum EventType {
