@@ -63,12 +63,11 @@
 - Angular 9
 - RxJs (async event management)
 - NgRx (state management)
-- WebRTC (p2p)
+- WebSocket
 
 ### Backend
 
 - Django (backend server)
-- SQLAlchemy (orm)
 - Mutagen (handles music metadata tagging)
 - PostgreSQL
 
