@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { init } from '@sentry/browser';
+import * as LogRocket from 'logrocket';
 import { environment } from '../environments/environment';
 
 @Component({
@@ -15,6 +16,7 @@ export class AppComponent implements OnInit {
     init({
       dsn: environment.sentryUrl,
     });
+    LogRocket.init('squad/tunesync');
   }
 
   onCreditsPage(): boolean {
