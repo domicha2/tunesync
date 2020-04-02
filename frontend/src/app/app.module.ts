@@ -42,7 +42,9 @@ export interface AppState {
       maxAge: 50,
     }),
     EffectsModule.forRoot([AuthEffects, DashboardEffects]),
-    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: environment.production,
+    }),
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: HttpAuthInterceptor, multi: true },

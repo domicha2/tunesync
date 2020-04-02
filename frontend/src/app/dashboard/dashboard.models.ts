@@ -1,4 +1,5 @@
 export const SYSTEM_USER_ID = 1;
+export const PERSONAL_ROOM_NAME = 'Personal Room';
 
 export interface Song {
   id: number;
@@ -13,10 +14,18 @@ export interface Filters {
   artist?: string;
 }
 
+// original FileList has a function field which screws over ngrx
+// otherwise this is the same minus the function (item)
+export interface FileList2 {
+  length: number;
+  [key: number]: File;
+}
+
 export enum UserChangeAction {
   Invite = 'I',
   Kick = 'K',
   RoleChange = 'C',
+  Join = 'J',
 }
 
 export enum PollType {
