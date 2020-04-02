@@ -25,11 +25,7 @@
       #songElement
       id="main-song"
       autoplay
-      src="{{
-        currentSong === undefined
-          ? ''
-          : 'http://localhost:8000/tunes/' + currentSong.id + '/data/'
-      }}"
+      [src]="currentSong | songUrl"
       (ended)="onEnded($event)"
       (timeupdate)="setSongProgress($event)"
       (play)="this.isPaused = false"
@@ -48,7 +44,7 @@
       ></mat-progress-bar>
     </div>
   </div>
-  <div id="song-buttons" class="row">
+  <div *ngIf="(userRole$ | async) !== 'R'" id="song-buttons" class="row">
     <button
       mat-icon-button
       matTooltip="Previous song"
@@ -62,7 +58,9 @@
       mat-icon-button
       matTooltip="Play"
       (click)="onPlay()"
-      [disabled]="queue === undefined || queue.length === 0"
+      [disabled]="
+        queue === undefined || queue.length === 0 || currentSong === undefined
+      "
     >
       <mat-icon>play_arrow</mat-icon>
     </button>
@@ -94,7 +92,9 @@
       mat-icon-button
       matTooltip="Skip 10 seconds"
       (click)="onForward()"
-      [disabled]="queue === undefined || queue.length === 0"
+      [disabled]="
+        queue === undefined || queue.length === 0 || currentSong === undefined
+      "
     >
       <mat-icon>forward_10</mat-icon>
     </button>

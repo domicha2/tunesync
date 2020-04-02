@@ -1,9 +1,24 @@
 <div id="queue-wrapper" class="column">
-  <div id="instructions">
+  <div *ngIf="(userRole$ | async) !== 'R'" id="instructions">
     <h3>Drag the song from the available songs to the queued songs.</h3>
     <h3>Remove a song from the queue, by dragging it to the songs.</h3>
     <h3>You may also reorder the songs in the queue</h3>
   </div>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Name</mat-label>
+    <input type="text" matInput [formControl]="nameControl" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Artist</mat-label>
+    <input type="text" matInput [formControl]="artistControl" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Album</mat-label>
+    <input type="text" matInput [formControl]="albumControl" />
+  </mat-form-field>
 
   <div id="song-lists" class="row" cdkDropListGroup>
     <div id="queued-songs">
@@ -20,6 +35,7 @@
           class="list-el"
           *ngFor="let song of queuedSongs"
           cdkDrag
+          [cdkDragDisabled]="(userRole$ | async) === 'R'"
         >
           {{ song.name }}
         </mat-list-item>
@@ -40,6 +56,7 @@
           class="list-el"
           *ngFor="let song of availableSongs"
           cdkDrag
+          [cdkDragDisabled]="(userRole$ | async) === 'R'"
         >
           {{ song.name }}
         </mat-list-item>

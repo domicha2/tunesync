@@ -1,13 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-
-import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
-
+import { Subscription } from 'rxjs';
 import { AppState } from '../../app.module';
-import { Room, Role } from '../dashboard.models';
-import { selectRooms } from '../store/dashboard.selectors';
+import { Role, Room } from '../dashboard.models';
+import { NotificationsService } from '../notifications.service';
 import * as DashboardActions from '../store/dashboard.actions';
+import { selectRooms } from '../store/dashboard.selectors';
 import { AddRoomComponent } from './add-room/add-room.component';
 
 @Component({
@@ -26,9 +25,28 @@ export class RoomsComponent implements OnInit, OnDestroy {
 
   activeRoom: Room;
 
-  constructor(private store: Store<AppState>, private dialog: MatDialog) {}
+  notifications: { [roomId: number]: number } = {};
+
+  constructor(
+    private notificationsService: NotificationsService,
+    private store: Store<AppState>,
+    private dialog: MatDialog,
+  ) {}
 
   ngOnInit(): void {
+    this.notificationsService.notificationsSubject.subscribe(payload => {
+      if (payload.action === 'reset') {
+        // undefined makes it so that it does not render
+        this.notifications[payload.roomId] = undefined;
+      } else if (payload.action === 'increment') {
+        if (this.notifications[payload.roomId] === undefined) {
+          this.notifications[payload.roomId] = 1;
+        } else {
+          this.notifications[payload.roomId]++;
+        }
+      }
+    });
+
     this.store.select(selectRooms).subscribe((rooms: Room[]) => {
       // clear existing value
       this.rooms = { admin: [], dj: [], regular: [] };
@@ -63,13 +81,16 @@ export class RoomsComponent implements OnInit, OnDestroy {
         activeRoomName: room.title,
       }),
     );
+    this.notificationsService.notificationsSubject.next({
+      roomId: room.id,
+      action: 'reset',
+    });
     this.store.dispatch(DashboardActions.getUsersByRoom({ roomId: room.id }));
     this.store.dispatch(DashboardActions.getEventsByRoom({ roomId: room.id }));
     this.store.dispatch(DashboardActions.getTuneSyncEvent({ roomId: room.id }));
   }
 
   onAddRoom(): void {
-    this.store.dispatch(DashboardActions.getAllUsers());
     // open modal
     this.dialog.open(AddRoomComponent);
   }

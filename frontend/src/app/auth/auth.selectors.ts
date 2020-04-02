@@ -1,5 +1,4 @@
 import { createSelector } from '@ngrx/store';
-
 import { AppState } from '../app.module';
 import { AuthState } from './auth.reducer';
 
@@ -11,4 +10,9 @@ export const selectUserId = createSelector(
 export const selectToken = createSelector(
   (state: AppState) => state.auth,
   (auth: AuthState) => (auth && auth.user ? auth.user.token : undefined),
+);
+
+export const selectErrorMessage = createSelector(
+  (state: AppState) => state.auth,
+  (auth: AuthState) => (auth ? auth.errorMessage : undefined),
 );

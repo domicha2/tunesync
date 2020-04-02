@@ -1,15 +1,13 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-
-import { Store, select } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
-
-import * as AuthActions from './auth.actions';
-import * as DashboardActions from '../dashboard/store/dashboard.actions';
-
 import { AppState } from '../app.module';
-import { selectToken } from './auth.selectors';
+import * as DashboardActions from '../dashboard/store/dashboard.actions';
+import { WebSocketService } from '../dashboard/web-socket.service';
+import * as AuthActions from './auth.actions';
+import { selectErrorMessage, selectToken } from './auth.selectors';
 
 @Component({
   selector: 'app-auth',
@@ -24,9 +22,21 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   subscription = new Subscription();
 
-  constructor(private router: Router, private store: Store<AppState>) {}
+  errorMessage: string;
+
+  constructor(
+    private webSocketService: WebSocketService,
+    private router: Router,
+    private store: Store<AppState>,
+  ) {}
 
   ngOnInit(): void {
+    this.subscription.add(
+      this.store
+        .select(selectErrorMessage)
+        .subscribe(errorMessage => (this.errorMessage = errorMessage)),
+    );
+
     this.subscription.add(
       this.store.pipe(select(selectToken)).subscribe(token => {
         if (token) {
@@ -36,12 +46,11 @@ export class AuthComponent implements OnInit, OnDestroy {
 
           // make a request to get a list of rooms for the user to go into
           this.store.dispatch(DashboardActions.getRooms());
+          this.webSocketService.createWebSocket(token);
           this.router.navigate(['/dashboard']);
         }
       }),
     );
-
-    document.querySelector('title').innerText = 'TuneSync - Auth';
   }
 
   ngOnDestroy(): void {

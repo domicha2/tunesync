@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
-
 import { Observable } from 'rxjs';
-
 import { HttpWrapperService } from '../../http-wrapper.service';
-import { Message, EventType } from '../dashboard.models';
+import { EventType, Message } from '../dashboard.models';
 
 @Injectable({
   providedIn: 'root',

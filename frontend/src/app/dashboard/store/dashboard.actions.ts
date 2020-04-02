@@ -1,7 +1,14 @@
 import { createAction, props } from '@ngrx/store';
-
-import { Song, User, Room, AppEvent } from '../dashboard.models';
-import { User as AuthUser } from '../dashboard.models';
+import {
+  AppEvent,
+  Role,
+  Room,
+  Song,
+  User as AuthUser,
+  User,
+  Filters,
+  FileList2,
+} from '../dashboard.models';
 
 export const resetState = createAction('[Rooms Component] Reset State');
 
@@ -56,7 +63,7 @@ export const setSongStatus = createAction(
 
 export const createTunes = createAction(
   '[Controls Component] Create Tunes',
-  props<{ tunes: FileList }>(),
+  props<{ tunes: FileList2 }>(),
 );
 
 export const createModifyQueueEvent = createAction(
@@ -71,6 +78,9 @@ export const storeQueue = createAction(
 
 export const getAvailableSongs = createAction(
   '[Queue Component] Get Available Songs',
+  props<{
+    filters: Filters;
+  }>(),
 );
 
 export const storeAvailableSongs = createAction(
@@ -131,9 +141,13 @@ export const storeEvents = createAction(
 );
 
 /* Users */
-export const getAllUsers = createAction('[Rooms Component] Get All Users');
+export const getUsersByUsername = createAction(
+  '[Add Room Component] Get Users By Username',
+  props<{ username: string, filterByActiveRoom: boolean }>(),
+);
 export const storeAllUsers = createAction(
   '[Users API] Store All Users',
+  // ! the import is pointing to the wrong interface
   props<{ allUsers: AuthUser[] }>(),
 );
 export const createInviteUsersEvent = createAction(
@@ -144,4 +158,14 @@ export const createInviteUsersEvent = createAction(
 export const createInviteResponseEvent = createAction(
   '[Main Screen Component] Create Invite Response Event',
   props<{ roomId: number; response: 'A' | 'R' }>(),
+);
+
+export const createRoleChangeEvent = createAction(
+  '[Users Component] Create Role Change Event',
+  props<{ userId: number; role: 'A' | 'D' | 'R' }>(),
+);
+
+export const setUserRole = createAction(
+  '[Users API] Set User Role',
+  props<{ userRole: Role }>(),
 );

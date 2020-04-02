@@ -1,0 +1,27 @@
+<div id="invite-wrapper">
+  <h1 mat-dialog-title>Invite Users</h1>
+  <mat-dialog-content class="column">
+    <mat-form-field appearance="outline">
+      <mat-label>Filter Users for Dropdown</mat-label>
+      <input type="text" matInput [formControl]="usernameControl" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Invite Users</mat-label>
+      <mat-select multiple [formControl]="users">
+        <mat-option
+          *ngFor="let user of allUsers$ | async"
+          [value]="user.userId"
+        >
+          {{ user.username }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-raised-button mat-dialog-close (click)="onInvite()">
+      Invite
+    </button>
+    <button mat-raised-button mat-dialog-close>Close</button>
+  </mat-dialog-actions>
+</div>

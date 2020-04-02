@@ -1,5 +1,6 @@
 div.top-bar {
-  justify-content: space-between;
+  justify-content: flex-start;
+  height: 5%;
 }
 
 div.list-el {
@@ -7,5 +8,10 @@ div.list-el {
 
   &.active {
     color: greenyellow;
+    border-color: greenyellow;
   }
+}
+
+div#rooms-wrapper {
+  height: 100%;
 }

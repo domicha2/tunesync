@@ -1,23 +1,21 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
 import {
   CdkDragDrop,
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
-
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { Subscription } from 'rxjs';
-
+import { combineLatest, Observable, Subscription } from 'rxjs';
+import { debounceTime, filter, map, startWith } from 'rxjs/operators';
 import { AppState } from '../../app.module';
-
+import { Filters, Role, Song } from '../dashboard.models';
+import * as DashboardActions from '../store/dashboard.actions';
 import {
-  selectQueuedSongs,
   selectAvailableSongs,
   selectQueueIndexAndSongs,
+  selectUserRole,
 } from '../store/dashboard.selectors';
-import * as DashboardActions from '../store/dashboard.actions';
-import { Song } from '../dashboard.models';
-import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-queue',
@@ -32,10 +30,35 @@ export class QueueComponent implements OnInit, OnDestroy {
   availableSongs: Song[] = [];
   songIndex: number;
 
+  userRole$: Observable<Role>;
+
+  nameControl = new FormControl();
+  albumControl = new FormControl();
+  artistControl = new FormControl();
+
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
-    this.store.dispatch(DashboardActions.getAvailableSongs());
+    this.subscription.add(
+      combineLatest([
+        this.nameControl.valueChanges.pipe(startWith('')),
+        this.albumControl.valueChanges.pipe(startWith('')),
+        this.artistControl.valueChanges.pipe(startWith('')),
+      ])
+        .pipe(
+          debounceTime(250),
+          map(([name, album, artist]) => ({
+            name,
+            album,
+            artist,
+          })),
+        )
+        .subscribe((filters: Filters) => {
+          this.store.dispatch(DashboardActions.getAvailableSongs({ filters }));
+        }),
+    );
+
+    this.userRole$ = this.store.select(selectUserRole);
 
     this.subscription.add(
       this.store

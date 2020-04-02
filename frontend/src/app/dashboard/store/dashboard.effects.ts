@@ -1,34 +1,32 @@
 import { Injectable } from '@angular/core';
-
 import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { select, Store } from '@ngrx/store';
 import { EMPTY, of } from 'rxjs';
 import {
-  map,
-  switchMap,
   catchError,
+  concatMap,
+  map,
+  mergeMap,
+  switchMap,
   tap,
   withLatestFrom,
-  concatMap,
-  mergeMap,
 } from 'rxjs/operators';
-
-import * as DashboardActions from './dashboard.actions';
+import { AppState } from '../../app.module';
+import { selectUserAndRoom } from '../../app.selectors';
+import { selectUserId } from '../../auth/auth.selectors';
+import { ControlsService } from '../controls/controls.service';
+import { AppEvent, Room, SYSTEM_USER_ID, User } from '../dashboard.models';
+import { MainScreenService } from '../main-screen/main-screen.service';
+import { MessagingService } from '../messaging/messaging.service';
 import { QueueService } from '../queue/queue.service';
 import { RoomsService } from '../rooms/rooms.service';
 import { UsersService } from '../users/users.service';
-import { Song, Room, User, AppEvent } from '../dashboard.models';
-import { User as AuthUser } from '../../auth/auth.models';
-import { MessagingService } from '../messaging/messaging.service';
-import { AppState } from '../../app.module';
-import { Store, select } from '@ngrx/store';
-import { selectUserAndRoom } from '../../app.selectors';
-import { MainScreenService } from '../main-screen/main-screen.service';
+import * as DashboardActions from './dashboard.actions';
 import {
   selectActiveRoom,
   selectQueueIndexAndRoom,
+  selectUsers,
 } from './dashboard.selectors';
-import { selectUserId } from '../../auth/auth.selectors';
-import { ControlsService } from '../controls/controls.service';
 
 @Injectable()
 export class DashboardEffects {
@@ -53,11 +51,11 @@ export class DashboardEffects {
   getAvailableSongs$ = createEffect(() =>
     this.actions$.pipe(
       ofType(DashboardActions.getAvailableSongs),
-      switchMap(() =>
-        this.queueService.getAvailableSongs().pipe(
-          map((availableSongs: Song[]) => ({
+      switchMap(action =>
+        this.queueService.getAvailableSongs(action.filters).pipe(
+          map(response => ({
             type: DashboardActions.storeAvailableSongs.type,
-            availableSongs,
+            availableSongs: response.results,
           })),
           catchError(() => EMPTY),
         ),
@@ -86,12 +84,18 @@ export class DashboardEffects {
   getUsersByRoom$ = createEffect(() =>
     this.actions$.pipe(
       ofType(DashboardActions.getUsersByRoom),
-      switchMap(action =>
+      concatMap(action =>
+        of(action).pipe(withLatestFrom(this.store.pipe(select(selectUserId)))),
+      ),
+      switchMap(([action, userId]) =>
         this.usersService.getUsersByRoom(action.roomId).pipe(
-          map((users: User[]) => ({
-            type: DashboardActions.storeUsers.type,
-            users,
-          })),
+          mergeMap((users: User[]) => {
+            const userRole = users.find(user => user.userId === userId).role;
+            return [
+              { type: DashboardActions.storeUsers.type, users },
+              { type: DashboardActions.setUserRole.type, userRole },
+            ];
+          }),
           catchError(() => EMPTY),
         ),
       ),
@@ -152,8 +156,7 @@ export class DashboardEffects {
       ),
       switchMap(([action, room]) =>
         this.usersService.removeUserFromRoom(room, action.userId).pipe(
-          tap(response => console.log(response)),
-          map(response => ({
+          map(() => ({
             type: DashboardActions.getUsersByRoom.type,
             roomId: room,
           })),
@@ -172,7 +175,6 @@ export class DashboardEffects {
             withLatestFrom(this.store.pipe(select(selectUserAndRoom))),
           ),
         ),
-        tap(([action, userAndRoom]) => console.log(action, userAndRoom)),
         switchMap(([action, userAndRoom]) =>
           this.messagingService
             .createMessage({
@@ -189,17 +191,39 @@ export class DashboardEffects {
     { dispatch: false },
   );
 
-  getAllUsers$ = createEffect(() =>
+  getUsersByUsername$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(DashboardActions.getAllUsers),
-      switchMap(() =>
-        this.usersService.getAllUsers().pipe(
-          map((users: any[]) => ({
+      ofType(DashboardActions.getUsersByUsername),
+      withLatestFrom(
+        this.store.select(selectUserId),
+        this.store.select(selectUsers),
+      ),
+      switchMap(([action, userId, roomUsers]) =>
+        this.usersService.getUsersByUsername(action.username).pipe(
+          map(response => ({
             type: DashboardActions.storeAllUsers.type,
-            allUsers: users.map(user => ({
-              username: user.username,
-              userId: user.id,
-            })),
+            allUsers: response.results
+              .filter(resUser => {
+                if (resUser.id === SYSTEM_USER_ID) {
+                  return false;
+                }
+                if (action.filterByActiveRoom === false) {
+                  // do not want to filter because we are creating new room
+                  // however we should filter out the the current user
+                  return resUser.id !== userId;
+                } else {
+                  // check that the user is not already in the room
+                  return (
+                    roomUsers.find(
+                      roomUser => roomUser.userId === resUser.id,
+                    ) === undefined
+                  );
+                }
+              })
+              .map(user => ({
+                username: user.username,
+                userId: user.id,
+              })),
           })),
         ),
       ),
@@ -304,7 +328,6 @@ export class DashboardEffects {
             withLatestFrom(this.store.pipe(select(selectQueueIndexAndRoom))),
           ),
         ),
-        tap(data => console.log(data)),
         switchMap(([action, data]) =>
           this.controlsService
             .createPlaySongEvent(data.room, data.index, action.timestamp)
@@ -323,7 +346,6 @@ export class DashboardEffects {
             withLatestFrom(this.store.pipe(select(selectQueueIndexAndRoom))),
           ),
         ),
-        tap(data => console.log('in the pause song effect')),
         switchMap(([action, data]) =>
           this.controlsService
             .createPauseSongEvent(data.room, data.index, action.timestamp)
@@ -339,9 +361,24 @@ export class DashboardEffects {
       switchMap(action =>
         this.usersService
           .createInviteResponseEvent(action.roomId, action.response)
+          .pipe(map(() => ({ type: DashboardActions.getRooms.type }))),
+      ),
+    ),
+  );
+
+  createRoleChangeEvent$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardActions.createRoleChangeEvent),
+      concatMap(action =>
+        of(action).pipe(
+          withLatestFrom(this.store.pipe(select(selectActiveRoom))),
+        ),
+      ),
+      switchMap(([action, roomId]) =>
+        this.usersService
+          .createRoleChangeEvent(action.userId, roomId, action.role)
           .pipe(
-            tap(response => console.log(response)),
-            map(() => ({ type: DashboardActions.getRooms.type })),
+            map(() => ({ type: DashboardActions.getUsersByRoom.type, roomId })),
           ),
       ),
     ),

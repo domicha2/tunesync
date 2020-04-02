@@ -1,15 +1,13 @@
-import {
-  CanActivate,
-  ActivatedRouteSnapshot,
-  RouterStateSnapshot,
-  Router,
-} from '@angular/router';
 import { Injectable } from '@angular/core';
-
+import {
+  ActivatedRouteSnapshot,
+  CanActivate,
+  Router,
+  RouterStateSnapshot,
+} from '@angular/router';
+import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Store } from '@ngrx/store';
-
 import { AppState } from '../app.module';
 import { selectToken } from './auth.selectors';
 
