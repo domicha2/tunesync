@@ -8,6 +8,7 @@ import { selectUserId } from '../../auth/auth.selectors';
 import {
   AppEvent,
   EventType,
+  PERSONAL_ROOM_NAME,
   PlayState,
   QueueState,
   TuneSyncEvent,
@@ -146,7 +147,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
           }
           break;
         case EventType.UserChange:
-          if (this.activeRoomName === 'System Room') {
+          if (this.activeRoomName === PERSONAL_ROOM_NAME) {
             this.events.push(event);
           } else if (event.args['type'] === UserChangeAction.RoleChange) {
             this.store.dispatch(
@@ -178,8 +179,10 @@ export class MainScreenComponent implements OnInit, OnDestroy {
       new Date(eventA.creation_time) > new Date(eventB.creation_time) ? 1 : -1,
     );
     this.events = this.events.filter(event => {
-      // ! hard coded refactor if have time
-      if (this.activeRoomName !== 'System Room' && event.event_type === 'U') {
+      if (
+        this.activeRoomName !== PERSONAL_ROOM_NAME &&
+        event.event_type === 'U'
+      ) {
         return false;
       } else if (event.event_type === EventType.TuneSync) {
         return false;
