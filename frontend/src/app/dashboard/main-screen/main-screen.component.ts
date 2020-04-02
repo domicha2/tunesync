@@ -156,7 +156,33 @@ export class MainScreenComponent implements OnInit, OnDestroy {
           }
           break;
         case EventType.Messaging:
-          this.events.push(event);
+          // the message might be for a join event
+          if (
+            event.event_type === EventType.Messaging &&
+            typeof event.args.is_accepted === 'boolean'
+          ) {
+            // need to look for the invite event to delete and change the contents of the message
+            const inviteEventIndex = this.events.findIndex(
+              innerEvent => event.args.room === innerEvent.args.room_id,
+            );
+            const inviteEvent = this.events[inviteEventIndex];
+            const message = `You have ${
+              event.args.is_accepted ? 'accepted' : 'rejected'
+            } the invite to ${inviteEvent.args.room_name} from ${inviteEvent.username}`;
+            const newJoinEvent: AppEvent = {
+              ...event,
+              args: {
+                content: message,
+              },
+            };
+            this.events.push(newJoinEvent);
+
+            // need to remove the invite event from the list of events
+            this.events.splice(inviteEventIndex, 1);
+          } else {
+            this.events.push(event);
+          }
+
           break;
         default:
           console.error('bad event type');
@@ -199,17 +225,17 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         typeof outerEvent.args.is_accepted === 'boolean'
       ) {
         // look back for the join event
-        const event = this.events.find(innerEvent => {
+        const inviteEvent = this.events.find(innerEvent => {
           return (
             innerEvent.event_type === EventType.UserChange &&
             innerEvent.args.type === UserChangeAction.Invite &&
             outerEvent.args.room === innerEvent.args.room_id
           );
         });
-        eventsToDelete.push(event.event_id);
+        eventsToDelete.push(inviteEvent.event_id);
         const message = `You have ${
           outerEvent.args.is_accepted ? 'accepted' : 'rejected'
-        } the invite to ${event.args.room_name} from ${event.username}`;
+        } the invite to ${inviteEvent.args.room_name} from ${inviteEvent.username}`;
         const newJoinEvent: AppEvent = {
           ...outerEvent,
           args: {
