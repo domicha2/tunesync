@@ -69,7 +69,7 @@ class UserViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         serializer = UserSerializer(u)
-        room = Room(title="System Room", creator=u, system_user=u)
+        room = Room(title="Personal Room", creator=u, system_user=u)
         room.save()
         membership = Membership(user=u, room=room, state="A", role="A")
         membership.save()
