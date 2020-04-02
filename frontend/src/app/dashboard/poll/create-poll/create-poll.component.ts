@@ -27,6 +27,11 @@ export class CreatePollComponent implements OnInit, OnDestroy {
   albumControl = new FormControl('');
   artistControl = new FormControl('');
 
+  pollType: string;
+  pollTypes: string[] = ['Modify Queue', 'Play', 'Kick'];
+
+  users: string[] = ['michael', 'jason'];
+
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {

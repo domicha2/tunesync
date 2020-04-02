@@ -1,24 +1,26 @@
 <div id="create-poll-wrapper" class="column">
-  <h1 mat-dialog-title>TITLE PLACEHOLDER | {{ testVariable }}</h1>
+  <h1 mat-dialog-title>Create Poll | {{ testVariable }}</h1>
   <mat-dialog-content>
-    <p>Note: play is the most complex of the 3 actions so let's leave that for the end</p>
-    <h1>
-      1. Put a radio button selection here for the action (kick, mq) for the
-      poll
-    </h1>
-    <a href="https://material.angular.io/components/radio/api">
-      Reference this link for radio button
-    </a>
     <p>
-      Here we will have the UI for all actions in one view. Later we will make
-      it dynamic so that only one view shows up based on what was selected
+      Note: play is the most complex of the 3 actions so let's leave that for
+      the end
     </p>
-    <a href="https://material.angular.io/components/select/api">
-      Reference this link for dropdowns
-    </a>
-    <h1>
-      2. Kick user action: Have a dropdown of available users to select from
+    <label id="poll type label"> Select a type of poll </label>
+    <mat-radio-group aria-labelledby="poll type label" [(ngModel)]="pollType"
+      ><mat-radio-button *ngFor="let type of pollTypes" value="type">
+        {{ type }}
+      </mat-radio-button></mat-radio-group
+    >
+    <div>Your poll type is: {{ pollType }}</div>
+    <h1 mat-dialog-title>
+      Kick User
     </h1>
+    <mat-label>User</mat-label>
+    <mat-select ngModel="users"
+      ><mat-option *ngfor="let user of users" value="user">
+        {{ user }}</mat-option
+      ></mat-select
+    >
     <h1>
       3. Modify queue action: Have a dropdown of available songs to select from
     </h1>
@@ -31,12 +33,12 @@
         <mat-label>Name</mat-label>
         <input type="text" matInput [formControl]="nameControl" />
       </mat-form-field>
-    
+
       <mat-form-field appearance="outline">
         <mat-label>Artist</mat-label>
         <input type="text" matInput [formControl]="artistControl" />
       </mat-form-field>
-    
+
       <mat-form-field appearance="outline">
         <mat-label>Album</mat-label>
         <input type="text" matInput [formControl]="albumControl" />
