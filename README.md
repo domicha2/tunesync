@@ -73,7 +73,7 @@
 
 ## Top 5 Technical Challenges
 
-1. playing synced music using WebRTC for a room of users
+1. playing synced music using WebSocket for a room of users
 2. messaging system (WebSocket)
 3. voting feature
 
