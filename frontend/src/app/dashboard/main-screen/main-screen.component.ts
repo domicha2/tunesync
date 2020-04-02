@@ -181,7 +181,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
     this.events = this.events.filter(event => {
       if (
         this.activeRoomName !== PERSONAL_ROOM_NAME &&
-        event.event_type === 'U'
+        event.event_type === EventType.UserChange
       ) {
         return false;
       } else if (event.event_type === EventType.TuneSync) {
@@ -190,6 +190,44 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         return true;
       }
     });
+    // iterate through all events looking for join events (event type: 'M" and args : {is_accepted: boolean})
+    // if found event remove invitation event with a meaningful message about the join event
+    const eventsToDelete = [];
+    this.events = this.events.map(outerEvent => {
+      if (
+        outerEvent.event_type === EventType.Messaging &&
+        typeof outerEvent.args.is_accepted === 'boolean'
+      ) {
+        // look back for the join event
+        const event = this.events.find(innerEvent => {
+          return (
+            innerEvent.event_type === EventType.UserChange &&
+            innerEvent.args.type === UserChangeAction.Invite &&
+            outerEvent.args.room === innerEvent.args.room_id
+          );
+        });
+        eventsToDelete.push(event.event_id);
+        const message = `You have ${
+          outerEvent.args.is_accepted ? 'accepted' : 'rejected'
+        } the invite to ${event.args.room_name} from ${event.username}`;
+        const newJoinEvent: AppEvent = {
+          ...outerEvent,
+          args: {
+            content: message,
+          },
+        };
+        return newJoinEvent;
+      } else {
+        // keep the event the same since it is not the join event
+        return outerEvent;
+      }
+    });
+
+    // filter events
+    this.events = this.events.filter(
+      event => !eventsToDelete.includes(event.event_id),
+    );
+
     setTimeout(() => {
       const el = document.querySelector('mat-list-item:last-child');
       if (el) {
