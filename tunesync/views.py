@@ -19,7 +19,7 @@ from rest_framework.response import Response
 from tunesync.models import Event, Membership, Poll, Room, Tune, TuneSync
 
 from .event_handlers import Handler, PollTask
-from .filters import TuneFilter, UserFilter
+from .filters import TuneFilter, UserFilter, EventFilter
 from .permissions import *  # we literally need everything
 from .serializers import *  # we literally need everything
 
@@ -175,18 +175,13 @@ class RoomViewSet(viewsets.ViewSet):
     def events(self, request, pk=None):
         # get all events at this room
         # TODO: paginate this and add filter
-        events = (
-            Event.objects.filter(room=pk)
-            .values("args", "parent_event_id", "creation_time", "event_type")
-            .annotate(
-                username=F("author__username"),
-                event_id=F("id"),
-                user_id=F("author"),
-                room_id=F("room"),
-            )
-            .order_by("-creation_time")[:100]
-        )
-        return Response(events)
+        paginator = PageNumberPagination()
+        filtered_set = EventFilter(
+            request.GET, queryset=Event.objects.filter(room_id=pk)
+        ).qs
+        context = paginator.paginate_queryset(filtered_set, request)
+        serializer = EventSerializer(context, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     @action(methods=["get"], detail=True)
     def users(self, request, pk=None):

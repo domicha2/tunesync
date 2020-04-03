@@ -29,7 +29,4 @@ class TuneFilter(FilterSet):
 class EventFilter(FilterSet):
     class Meta:
         model = Event
-        fields = {
-            "creation_time": ["gt"]
-            "event_type": ["exact"]
-        }
+        fields = {"creation_time": ["gt"], "event_type": ["exact"]}
