@@ -36,6 +36,8 @@ export class MainScreenComponent implements OnInit, OnDestroy {
   activeRoomName: string;
   activeRoomId: number;
 
+  showLoadMore = false;
+
   constructor(
     private notificationsService: NotificationsService,
     private webSocketService: WebSocketService,
@@ -86,6 +88,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
           ),
         )
         .subscribe((events: AppEvent[]) => {
+          this.showLoadMore = false;
           this.handleEventsResponse(events);
         }),
     );
@@ -275,6 +278,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
       const el = document.querySelector('mat-list-item:last-child');
       if (el) {
         el.scrollIntoView();
+        this.showLoadMore = true;
       }
     }, 500);
   }
@@ -398,5 +402,9 @@ export class MainScreenComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       DashboardActions.createInviteResponseEvent({ roomId, response }),
     );
+  }
+
+  onLoadMore(): void {
+    // call the backend with the next set of events
   }
 }

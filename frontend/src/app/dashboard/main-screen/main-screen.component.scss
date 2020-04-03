@@ -7,5 +7,9 @@ div#main-screen-wrapper {
 
   mat-list-item {
     height: fit-content;
+
+    ::ng-deep &:first-child div.mat-list-item-content {
+      justify-content: center;
+    }
   }
 }

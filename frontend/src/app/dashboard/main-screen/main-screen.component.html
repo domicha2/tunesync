@@ -1,5 +1,8 @@
 <div id="main-screen-wrapper">
   <mat-list class="column">
+    <mat-list-item *ngIf="showLoadMore">
+      <button mat-raised-button (click)="onLoadMore()">Load more</button>
+    </mat-list-item>
     <mat-list-item
       *ngFor="let event of events"
       [ngClass]="{ 'current-user': userId === event.user_id }"
