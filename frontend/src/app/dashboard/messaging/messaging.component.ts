@@ -14,6 +14,7 @@ export class MessagingComponent {
   constructor(private store: Store<AppState>) {}
 
   onEnter(event: KeyboardEvent): void {
+    if (this.message.trim().length === 0) return;
     this.store.dispatch(
       DashboardActions.createMessage({ message: this.message }),
     );
