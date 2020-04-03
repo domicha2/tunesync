@@ -1,7 +1,12 @@
 <div id="users-wrapper" class="column">
   <div id="top-bar" class="row">
     <h1>Users</h1>
-    <button mat-icon-button (click)="onInvite()" matTooltip="Add users to room">
+    <button
+      *ngIf="(roomName$ | async) !== 'Personal Room'"
+      mat-icon-button
+      (click)="onInvite()"
+      matTooltip="Add users to room"
+    >
       <mat-icon>add_circle</mat-icon>
     </button>
     <button mat-icon-button (click)="onSignOut()" matTooltip="Sign out">
