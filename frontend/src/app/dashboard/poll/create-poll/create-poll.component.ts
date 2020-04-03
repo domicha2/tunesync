@@ -27,6 +27,8 @@ export class CreatePollComponent implements OnInit, OnDestroy {
   albumControl = new FormControl('');
   artistControl = new FormControl('');
 
+  selectedUsers: string[] = ['michae', 'jason'];
+
   pollType: string;
   pollTypes: string[] = ['Modify Queue', 'Play', 'Kick'];
 

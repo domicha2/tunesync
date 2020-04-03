@@ -16,8 +16,8 @@
       Kick User
     </h1>
     <mat-label>User</mat-label>
-    <mat-select ngModel="users"
-      ><mat-option *ngfor="let user of users" value="user">
+    <mat-select [(ngModel)]="users"
+      ><mat-option *ngFor="let user of users" value="user">
         {{ user }}</mat-option
       ></mat-select
     >
