@@ -44,6 +44,7 @@ class Event(models.Model):
         (USER_CHANGE, "User Change"),
         (TUNESYNC, "Tune Sync"),
         (VOTE, "Vote"),
+        (MESSAGE, "M"),
     ]
     isDeleted = models.BooleanField(default=False)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
