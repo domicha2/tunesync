@@ -179,13 +179,15 @@ class RoomViewSet(viewsets.ViewSet):
         filtered_set = EventFilter(
             request.GET, queryset=Event.objects.filter(room_id=pk)
         ).qs
-        renamed_set = filtered_set.values(
-            "args", "parent_event_id", "creation_time", "event_type"
-        ).annotate(
-            username=F("author__username"),
-            event_id=F("id"),
-            user_id=F("author"),
-            room_id=F("room"),
+        renamed_set = (
+            filtered_set.order_by("-creation_time")
+            .values("args", "parent_event_id", "creation_time", "event_type")
+            .annotate(
+                username=F("author__username"),
+                event_id=F("id"),
+                user_id=F("author"),
+                room_id=F("room"),
+            )
         )
         context = paginator.paginate_queryset(renamed_set, request)
         return paginator.get_paginated_response(context)
