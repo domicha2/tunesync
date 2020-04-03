@@ -1,7 +1,12 @@
 <div id="users-wrapper" class="column">
   <div id="top-bar" class="row">
     <h1>Users</h1>
-    <button mat-icon-button (click)="onInvite()" matTooltip="Add users to room">
+    <button
+      *ngIf="(roomName$ | async) !== 'Personal Room'"
+      mat-icon-button
+      (click)="onInvite()"
+      matTooltip="Add users to room"
+    >
       <mat-icon>add_circle</mat-icon>
     </button>
     <button mat-icon-button (click)="onSignOut()" matTooltip="Sign out">
@@ -25,12 +30,7 @@
         [cdkDropListData]="users.admin"
         (cdkDropListDropped)="drop($event, 'A')"
       >
-        <div
-          class="list-el"
-          *ngFor="let user of users.admin"
-          cdkDrag
-          [cdkDragDisabled]="(userRole$ | async) !== 'A'"
-        >
+        <div class="list-el" *ngFor="let user of users.admin">
           <h3>{{ user.name }}</h3>
         </div>
       </div>

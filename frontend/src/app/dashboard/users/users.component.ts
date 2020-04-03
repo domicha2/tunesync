@@ -10,7 +10,11 @@ import { Observable, Subscription } from 'rxjs';
 import { AppState } from '../../app.module';
 import { Role, User } from '../dashboard.models';
 import * as DashboardActions from '../store/dashboard.actions';
-import { selectUserRole, selectUsers } from '../store/dashboard.selectors';
+import {
+  selectActiveRoomName,
+  selectUserRole,
+  selectUsers,
+} from '../store/dashboard.selectors';
 import { InviteComponent } from './invite/invite.component';
 import { KickUserComponent } from './kick-user/kick-user.component';
 
@@ -29,10 +33,12 @@ export class UsersComponent implements OnInit, OnDestroy {
   };
 
   userRole$: Observable<Role>;
+  roomName$: Observable<string>;
 
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
+    this.roomName$ = this.store.select(selectActiveRoomName);
     this.userRole$ = this.store.select(selectUserRole);
 
     this.subscription.add(

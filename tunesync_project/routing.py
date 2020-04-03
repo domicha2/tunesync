@@ -8,7 +8,7 @@ from tunesync.consumers import EventConsumer
 application = ProtocolTypeRouter(
     {
         # WebSocket chat handler
-        "websocket": AuthMiddlewareStack(URLRouter([url(r"^test/$", EventConsumer)]))
+        "websocket": AuthMiddlewareStack(URLRouter([url(r"^events/$", EventConsumer)]))
     }
 )
 
