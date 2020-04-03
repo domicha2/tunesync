@@ -30,12 +30,7 @@
         [cdkDropListData]="users.admin"
         (cdkDropListDropped)="drop($event, 'A')"
       >
-        <div
-          class="list-el"
-          *ngFor="let user of users.admin"
-          cdkDrag
-          [cdkDragDisabled]="(userRole$ | async) !== 'A'"
-        >
+        <div class="list-el" *ngFor="let user of users.admin">
           <h3>{{ user.name }}</h3>
         </div>
       </div>
