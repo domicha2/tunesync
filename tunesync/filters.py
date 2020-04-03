@@ -1,7 +1,7 @@
 from django_filters.rest_framework import FilterSet
 from .models import Tune, Room, Event
 from django.contrib.auth.models import User
-from rest_framework_filters import RelatedFilter
+from rest_framework_filters.filters import RelatedFilter
 
 
 class UserFilter(FilterSet):
@@ -11,11 +11,6 @@ class UserFilter(FilterSet):
 
 
 class TuneFilter(FilterSet):
-
-    # uploader = RelatedFilter(
-    #     UserFilter, field_name="uploader", query_set=User.objects.all()
-    # )
-
     class Meta:
         model = Tune
         fields = {
@@ -27,6 +22,12 @@ class TuneFilter(FilterSet):
 
 
 class EventFilter(FilterSet):
+
+    # RelatedFilter
     class Meta:
         model = Event
-        fields = {"creation_time": ["gt"], "event_type": ["exact"]}
+        fields = {
+            "id": ["iexact", "exact"],
+            "creation_time": ["gt"],
+            "event_type": ["exact"],
+        }
