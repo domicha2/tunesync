@@ -24,9 +24,9 @@ export class UsersService {
   }
 
   getUsersByUsername(username: string): Observable<any> {
-    return this.httpWrapperService.get(
-      `/users/?username__icontains=${username}`,
-    );
+    return this.httpWrapperService.get('/users/', {
+      username__icontains: username,
+    });
   }
 
   createInviteUsersEvent(users: number[], roomId: number): Observable<any> {
