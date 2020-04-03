@@ -11,6 +11,9 @@
     <mat-list-item
       *ngFor="let event of events"
       [ngClass]="{ 'current-user': userId === event.user_id }"
+      [matTooltip]="event.creation_time"
+      [matTooltipPosition]="userId === event.user_id ? 'right' : 'left'"
+      [matTooltipShowDelay]="500"
     >
       <div class="list-el" [ngSwitch]="event.event_type">
         <ng-container *ngSwitchCase="'MQ'">

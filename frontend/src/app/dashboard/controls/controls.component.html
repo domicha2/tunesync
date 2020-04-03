@@ -47,7 +47,9 @@
   <div *ngIf="(userRole$ | async) !== 'R'" id="song-buttons" class="row">
     <button
       mat-icon-button
-      matTooltip="Previous song"
+      [matTooltip]="
+        queue && queue[queueIndex - 1] ? queue[queueIndex - 1].name : undefined
+      "
       (click)="onPrevious()"
       [disabled]="queueIndex < 1"
     >
@@ -74,7 +76,9 @@
     </button>
     <button
       mat-icon-button
-      matTooltip="Next song"
+      [matTooltip]="
+        queue && queue[queueIndex + 1] ? queue[queueIndex + 1].name : undefined
+      "
       [disabled]="queue && queueIndex === queue.length - 1"
       (click)="onNext(true)"
     >
