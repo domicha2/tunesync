@@ -1,5 +1,11 @@
 div#main-screen-wrapper {
   height: 100%;
+  flex-wrap: nowrap !important;
+
+  button#load-more {
+    width: 7.5rem;
+    align-self: center;
+  }
 
   ::ng-deep mat-list-item.current-user > div.mat-list-item-content {
     justify-content: flex-end;
@@ -7,9 +13,5 @@ div#main-screen-wrapper {
 
   mat-list-item {
     height: fit-content;
-
-    ::ng-deep &:first-child div.mat-list-item-content {
-      justify-content: center;
-    }
   }
 }
