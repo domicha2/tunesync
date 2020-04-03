@@ -21,6 +21,8 @@
         [ngClass]="{ active: activeRoom === room }"
         (click)="onRoomClick(room)"
         [matBadge]="notifications[room.id]"
+        [matTooltip]="room.subtitle"
+        matTooltipPosition="right"
       >
         {{ room.title }}
       </div>
@@ -41,6 +43,8 @@
         [ngClass]="{ active: activeRoom === room }"
         (click)="onRoomClick(room)"
         [matBadge]="notifications[room.id]"
+        [matTooltip]="room.subtitle"
+        matTooltipPosition="right"
       >
         {{ room.title }}
       </div>
@@ -61,6 +65,8 @@
         [ngClass]="{ active: activeRoom === room }"
         (click)="onRoomClick(room)"
         [matBadge]="notifications[room.id]"
+        [matTooltip]="room.subtitle"
+        matTooltipPosition="right"
       >
         {{ room.title }}
       </div>
