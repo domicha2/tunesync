@@ -121,5 +121,11 @@ export class MainScreenComponent implements OnInit, OnDestroy {
 
   onLoadMore(): void {
     // call the backend with the next set of events
+    this.store.dispatch(
+      DashboardActions.getEventsByRoom({
+        roomId: this.activeRoomId,
+        creationTime: new Date(this.events[0].creation_time),
+      }),
+    );
   }
 }
