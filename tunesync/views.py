@@ -179,9 +179,16 @@ class RoomViewSet(viewsets.ViewSet):
         filtered_set = EventFilter(
             request.GET, queryset=Event.objects.filter(room_id=pk)
         ).qs
-        context = paginator.paginate_queryset(filtered_set, request)
-        serializer = EventSerializer(context, many=True)
-        return paginator.get_paginated_response(serializer.data)
+        renamed_set = filtered_set.values(
+            "args", "parent_event_id", "creation_time", "event_type"
+        ).annotate(
+            username=F("author__username"),
+            event_id=F("id"),
+            user_id=F("author"),
+            room_id=F("room"),
+        )
+        context = paginator.paginate_queryset(renamed_set, request)
+        return paginator.get_paginated_response(context)
 
     @action(methods=["get"], detail=True)
     def users(self, request, pk=None):
