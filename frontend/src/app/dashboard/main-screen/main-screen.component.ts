@@ -7,14 +7,10 @@ import { AppState } from '../../app.module';
 import { selectUserId } from '../../auth/auth.selectors';
 import {
   AppEvent,
-  EventType,
-  PERSONAL_ROOM_NAME,
   PlayState,
   QueueState,
   TuneSyncEvent,
-  UserChangeAction,
 } from '../dashboard.models';
-import { NotificationsService } from '../notifications.service';
 import * as DashboardActions from '../store/dashboard.actions';
 import {
   selectActiveRoom,
@@ -41,14 +37,26 @@ export class MainScreenComponent implements OnInit, OnDestroy {
 
   constructor(
     private eventsService: EventsService,
-    private notificationsService: NotificationsService,
     private webSocketService: WebSocketService,
     private store: Store<AppState>,
   ) {}
 
   ngOnInit(): void {
     this.webSocketService.messageSubject.subscribe(messageData => {
-      this.handleWebSocketMessage(messageData);
+      const updateView: boolean = this.eventsService.processWebSocketMessage(
+        messageData,
+        this.activeRoomId,
+        this.activeRoomName,
+        this.events,
+      );
+      if (updateView === true) {
+        setTimeout(() => {
+          const item = document.querySelector('mat-list-item:last-child');
+          if (item) {
+            item.scrollIntoView();
+          }
+        }, 500);
+      }
     });
 
     this.subscription.add(
@@ -109,122 +117,6 @@ export class MainScreenComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
-  }
-
-  handleWebSocketMessage(data): void {
-    const event: AppEvent = JSON.parse(data);
-    console.log('payload from websocket: ', event);
-    if (event.room_id !== this.activeRoomId) {
-      // the associated room does not match the active room add a notification
-      // TODO: consider what events should trigger a notification
-      this.notificationsService.notificationsSubject.next({
-        roomId: event.room_id,
-        action: 'increment',
-      });
-      return;
-    }
-    if (event.event_id || event['last_modify_queue']) {
-      // the associated room matches the active room continue
-      switch (event.event_type) {
-        // !TUNESYNC EVENT
-        case undefined:
-          // determine what type of event it was
-          // if it is playing the dispatch set song stat
-          // if it is modifying the queue, need to dispatch a new queue
-          const tuneSyncEvent = {
-            last_modify_queue: event['last_modify_queue'],
-            last_play: event['last_play'],
-            play_time: event['play_time'],
-          } as TuneSyncEvent;
-          if (
-            tuneSyncEvent.last_play === null ||
-            tuneSyncEvent.last_modify_queue.event_id >
-              tuneSyncEvent.last_play.event_id
-          ) {
-            // the  DJ made a modify queue event
-            // need to dispatch new queue into my store
-            this.store.dispatch(
-              DashboardActions.storeQueue({
-                queue: tuneSyncEvent.last_modify_queue.queue.map(
-                  ([id, length, name]) => ({ id, length, name }),
-                ),
-              }),
-            );
-          } else {
-            // the DJ made a play event
-            // ! could have race condition but handleTuneSync function has the same design
-            this.store.dispatch(
-              DashboardActions.setSongStatus({
-                isPlaying: tuneSyncEvent.last_play.is_playing,
-                seekTime: tuneSyncEvent.last_play.timestamp,
-                queueIndex: tuneSyncEvent.last_play.queue_index,
-              }),
-            );
-          }
-          break;
-        case EventType.UserChange:
-          if (this.activeRoomName === PERSONAL_ROOM_NAME) {
-            this.events.push(event);
-          } else if (event.args['type'] === UserChangeAction.RoleChange) {
-            this.store.dispatch(
-              DashboardActions.getUsersByRoom({ roomId: this.activeRoomId }),
-            );
-          } else if (event.args['type'] === UserChangeAction.Join) {
-            if (event.args.is_accepted === true) {
-              // need to update the users list to show the new user
-              this.store.dispatch(
-                DashboardActions.getUsersByRoom({ roomId: this.activeRoomId }),
-              );
-
-              // ? convert the event to a message event for cosmetic effects
-              event.event_type = EventType.Messaging;
-              event.args.content = 'joined the room';
-              this.events.push(event);
-            }
-          }
-          break;
-        case EventType.Messaging:
-          // the message might be for a join event
-          if (
-            event.event_type === EventType.Messaging &&
-            typeof event.args.is_accepted === 'boolean'
-          ) {
-            // need to look for the invite event to delete and change the contents of the message
-            const inviteEventIndex = this.events.findIndex(
-              innerEvent => event.args.room === innerEvent.args.room_id,
-            );
-            const inviteEvent = this.events[inviteEventIndex];
-            const message = `You have ${
-              event.args.is_accepted ? 'accepted' : 'rejected'
-            } the invite to ${inviteEvent.args.room_name} from ${
-              inviteEvent.username
-            }`;
-            const newJoinEvent: AppEvent = {
-              ...event,
-              args: {
-                content: message,
-              },
-            };
-            this.events.push(newJoinEvent);
-
-            // need to remove the invite event from the list of events
-            this.events.splice(inviteEventIndex, 1);
-          } else {
-            this.events.push(event);
-          }
-
-          break;
-        default:
-          console.error('bad event type');
-          break;
-      }
-      setTimeout(() => {
-        const item = document.querySelector('mat-list-item:last-child');
-        if (item) {
-          item.scrollIntoView();
-        }
-      }, 500);
-    }
   }
 
   handleTuneSyncEvent(tuneSyncEvent: TuneSyncEvent): void {
