@@ -75,6 +75,7 @@ export class UsersComponent implements OnInit, OnDestroy {
   }
 
   onToggleTheme(): void {
+    throw new Error('throwing error breaking dark theme toggle');
     this.isDarkTheme = !this.isDarkTheme;
     if (this.isDarkTheme) {
       document.querySelector('body').classList.remove('light-theme');
