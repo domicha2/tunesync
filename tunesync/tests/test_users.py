@@ -80,6 +80,8 @@ class TestUsers:
     #TODO: Not sure how this test is supposed to be formatted?
     # Keep getting a 403 no matter what I try
     def test_invite_user_event(self):
+        print()
+        print("test_invite_user_event")
         token = helper.getToken("c", "123")
         room_id = 1
         users = 3
@@ -88,10 +90,22 @@ class TestUsers:
         print(event.text)
         assert True
 
-    #TODO: Once I get that figured out, maybe try inviting non-existant user(s)
+    #TODO: Keep getting a 403 no matter what I try
+    def test_invite_fake_user_event(self):
+        print()
+        print("test_invite_fake_user_event")
+        token = helper.getToken("c", "123")
+        room_id = 1
+        users = 100
+        event = helper.inviteUsers(token, room_id, users)
+        print(event)
+        print(event.text)
+        assert True
 
     #TODO: Keep getting a 403 no matter what I try
     def test_user_join_true_event(self):
+        print()
+        print("test_user_join_true_event")
         token = helper.getToken("c", "123")
         room_id = 1
         is_accepted = True
@@ -102,10 +116,36 @@ class TestUsers:
         
     #TODO: Keep getting a 403 no matter what I try
     def test_user_join_false_event(self):
+        print()
+        print("test_user_join_false_event")
         token = helper.getToken("c", "123")
         room_id = 1
         is_accepted = False
         event = helper.inviteUsers(token, room_id, is_accepted)
+        print(event)
+        print(event.text)
+        assert True
+
+    def test_change_user_event(self):
+        print()
+        print("test_change_user_event")
+        token = helper.getToken("c", "123")
+        room_id = 1
+        user_id = 3
+        new_role = "A"
+        event = helper.changeUser(token, room_id, user_id, new_role)
+        print(event)
+        print(event.text)
+        assert True
+
+    def test_change_user_to_fake_role_event(self):
+        print()
+        print("test_change_user_to_fake_role_event")
+        token = helper.getToken("c", "123")
+        room_id = 1
+        user_id = 3
+        new_role = "CC"
+        event = helper.changeUser(token, room_id, user_id, new_role)
         print(event)
         print(event.text)
         assert True
