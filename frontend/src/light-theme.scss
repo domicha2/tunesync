@@ -1,0 +1,16 @@
+@import '~@angular/material/theming';
+@include mat-core();
+
+$tune-sync-primary: mat-palette($mat-indigo);
+$tune-sync-accent: mat-palette($mat-pink, A200, A100, A400);
+$tune-sync-warn: mat-palette($mat-red);
+
+$tune-sync-theme: mat-light-theme(
+  $tune-sync-primary,
+  $tune-sync-accent,
+  $tune-sync-warn
+);
+
+.light-theme {
+  @include angular-material-theme($tune-sync-theme);
+}
