@@ -25,6 +25,7 @@ import { KickUserComponent } from './kick-user/kick-user.component';
 })
 export class UsersComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
+  isDarkTheme = true;
 
   users = {
     admin: [] as User[],
@@ -71,6 +72,15 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+  }
+
+  onToggleTheme(): void {
+    this.isDarkTheme = !this.isDarkTheme;
+    if (this.isDarkTheme) {
+      document.querySelector('body').classList.remove('light-theme');
+    } else {
+      document.querySelector('body').classList.add('light-theme');
+    }
   }
 
   onSignOut(): void {

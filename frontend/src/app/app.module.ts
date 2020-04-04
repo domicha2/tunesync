@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ErrorHandler, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -42,6 +43,7 @@ export function getMetaReducers(): MetaReducer<any>[] {
 @NgModule({
   declarations: [AppComponent],
   imports: [
+    CommonModule,
     DashboardModule,
     CreditsModule,
     AuthModule,
