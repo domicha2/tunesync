@@ -49,32 +49,49 @@ class TestUsers:
     def test_make_message_event(self):
         print()
         print("EVENT TESTS")
+        print("======================================")
+        print()
+        print("test_make_message_event")
         token = helper.getToken("c", "123")
         room_id = 1
         content = "sucksucksuck"
         event = helper.sendMessage(token, room_id, content)
+        print(event)
+        print(event.text)
         assert "event_type" in event.text and "room" in event.text and "author" in event.text
 
     def test_make_message_event_for_fake_room(self):
+        print()
+        print("test_make_message_event_for_fake_room")
         token = helper.getToken("c", "123")
         room_id = 6
         content = "sucksucksuck"
-        event = helper.sendMessage(token, room_id, content) 
+        event = helper.sendMessage(token, room_id, content)
+        print(event)
+        print(event.text)
         assert "detail" in event.text
 
     def test_make_kick_user_event(self):
+        print()
+        print("test_make_kick_user_event")
         token = helper.getToken("c", "123")
         room_id = 1
         # Should we allow someone to kick themselves? LOL
         kicked_user_id = 2
         event = helper.kickUser(token, room_id, kicked_user_id)
+        print(event)
+        print(event.text)
         assert "event_type" in event.text and "room" in event.text and "author" in event.text
 
     def test_make_kick_fake_user_event(self):
+        print()
+        print("test_make_kick_fake_user_event")
         token = helper.getToken("c", "123")
         room_id = 1
         kicked_user_id = 100
         event = helper.kickUser(token, room_id, kicked_user_id)
+        print(event)
+        print(event.text)
         assert "detail" in event.text
 
     #TODO: Not sure how this test is supposed to be formatted?
@@ -126,6 +143,7 @@ class TestUsers:
         print(event.text)
         assert True
 
+    #TODO: Keep getting a 403 no matter what I try
     def test_change_user_event(self):
         print()
         print("test_change_user_event")
@@ -138,6 +156,7 @@ class TestUsers:
         print(event.text)
         assert True
 
+    #TODO: Keep getting a 403 no matter what I try
     def test_change_user_to_fake_role_event(self):
         print()
         print("test_change_user_to_fake_role_event")
@@ -150,4 +169,12 @@ class TestUsers:
         print(event.text)
         assert True
 
-    #TODO: Voting Tests
+    #TODO: TuneSync Event Tests
+    
+    #TODO: Voting Event Tests
+
+    #TODO: Polling Event Tests
+
+    #TODO: Delete Event Tests
+
+    #TODO: REMEMBER TO UNDO CHANGES TO runserver.sh, reset_dev.sh and everything else you changed in 1st commit before merging!!!
