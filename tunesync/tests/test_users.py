@@ -2,6 +2,8 @@ import requests
 import json
 import tunesync.tests.helper_functions as helper
 
+# Run these commands in order to test thoroughly
+# sh reset_dev.sh
 # python -m pytest tunesync/tests/test_users.py -s
 class TestUsers:
     # If running consecutively multiple times, change the user
@@ -45,16 +47,32 @@ class TestUsers:
 
     #TODO: All Types of Event Tests
 
-    # Getting a 403 - why?
-    def test_make_kick_user_event(self):
+    # RoomId is 1 created by UserId 2 Billy(Bob) so message works
+    def test_make_message_event(self):
         print()
         print("EVENT TESTS")
         token = helper.getToken("c", "123")
         room_id = 1
-        kicked_user_id = 2
-        event = helper.kickUser(token, room_id, kicked_user_id)
-        print(event)
+        content = "sucksucksuck"
+        event = helper.sendMessage(token, room_id, content)
+        assert "content" in event.text and "event_type" in event.text and "author" in event.text
+
+    def test_make_message_event_for_fake_room(self):
+        token = helper.getToken("c", "123")
+        room_id = 6
+        content = "sucksucksuck"
+        event = helper.sendMessage(token, room_id, content)
         print(event.text)
-        assert True
+        assert "detail" in event.text
+
+    # # Getting a 403 - why?
+    # def test_make_kick_user_event(self):
+    #     token = helper.getToken("c", "123")
+    #     room_id = 1
+    #     kicked_user_id = 2
+    #     event = helper.kickUser(token, room_id, kicked_user_id)
+    #     print(event)
+    #     print(event.text)
+    #     assert True
 
     #TODO: Voting Tests

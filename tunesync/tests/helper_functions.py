@@ -110,3 +110,6 @@ def updateTune(token, tune_id, name=None, artist=None, album=None):
     params = {"tune_name": name, "tune_artist": artist, "tune_album": album}
     res = requests.patch(url, params=params, headers={"Authorization": "Token " + token})
     return res
+
+def sendMessage(token, room_id, content):
+    return makeEvent(token, room_id, "M", {"content": content})
