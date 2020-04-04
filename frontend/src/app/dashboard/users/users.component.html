@@ -9,9 +9,22 @@
     >
       <mat-icon>add_circle</mat-icon>
     </button>
-    <button mat-icon-button (click)="onSignOut()" matTooltip="Sign out">
-      <mat-icon>exit_to_app</mat-icon>
+
+    <button mat-icon-button [matMenuTriggerFor]="menu">
+      <mat-icon>settings</mat-icon>
     </button>
+
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item>
+        <mat-slide-toggle (change)="onToggleTheme()">
+          {{ isDarkTheme ? 'Dark Mode' : 'Light Mode' }}
+        </mat-slide-toggle>
+      </button>
+      <button mat-menu-item (click)="onSignOut()">
+        <mat-icon>exit_to_app</mat-icon>
+        <span>Signout</span>
+      </button>
+    </mat-menu>
   </div>
 
   <mat-accordion displayMode="flat" [multi]="true" cdkDropListGroup>

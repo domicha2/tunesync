@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpWrapperService } from '../../http-wrapper.service';
-import { EventType, Role, UserChangeAction } from '../dashboard.models';
+import { EventType, UserChangeAction } from '../dashboard.models';
 
 @Injectable({ providedIn: 'root' })
 export class UsersService {

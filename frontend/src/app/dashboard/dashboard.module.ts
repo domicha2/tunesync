@@ -10,8 +10,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ControlsComponent } from './controls/controls.component';
 import { SongUrlPipe } from './controls/song-url.pipe';
@@ -48,6 +50,7 @@ import { UsersComponent } from './users/users.component';
     MatDialogModule,
     MatBadgeModule,
     MatExpansionModule,
+    MatMenuModule,
     MatListModule,
     MatFormFieldModule,
     MatInputModule,
@@ -56,6 +59,7 @@ import { UsersComponent } from './users/users.component';
     MatButtonModule,
     MatIconModule,
     MatSelectModule,
+    MatSlideToggleModule,
   ],
   providers: [NotificationsService],
 })
