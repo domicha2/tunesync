@@ -4,8 +4,7 @@ import { DashboardState } from './dashboard.reducer';
 
 export const selectLoadMore = createSelector(
   (state: AppState) => state.dashboard,
-  (dashboard: DashboardState) =>
-    dashboard ? dashboard.loadMore : undefined,
+  (dashboard: DashboardState) => (dashboard ? dashboard.loadMore : undefined),
 );
 
 export const selectQueuedSongs = createSelector(

@@ -21,7 +21,7 @@ export class AuthEffects {
           .pipe(
             tap(user => {
               LogRocket.identify(user.user_id, {
-                name: credentials.username
+                name: credentials.username,
               });
             }),
             map(user => ({

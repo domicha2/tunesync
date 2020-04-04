@@ -28,7 +28,10 @@ export class InviteComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscription.add(
       this.usernameControl.valueChanges
-        .pipe(startWith(''), debounceTime(250))
+        .pipe(
+          startWith(''),
+          debounceTime(250),
+        )
         .subscribe((username: string) => {
           this.store.dispatch(
             DashboardActions.getUsersByUsername({
