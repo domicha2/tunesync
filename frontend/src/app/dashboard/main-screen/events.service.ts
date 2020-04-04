@@ -140,9 +140,13 @@ export class EventsService {
   }
 
   processEvents(events: AppEvent[], roomName: string): AppEvent[] {
-    let result = events.slice().sort((eventA, eventB) =>
-      new Date(eventA.creation_time) > new Date(eventB.creation_time) ? 1 : -1,
-    );
+    let result = events
+      .slice()
+      .sort((eventA, eventB) =>
+        new Date(eventA.creation_time) > new Date(eventB.creation_time)
+          ? 1
+          : -1,
+      );
 
     result = result.filter(event => {
       // ? revisit user change events (join/kick/role change to be displayed)
@@ -219,93 +223,112 @@ export class EventsService {
       switch (event.event_type) {
         // ? this is a TUNESYNC EVENT
         case undefined:
-          // determine what type of event it was
-          // if it is playing the dispatch set song stat
-          // if it is modifying the queue, need to dispatch a new queue
-          const tuneSyncEvent = {
-            last_modify_queue: event['last_modify_queue'],
-            last_play: event['last_play'],
-            play_time: event['play_time'],
-          } as TuneSyncEvent;
-          if (
-            tuneSyncEvent.last_play === null ||
-            tuneSyncEvent.last_modify_queue.event_id >
-              tuneSyncEvent.last_play.event_id
-          ) {
-            // the  DJ made a modify queue event
-            // need to dispatch new queue into my store
-            this.store.dispatch(
-              DashboardActions.storeQueue({
-                queue: tuneSyncEvent.last_modify_queue.queue.map(
-                  ([id, length, name]) => ({ id, length, name }),
-                ),
-              }),
-            );
-          } else {
-            // the DJ made a play event
-            // ! could have race condition but handleTuneSync function has the same design
-            this.store.dispatch(
-              DashboardActions.setSongStatus({
-                isPlaying: tuneSyncEvent.last_play.is_playing,
-                seekTime: tuneSyncEvent.last_play.timestamp,
-                queueIndex: tuneSyncEvent.last_play.queue_index,
-              }),
-            );
-          }
+          this.processWSTuneSyncEvent(event);
           break;
         case EventType.UserChange:
-          if (roomName === PERSONAL_ROOM_NAME) {
-            events.push(event);
-          } else if (event.args['type'] === UserChangeAction.RoleChange) {
-            this.store.dispatch(DashboardActions.getUsersByRoom({ roomId }));
-          } else if (event.args['type'] === UserChangeAction.Join) {
-            if (event.args.is_accepted === true) {
-              // need to update the users list to show the new user
-              this.store.dispatch(DashboardActions.getUsersByRoom({ roomId }));
-
-              // ? convert the event to a message event for cosmetic effects
-              event.event_type = EventType.Messaging;
-              event.args.content = 'joined the room';
-              events.push(event);
-            }
-          }
+          this.processWSUserChangeEvent(event, events, roomName, roomId);
           break;
         case EventType.Messaging:
-          // the message might be for a join event
-          if (
-            event.event_type === EventType.Messaging &&
-            typeof event.args.is_accepted === 'boolean'
-          ) {
-            // need to look for the invite event to delete and change the contents of the message
-            const inviteEventIndex = events.findIndex(
-              innerEvent => event.args.room === innerEvent.args.room_id,
-            );
-            const inviteEvent = events[inviteEventIndex];
-            const message = `You have ${
-              event.args.is_accepted ? 'accepted' : 'rejected'
-            } the invite to ${inviteEvent.args.room_name} from ${
-              inviteEvent.username
-            }`;
-            const newJoinEvent: AppEvent = {
-              ...event,
-              args: {
-                content: message,
-              },
-            };
-            events.push(newJoinEvent);
-
-            // need to remove the invite event from the list of events
-            events.splice(inviteEventIndex, 1);
-          } else {
-            events.push(event);
-          }
-
+          this.processWSMessagingEvent(event, events);
           break;
         default:
           console.error('bad event type');
           break;
       }
       return true;
+    }
+  }
+
+  processWSUserChangeEvent(
+    event: AppEvent,
+    events: AppEvent[],
+    roomName: string,
+    roomId: number,
+  ): void {
+    if (roomName === PERSONAL_ROOM_NAME) {
+      events.push(event);
+    } else if (event.args['type'] === UserChangeAction.RoleChange) {
+      this.store.dispatch(DashboardActions.getUsersByRoom({ roomId }));
+    } else if (event.args['type'] === UserChangeAction.Join) {
+      if (event.args.is_accepted === true) {
+        // need to update the users list to show the new user
+        this.store.dispatch(DashboardActions.getUsersByRoom({ roomId }));
+
+        // ? convert the event to a message event for cosmetic effects
+        event.event_type = EventType.Messaging;
+        event.args.content = 'joined the room';
+        events.push(event);
+      }
+    }
+  }
+
+  processWSMessagingEvent(event: AppEvent, events: AppEvent[]): void {
+    // the message might be for a join event
+    if (
+      event.event_type === EventType.Messaging &&
+      typeof event.args.is_accepted === 'boolean'
+    ) {
+      // need to look for the invite event to delete and change the contents of the message
+      const inviteEventIndex = events.findIndex(
+        innerEvent => event.args.room === innerEvent.args.room_id,
+      );
+      const inviteEvent = events[inviteEventIndex];
+      const message = `You have ${
+        event.args.is_accepted ? 'accepted' : 'rejected'
+      } the invite to ${inviteEvent.args.room_name} from ${
+        inviteEvent.username
+      }`;
+      const newJoinEvent: AppEvent = {
+        ...event,
+        args: {
+          content: message,
+        },
+      };
+      events.push(newJoinEvent);
+
+      // need to remove the invite event from the list of events
+      events.splice(inviteEventIndex, 1);
+    } else {
+      events.push(event);
+    }
+  }
+
+  /**
+   * Handle a TuneSync event from the WebSocket
+   */
+  processWSTuneSyncEvent(event: AppEvent): void {
+    // determine what type of event it was
+    // if it is playing the dispatch set song stat
+    // if it is modifying the queue, need to dispatch a new queue
+    const tuneSyncEvent = {
+      last_modify_queue: event['last_modify_queue'],
+      last_play: event['last_play'],
+      play_time: event['play_time'],
+    } as TuneSyncEvent;
+    if (
+      tuneSyncEvent.last_play === null ||
+      tuneSyncEvent.last_modify_queue.event_id >
+        tuneSyncEvent.last_play.event_id
+    ) {
+      // the  DJ made a modify queue event
+      // need to dispatch new queue into my store
+      this.store.dispatch(
+        DashboardActions.storeQueue({
+          queue: tuneSyncEvent.last_modify_queue.queue.map(
+            ([id, length, name]) => ({ id, length, name }),
+          ),
+        }),
+      );
+    } else {
+      // the DJ made a play event
+      // ! could have race condition but handleTuneSync function has the same design
+      this.store.dispatch(
+        DashboardActions.setSongStatus({
+          isPlaying: tuneSyncEvent.last_play.is_playing,
+          seekTime: tuneSyncEvent.last_play.timestamp,
+          queueIndex: tuneSyncEvent.last_play.queue_index,
+        }),
+      );
     }
   }
 }
