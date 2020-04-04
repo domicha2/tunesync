@@ -3,7 +3,7 @@ set -e
 set -x
 
 M() {
-    python3 manage.py "$@"
+    python manage.py "$@"
 }
 export DJANGO_DEV=1
 

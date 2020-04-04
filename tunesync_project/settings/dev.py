@@ -14,7 +14,7 @@ class DevSettings(BaseSettings):
         return {
             "default": {
                 "ENGINE": "django.db.backends.postgresql",
-                "NAME": "django",
+                "NAME": "Django",
                 "USER": "user",
                 "PASSWORD": "green123",
                 "HOST": "127.0.0.1",
