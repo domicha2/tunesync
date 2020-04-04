@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { HttpWrapperService } from '../../http-wrapper.service';
 import { EventType, FileList2 } from '../dashboard.models';
 
 @Injectable({ providedIn: 'root' })
 export class ControlsService {
+  songsUploaded = new Subject<number>();
+
   constructor(private httpWrapperService: HttpWrapperService) {}
 
   createTunes(tunes: FileList2): Observable<any> {
