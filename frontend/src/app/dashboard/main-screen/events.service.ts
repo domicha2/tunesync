@@ -140,7 +140,7 @@ export class EventsService {
   }
 
   processEvents(events: AppEvent[], roomName: string): AppEvent[] {
-    let result = events.sort((eventA, eventB) =>
+    let result = events.slice().sort((eventA, eventB) =>
       new Date(eventA.creation_time) > new Date(eventB.creation_time) ? 1 : -1,
     );
 

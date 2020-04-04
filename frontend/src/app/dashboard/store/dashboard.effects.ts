@@ -123,9 +123,10 @@ export class DashboardEffects {
         this.mainScreenService
           .getEventsByRoom(action.roomId, action.creationTime)
           .pipe(
-            map((events: AppEvent[]) => ({
+            map(response => ({
               type: DashboardActions.storeEvents.type,
-              events,
+              events: response.results,
+              loadMore: response.next !== null
             })),
             catchError(() => EMPTY),
           ),

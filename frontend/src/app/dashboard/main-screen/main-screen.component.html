@@ -1,7 +1,7 @@
 <div id="main-screen-wrapper" class="column">
   <button
     id="load-more"
-    *ngIf="showLoadMore"
+    *ngIf="loadMore$ | async"
     mat-raised-button
     (click)="onLoadMore()"
   >

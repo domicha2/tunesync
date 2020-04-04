@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, filter } from 'rxjs/operators';
 import { AppState } from '../../app.module';
 import { selectUserId } from '../../auth/auth.selectors';
@@ -10,6 +10,7 @@ import {
   selectActiveRoom,
   selectActiveRoomName,
   selectEvents,
+  selectLoadMore,
   selectTuneSyncEvent,
 } from '../store/dashboard.selectors';
 import { WebSocketService } from '../web-socket.service';
@@ -27,7 +28,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
   activeRoomName: string;
   activeRoomId: number;
 
-  showLoadMore = false;
+  loadMore$: Observable<boolean>;
 
   constructor(
     private eventsService: EventsService,
@@ -36,6 +37,8 @@ export class MainScreenComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.loadMore$ = this.store.select(selectLoadMore);
+
     this.webSocketService.messageSubject.subscribe(messageData => {
       const updateView: boolean = this.eventsService.processWebSocketMessage(
         messageData,
@@ -80,31 +83,18 @@ export class MainScreenComponent implements OnInit, OnDestroy {
       }),
     );
 
-    // get a list of events
+    // pagination list of events
     this.subscription.add(
       this.store
         .select(selectEvents)
         .pipe(
           filter(events => events !== undefined && events !== null),
-          distinctUntilChanged(
-            (prev, curr) =>
-              prev[0] && curr[0] && prev[0].room_id === curr[0].room_id,
-          ),
+          distinctUntilChanged((prev, curr) => {
+            return prev[0] && curr[0] && prev[0].event_id === curr[0].event_id;
+          }),
         )
         .subscribe((events: AppEvent[]) => {
-          // new room, replace old events with new events
-          this.showLoadMore = false;
-          this.events = this.eventsService.processEvents(
-            events,
-            this.activeRoomName,
-          );
-          setTimeout(() => {
-            const el = document.querySelector('mat-list-item:last-child');
-            if (el) {
-              el.scrollIntoView();
-              this.showLoadMore = true;
-            }
-          }, 500);
+          this.handleEventsResponse(events);
         }),
     );
   }
@@ -127,5 +117,61 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         creationTime: new Date(this.events[0].creation_time),
       }),
     );
+  }
+
+  handleEventsResponse(events: AppEvent[]): void {
+    const firstSetOfEvents = this.events.length === 0;
+    let viewTop: boolean;
+
+    if (firstSetOfEvents) {
+      // no events set, so just set it in
+      this.events = this.eventsService.processEvents(
+        events,
+        this.activeRoomName,
+      );
+      viewTop = false;
+    } else {
+      // already have a set of events
+      // we are either adding on or swapping
+      if (
+        events[0] &&
+        this.events[0] &&
+        events[0].room_id === this.events[0].room_id
+      ) {
+        // combine existing events with the new set
+        // first have to process the raw events
+        this.events = this.eventsService
+          .processEvents(events, this.activeRoomName)
+          .concat(this.events);
+        viewTop = true;
+      } else {
+        if (events.length === 0) {
+          // the room has no events but there was existing events
+          this.events = [];
+        } else {
+          // rooms are different so swap out the events
+          this.events = this.eventsService.processEvents(
+            events,
+            this.activeRoomName,
+          );
+          viewTop = false;
+        }
+      }
+    }
+
+    // check if the new events have the same room id as the current events
+    setTimeout(() => {
+      let el: HTMLElement;
+      if (viewTop) {
+        // scroll to view the last child
+        el = document.querySelector('mat-list-item:first-child');
+      } else {
+        // stay on the current child
+        el = document.querySelector('mat-list-item:last-child');
+      }
+      if (el) {
+        el.scrollIntoView();
+      }
+    }, 500);
   }
 }

@@ -137,7 +137,7 @@ export const getEventsByRoom = createAction(
 );
 export const storeEvents = createAction(
   '[Events API] Store Events',
-  props<{ events: AppEvent[] }>(),
+  props<{ events: AppEvent[], loadMore: boolean }>(),
 );
 
 /* Users */
