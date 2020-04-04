@@ -188,6 +188,7 @@ class RoomViewSet(viewsets.ViewSet):
                 user_id=F("author"),
                 room_id=F("room"),
             )
+            .exclude(isDeleted=True)
         )
         context = paginator.paginate_queryset(renamed_set, request)
         return paginator.get_paginated_response(context)

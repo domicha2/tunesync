@@ -109,9 +109,9 @@ class BaseSettings(DjangoDefaults):
         "channels",
         "rest_framework.authtoken",
         "django.contrib.sites",
+        "django_filters",
         "rest_framework_filters",
         "background_task",
-        # "captcha",
     ]
 
     PROJECT_APPS = ["tunesync_project", "tunesync"]
