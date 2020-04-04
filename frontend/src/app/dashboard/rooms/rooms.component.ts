@@ -73,6 +73,10 @@ export class RoomsComponent implements OnInit, OnDestroy {
   }
 
   onRoomClick(room: Room): void {
+    // prevent users from triggering a refresh when clicking same room
+    // Why? there is no need the data is the same and is a hit in performance
+    if (this.activeRoom && room.id === this.activeRoom.id) return;
+
     this.activeRoom = room;
     this.store.dispatch(DashboardActions.resetState());
     this.store.dispatch(
@@ -86,7 +90,12 @@ export class RoomsComponent implements OnInit, OnDestroy {
       action: 'reset',
     });
     this.store.dispatch(DashboardActions.getUsersByRoom({ roomId: room.id }));
-    this.store.dispatch(DashboardActions.getEventsByRoom({ roomId: room.id }));
+    this.store.dispatch(
+      DashboardActions.getEventsByRoom({
+        roomId: room.id,
+        creationTime: new Date(),
+      }),
+    );
     this.store.dispatch(DashboardActions.getTuneSyncEvent({ roomId: room.id }));
   }
 

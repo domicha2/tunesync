@@ -1,4 +1,12 @@
-<div id="main-screen-wrapper">
+<div id="main-screen-wrapper" class="column">
+  <button
+    id="load-more"
+    *ngIf="loadMore$ | async"
+    mat-raised-button
+    (click)="onLoadMore()"
+  >
+    Load more
+  </button>
   <mat-list class="column">
     <mat-list-item
       *ngFor="let event of events"
