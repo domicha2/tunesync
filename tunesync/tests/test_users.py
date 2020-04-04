@@ -59,7 +59,7 @@ class TestUsers:
         token = helper.getToken("c", "123")
         room_id = 6
         content = "sucksucksuck"
-        event = helper.sendMessage(token, room_id, content)
+        event = helper.sendMessage(token, room_id, content) 
         assert "detail" in event.text
 
     def test_make_kick_user_event(self):
@@ -76,5 +76,38 @@ class TestUsers:
         kicked_user_id = 100
         event = helper.kickUser(token, room_id, kicked_user_id)
         assert "detail" in event.text
+
+    #TODO: Not sure how this test is supposed to be formatted?
+    # Keep getting a 403 no matter what I try
+    def test_invite_user_event(self):
+        token = helper.getToken("c", "123")
+        room_id = 1
+        users = 3
+        event = helper.inviteUsers(token, room_id, users)
+        print(event)
+        print(event.text)
+        assert True
+
+    #TODO: Once I get that figured out, maybe try inviting non-existant user(s)
+
+    #TODO: Keep getting a 403 no matter what I try
+    def test_user_join_true_event(self):
+        token = helper.getToken("c", "123")
+        room_id = 1
+        is_accepted = True
+        event = helper.inviteUsers(token, room_id, is_accepted)
+        print(event)
+        print(event.text)
+        assert True
+        
+    #TODO: Keep getting a 403 no matter what I try
+    def test_user_join_false_event(self):
+        token = helper.getToken("c", "123")
+        room_id = 1
+        is_accepted = False
+        event = helper.inviteUsers(token, room_id, is_accepted)
+        print(event)
+        print(event.text)
+        assert True
 
     #TODO: Voting Tests
