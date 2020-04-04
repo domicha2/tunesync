@@ -239,7 +239,7 @@ export class EventsService {
     }
   }
 
-  processWSUserChangeEvent(
+  private processWSUserChangeEvent(
     event: AppEvent,
     events: AppEvent[],
     roomName: string,
@@ -262,7 +262,7 @@ export class EventsService {
     }
   }
 
-  processWSMessagingEvent(event: AppEvent, events: AppEvent[]): void {
+  private processWSMessagingEvent(event: AppEvent, events: AppEvent[]): void {
     // the message might be for a join event
     if (
       event.event_type === EventType.Messaging &&
@@ -296,7 +296,7 @@ export class EventsService {
   /**
    * Handle a TuneSync event from the WebSocket
    */
-  processWSTuneSyncEvent(event: AppEvent): void {
+  private processWSTuneSyncEvent(event: AppEvent): void {
     // determine what type of event it was
     // if it is playing the dispatch set song stat
     // if it is modifying the queue, need to dispatch a new queue
