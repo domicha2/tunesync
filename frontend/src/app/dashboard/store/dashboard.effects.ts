@@ -126,7 +126,7 @@ export class DashboardEffects {
             map(response => ({
               type: DashboardActions.storeEvents.type,
               events: response.results,
-              loadMore: response.next !== null
+              loadMore: response.next !== null,
             })),
             catchError(() => EMPTY),
           ),
@@ -139,11 +139,12 @@ export class DashboardEffects {
       this.actions$.pipe(
         ofType(DashboardActions.createTunes),
         switchMap(action =>
-          this.controlsService
-            .createTunes(action.tunes)
-            .pipe(
-              tap(response => console.log('create tunes response: ', response)),
-            ),
+          this.controlsService.createTunes(action.tunes).pipe(
+            tap(response => {
+              // emit a snackbar event
+              this.controlsService.songsUploaded.next(response.length);
+            }),
+          ),
         ),
       ),
     { dispatch: false },

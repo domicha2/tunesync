@@ -14,6 +14,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ControlsComponent } from './controls/controls.component';
 import { SongUrlPipe } from './controls/song-url.pipe';
@@ -60,6 +61,7 @@ import { UsersComponent } from './users/users.component';
     MatIconModule,
     MatSelectModule,
     MatSlideToggleModule,
+    MatSnackBarModule,
   ],
   providers: [NotificationsService],
 })
