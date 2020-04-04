@@ -46,8 +46,6 @@ class TestUsers:
     #TODO: Update tune tests
 
     #TODO: All Types of Event Tests
-
-    # RoomId is 1 created by UserId 2 Billy(Bob) so message works
     def test_make_message_event(self):
         print()
         print("EVENT TESTS")
@@ -55,24 +53,28 @@ class TestUsers:
         room_id = 1
         content = "sucksucksuck"
         event = helper.sendMessage(token, room_id, content)
-        assert "content" in event.text and "event_type" in event.text and "author" in event.text
+        assert "event_type" in event.text and "room" in event.text and "author" in event.text
 
     def test_make_message_event_for_fake_room(self):
         token = helper.getToken("c", "123")
         room_id = 6
         content = "sucksucksuck"
         event = helper.sendMessage(token, room_id, content)
-        print(event.text)
         assert "detail" in event.text
 
-    # # Getting a 403 - why?
-    # def test_make_kick_user_event(self):
-    #     token = helper.getToken("c", "123")
-    #     room_id = 1
-    #     kicked_user_id = 2
-    #     event = helper.kickUser(token, room_id, kicked_user_id)
-    #     print(event)
-    #     print(event.text)
-    #     assert True
+    def test_make_kick_user_event(self):
+        token = helper.getToken("c", "123")
+        room_id = 1
+        # Should we allow someone to kick themselves? LOL
+        kicked_user_id = 2
+        event = helper.kickUser(token, room_id, kicked_user_id)
+        assert "event_type" in event.text and "room" in event.text and "author" in event.text
+
+    def test_make_kick_fake_user_event(self):
+        token = helper.getToken("c", "123")
+        room_id = 1
+        kicked_user_id = 100
+        event = helper.kickUser(token, room_id, kicked_user_id)
+        assert "detail" in event.text
 
     #TODO: Voting Tests
