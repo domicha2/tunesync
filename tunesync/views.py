@@ -210,6 +210,16 @@ class RoomViewSet(viewsets.ViewSet):
         result = TuneSync.get_tune_sync(pk)
         return Response(result)
 
+    @action(methods=["get"], detail=True)
+    def polls(self, request, pk=None):
+        paginator = PageNumberPagination()
+        active_polls = Poll.objects.filter(event__room_id=pk, is_active=True)
+        context = paginator.paginate_queryset(active_polls, request)
+        result = []
+        for poll in context:
+            result.append(poll.get_state())
+        return paginator.get_paginated_response(result)
+
 
 class TuneViewSet(viewsets.ViewSet):
     permission_classes = [UploaderOnly]
