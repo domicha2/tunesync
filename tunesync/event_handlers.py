@@ -296,9 +296,7 @@ class Handler:
             membership.state = "R"
         invite_event = Event.objects.filter(
             room=system_room, args__type="I", args__room_id=event.room.id
-        ).order_by("-creation_time")
-        invite_event[0].isDeleted = True
-        invite_event[0].save()
+        ).update(isDeleted=True)
         membership.save()
         return (None, status.HTTP_200_OK)
 
