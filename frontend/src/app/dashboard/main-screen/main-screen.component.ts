@@ -45,7 +45,6 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         this.activeRoomId,
         this.activeRoomName,
         this.events,
-        this.userId,
       );
       if (updateView === true) {
         setTimeout(() => {

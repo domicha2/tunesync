@@ -206,7 +206,6 @@ export class EventsService {
     roomId: number,
     roomName: string,
     events: AppEvent[],
-    userId: number,
   ): boolean {
     const event: AppEvent = JSON.parse(data);
     console.log('payload from websocket: ', event);
