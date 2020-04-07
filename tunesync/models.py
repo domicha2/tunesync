@@ -270,8 +270,8 @@ def update_poll_listeners(sender, instance, **kwargs):
     send_update(room, status)
 
 
-@receiver(post_save, sender=Vote, dispatch_uid="update_poll_listeners")
-def update_poll_listeners(sender, instance, **kwargs):
+@receiver(post_save, sender=Vote, dispatch_uid="update_vote_listeners")
+def update_vote_listeners(sender, instance, **kwargs):
     room = instance.event.room
     status = instance.poll.get_state()
     send_update(room, status)
