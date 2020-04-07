@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
-import { distinctUntilChanged, filter } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 import { AppState } from '../../app.module';
 import { selectUserId } from '../../auth/auth.selectors';
 import { AppEvent, EventType, TuneSyncEvent } from '../dashboard.models';
@@ -89,10 +89,10 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         .select(selectEvents)
         .pipe(
           filter((events) => events !== undefined && events !== null),
-          // ? this observable stream is emitting mysteriously more than it should
           distinctUntilChanged((prev, curr) => {
             return prev[0] && curr[0] && prev[0].event_id === curr[0].event_id;
           }),
+          map((events: AppEvent[]) => events.slice()),
         )
         .subscribe((events: AppEvent[]) => {
           this.handleEventsResponse(events);
