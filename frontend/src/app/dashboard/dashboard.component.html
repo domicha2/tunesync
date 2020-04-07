@@ -10,8 +10,8 @@
       <div id="main-screen">
         <app-main-screen></app-main-screen>
       </div>
-      <div id="bottom-bar">
-        <app-messaging></app-messaging>
+      <div id="bottom-bar" class="row">
+        <app-messaging id="messaging"></app-messaging>
         <button
           *ngIf="(userRole$ | async) === 'A'"
           mat-icon-button
