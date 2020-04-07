@@ -44,8 +44,7 @@ export const selectActiveRoom = createSelector(
 
 export const selectAllUsers = createSelector(
   (state: AppState) => state.dashboard,
-  (dashboard: DashboardState) =>
-    dashboard && dashboard.allUsers ? dashboard.allUsers.slice() : undefined,
+  (dashboard: DashboardState) => (dashboard ? dashboard.allUsers : undefined),
 );
 
 export const selectIsPlaying = createSelector(
