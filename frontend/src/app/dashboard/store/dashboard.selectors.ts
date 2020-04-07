@@ -10,9 +10,7 @@ export const selectLoadMore = createSelector(
 export const selectQueuedSongs = createSelector(
   (state: AppState) => state.dashboard,
   (dashboard: DashboardState) =>
-    dashboard && dashboard.queuedSongs
-      ? dashboard.queuedSongs.slice()
-      : undefined,
+    dashboard ? dashboard.queuedSongs : undefined,
 );
 
 export const selectAvailableSongs = createSelector(
