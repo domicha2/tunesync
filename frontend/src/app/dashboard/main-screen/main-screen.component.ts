@@ -4,7 +4,7 @@ import { Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, filter } from 'rxjs/operators';
 import { AppState } from '../../app.module';
 import { selectUserId } from '../../auth/auth.selectors';
-import { AppEvent, TuneSyncEvent } from '../dashboard.models';
+import { AppEvent, EventType, TuneSyncEvent } from '../dashboard.models';
 import * as DashboardActions from '../store/dashboard.actions';
 import {
   selectActiveRoom,
@@ -90,6 +90,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         .select(selectEvents)
         .pipe(
           filter((events) => events !== undefined && events !== null),
+          // ? this observable stream is emitting mysteriously more than it should
           distinctUntilChanged((prev, curr) => {
             return prev[0] && curr[0] && prev[0].event_id === curr[0].event_id;
           }),
@@ -112,6 +113,26 @@ export class MainScreenComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       DashboardActions.createInviteResponseEvent({ roomId, response }),
     );
+
+    const inviteEvent: AppEvent = this.events[eventIndex];
+
+    const content = `You have ${
+      response === 'A' ? 'accepted' : 'rejected'
+    } the invite to ${inviteEvent.args.room_name} from ${inviteEvent.username}`;
+    // cast the invite event to a msg event displaying what happened
+    const joinEvent: AppEvent = {
+      ...inviteEvent,
+      user_id: this.userId,
+      username: '',
+      event_type: EventType.Messaging,
+      args: {
+        content,
+      },
+    };
+    // remove the invite event (should not be able to respond again)
+    this.events.splice(eventIndex, 1);
+    // add a join message
+    this.events.push(joinEvent);
   }
 
   onLoadMore(): void {
