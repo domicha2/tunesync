@@ -177,19 +177,24 @@ class Handler:
         # save the poll and we're done
         poll_event.save()
         PollTask.initiate_poll(poll_event.event.id)
-        serializer = EventSerializer(event)
-        return Response(serializer.data)
+        return Response(poll_event.get_state())
 
     def handle_V(args, event, user, **kw):
         """
         Handler for the voting on any polls in a room
         """
-        if not Handler.validate_V(args):
+        if not Handler.validate_V(args, event):
             return Response(
                 {"details": "missing arguments"}, status=status.HTTP_400_BAD_REQUEST
             )
         # save event to Event table
-        poll = Poll.objects.filter(event=event.parent_event)[0]
+        poll = Poll.objects.filter(event=event.parent_event)
+        if poll:
+            poll = poll[0]
+        else:
+            return Response(
+                {"details": "poll does not exist"}, status=status.HTTP_400_BAD_REQUEST
+            )
         if not poll.is_active:
             return Response(
                 {"details": "This vote is already completed"},
@@ -200,11 +205,10 @@ class Handler:
         vote_event = Vote.objects.update_or_create(
             poll=poll, user=user, defaults={"event": event, "agree": agree_field}
         )
-        # save the vote
-        serializer = EventSerializer(event)
-        return Response(serializer.data)
+        result = poll.get_state()
+        return Response(poll.get_state())
 
-    def validate_V(args):
+    def validate_V(args, event):
         if "agree" in args:
             return isinstance(args["agree"], bool)
         else:
@@ -212,7 +216,7 @@ class Handler:
 
     # TODO: This is ugly. Refractor into multiple functions if time allows
 
-    def validate_U(args):
+    def validate_U(args, event):
         event_type = args["type"]
         if event_type == "K":
             if "user" not in args:
@@ -223,6 +227,11 @@ class Handler:
             if "users" not in args:
                 return Response(
                     {"details": "bad args"}, status=status.HTTP_400_BAD_REQUEST
+                )
+            if event.room.system_user:
+                return Response(
+                    {"details": "cannot invite others to personal room"},
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
         elif event_type == "J":
             if "is_accepted" not in args:
@@ -279,18 +288,15 @@ class Handler:
 
     def handle_U_J(args, event, user, **kw):
         system_room = Room.objects.get(system_user=user)
-        system_event = Event(author=user, room=system_room, event_type="M")
-        system_event_args = {"room": event.room.id}
         if args["is_accepted"]:
             membership = Membership.objects.get(room=event.room, user=user)
             membership.state = "A"
-            system_event_args["is_accepted"] = True
         else:
             membership = Membership.objects.get(room=event.room, user=user)
             membership.state = "R"
-            system_event_args["is_accepted"] = False
-        system_event.args = system_event_args
-        system_event.save()
+        invite_event = Event.objects.filter(
+            room=system_room, args__type="I", args__room_id=event.room.id
+        ).update(isDeleted=True)
         membership.save()
         return (None, status.HTTP_200_OK)
 
@@ -321,7 +327,7 @@ class Handler:
 
     def handle_U(args, event, user, **kw):
         if "type" in args:
-            handler_result = Handler.validate_U(args)
+            handler_result = Handler.validate_U(args, event)
             if handler_result:
                 return handler_result
             handle_event = getattr(Handler, "handle_U_" + args["type"])
@@ -340,7 +346,7 @@ class Handler:
     def validate_PO(args, event):
         if "action":
             if args["action"] == "U":
-                return Handler.validate_U(args)
+                return Handler.validate_U(args, event)
             elif args["action"] == "MQ":
                 return Handler.validate_MQ(args, event)
             elif args["action"] == "PL":

@@ -9,7 +9,6 @@ router.register(r"users", mine.UserViewSet, basename="user")
 router.register(r"events", mine.EventViewSet, basename="event")
 router.register(r"rooms", mine.RoomViewSet, basename="room")
 router.register(r"tunes", mine.TuneViewSet, basename="tune")
-router.register(r"memberships", mine.MembershipViewSet, basename="membership")
 
 
 # Wire up our API using automatic URL routing.
@@ -17,5 +16,4 @@ router.register(r"memberships", mine.MembershipViewSet, basename="membership")
 urlpatterns = [
     path("", include(router.urls)),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
-    url(r"^get-token/", views.obtain_auth_token),
 ]

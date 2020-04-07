@@ -62,7 +62,7 @@ def is_event_type(request, view, event):
 
 class InRoomOnly(BasePermission):
     def has_permission(self, request, view):
-        if view.action in {"tunesync", "events"}:
+        if view.action in {"tunesync", "events", "polls"}:
             room_id = view.kwargs["pk"]
             return Membership.is_in_room(room_id, request.user)
         return True

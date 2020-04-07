@@ -1,10 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
-import { debounceTime, startWith } from 'rxjs/operators';
+import { debounceTime, filter, startWith } from 'rxjs/operators';
 import { AppState } from '../../../app.module';
 import { User } from '../../../auth/auth.models';
+import { PERSONAL_ROOM_NAME } from '../../dashboard.models';
 import * as DashboardActions from '../../store/dashboard.actions';
 import { selectAllUsers } from '../../store/dashboard.selectors';
 
@@ -20,7 +26,10 @@ export class AddRoomComponent implements OnInit, OnDestroy {
   usernameControl = new FormControl('');
 
   roomForm = new FormGroup({
-    title: new FormControl(),
+    title: new FormControl(null, [
+      Validators.required,
+      this.roomTitleValidator,
+    ]),
     subtitle: new FormControl(),
   });
 
@@ -40,7 +49,10 @@ export class AddRoomComponent implements OnInit, OnDestroy {
         }),
     );
 
-    this.allUsers$ = this.store.select(selectAllUsers);
+    this.allUsers$ = this.store.select(selectAllUsers).pipe(
+      filter((users) => users !== undefined),
+      startWith([]),
+    );
   }
 
   ngOnDestroy(): void {
@@ -54,5 +66,13 @@ export class AddRoomComponent implements OnInit, OnDestroy {
         users: this.users.value,
       }),
     );
+  }
+
+  private roomTitleValidator(
+    control: AbstractControl,
+  ): { [key: string]: any } | null {
+    return control.value === PERSONAL_ROOM_NAME
+      ? { forbiddenName: { value: control.value } }
+      : null;
   }
 }

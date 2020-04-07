@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpWrapperService } from '../../http-wrapper.service';
-import { EventType, Role, UserChangeAction } from '../dashboard.models';
+import { EventType, UserChangeAction } from '../dashboard.models';
 
 @Injectable({ providedIn: 'root' })
 export class UsersService {
@@ -24,9 +24,9 @@ export class UsersService {
   }
 
   getUsersByUsername(username: string): Observable<any> {
-    return this.httpWrapperService.get(
-      `/users/?username__icontains=${username}`,
-    );
+    return this.httpWrapperService.get('/users/', {
+      username__icontains: username,
+    });
   }
 
   createInviteUsersEvent(users: number[], roomId: number): Observable<any> {

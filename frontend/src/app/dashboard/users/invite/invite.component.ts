@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
-import { debounceTime, startWith } from 'rxjs/operators';
+import { debounceTime, filter, startWith } from 'rxjs/operators';
 import { AppState } from '../../../app.module';
 import { User } from '../../../auth/auth.models';
 import * as DashboardActions from '../../store/dashboard.actions';
@@ -42,10 +42,13 @@ export class InviteComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.store
         .select(selectActiveRoom)
-        .subscribe(roomId => (this.activeRoomId = roomId)),
+        .subscribe((roomId) => (this.activeRoomId = roomId)),
     );
 
-    this.allUsers$ = this.store.select(selectAllUsers);
+    this.allUsers$ = this.store.select(selectAllUsers).pipe(
+      filter((users) => users !== undefined),
+      startWith([]),
+    );
   }
 
   ngOnDestroy(): void {

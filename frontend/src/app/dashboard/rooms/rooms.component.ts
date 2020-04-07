@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { AppState } from '../../app.module';
 import { Role, Room } from '../dashboard.models';
 import { NotificationsService } from '../notifications.service';
@@ -34,7 +35,7 @@ export class RoomsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.notificationsService.notificationsSubject.subscribe(payload => {
+    this.notificationsService.notificationsSubject.subscribe((payload) => {
       if (payload.action === 'reset') {
         // undefined makes it so that it does not render
         this.notifications[payload.roomId] = undefined;
@@ -47,11 +48,14 @@ export class RoomsComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.store.select(selectRooms).subscribe((rooms: Room[]) => {
-      // clear existing value
-      this.rooms = { admin: [], dj: [], regular: [] };
-      if (rooms) {
-        rooms.forEach(room => {
+    this.store
+      .select(selectRooms)
+      .pipe(filter((rooms) => rooms !== undefined))
+      .subscribe((rooms: Room[]) => {
+        // clear existing value
+        this.rooms = { admin: [], dj: [], regular: [] };
+
+        rooms.forEach((room) => {
           switch (room.role) {
             case Role.Admin:
               this.rooms.admin.push(room);
@@ -64,8 +68,7 @@ export class RoomsComponent implements OnInit, OnDestroy {
               break;
           }
         });
-      }
-    });
+      });
   }
 
   ngOnDestroy(): void {
@@ -73,6 +76,10 @@ export class RoomsComponent implements OnInit, OnDestroy {
   }
 
   onRoomClick(room: Room): void {
+    // prevent users from triggering a refresh when clicking same room
+    // Why? there is no need the data is the same and is a hit in performance
+    if (this.activeRoom && room.id === this.activeRoom.id) return;
+
     this.activeRoom = room;
     this.store.dispatch(DashboardActions.resetState());
     this.store.dispatch(
@@ -86,12 +93,24 @@ export class RoomsComponent implements OnInit, OnDestroy {
       action: 'reset',
     });
     this.store.dispatch(DashboardActions.getUsersByRoom({ roomId: room.id }));
-    this.store.dispatch(DashboardActions.getEventsByRoom({ roomId: room.id }));
+    this.store.dispatch(
+      DashboardActions.getEventsByRoom({
+        roomId: room.id,
+        creationTime: new Date(),
+      }),
+    );
     this.store.dispatch(DashboardActions.getTuneSyncEvent({ roomId: room.id }));
   }
 
   onAddRoom(): void {
     // open modal
     this.dialog.open(AddRoomComponent);
+  }
+
+  /**
+   * Used in the ngFor for each room's list
+   */
+  trackByRoomId(index: number, item: Room) {
+    return item.id;
   }
 }

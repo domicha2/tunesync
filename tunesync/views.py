@@ -19,16 +19,8 @@ from rest_framework.response import Response
 from tunesync.models import Event, Membership, Poll, Room, Tune, TuneSync
 
 from .event_handlers import Handler, PollTask
-from .filters import TuneFilter, UserFilter
-from .permissions import (
-    AnonCreateAndUpdateOwnerOnly,
-    DjOrAbove,
-    InRoomOnly,
-    InRoomOnlyEvents,
-    JoinPendingOnly,
-    RoomAdminOnly,
-    UploaderOnly,
-)
+from .filters import TuneFilter, UserFilter, EventFilter
+from .permissions import *  # we literally need everything
 from .serializers import *  # we literally need everything
 
 
@@ -78,22 +70,6 @@ class UserViewSet(viewsets.ViewSet):
         response = {"token": token.key, "user_id": u.pk}
         return Response(response)
 
-    # GET BY PK
-    def retrieve(self, request, pk=None):
-        pass
-
-    # PUT
-    def update(self, request, pk=None):
-        pass
-
-    # PATCH?
-    def partial_update(self, request, pk=None):
-        pass
-
-    # DELETE
-    def destroy(self, request, pk=None):
-        pass
-
     @action(detail=False, methods=["post"])
     def auth(self, request):
         """
@@ -111,16 +87,6 @@ class UserViewSet(viewsets.ViewSet):
                 {"details": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
             )
 
-    @action(methods=["get"], detail=False)
-    def whoami(self, request):
-        """
-        """
-        return Response({"username": request.user.username})
-
-    @action(detail=False, methods=["get"])
-    def set_password(self, request, pk=None):
-        return Response({"status": "password set"})
-
     @action(detail=True, methods=["get"])
     def rooms(self, request, pk=None):
 
@@ -137,29 +103,16 @@ class UserViewSet(viewsets.ViewSet):
 
 class EventViewSet(viewsets.ViewSet):
 
-    # permission_classes = [InRoomOnlyEvents, DjOrAbove, RoomAdminOnly, JoinPendingOnly]
-
-    # GET
-    def list(self, request):
-        if "event_type" in request.query_params:
-            event_type = request.query_params["event_type"]
-        try:
-            room_id = int(request.query_params["room"])
-            skip = int(request.query_params["skip"])
-            limit = int(request.query_params["limit"])
-        except:
-            return Response(
-                {"details": "Missing query params"}, status=status.HTTP_400_BAD_REQUEST
-            )
-        response_data = (
-            Event.objects.filter(room__pk=room_id, event_type=event_type)
-            .order_by("-creation_time")
-            .values()[skip:limit]
-        )
-        return Response(response_data)
+    permission_classes = [InRoomOnlyEvents, DjOrAbove, RoomAdminOnly, JoinPendingOnly]
 
     # POST
     def create(self, request):
+        """
+        We cannot use the serializer class to do validation for events because
+        of how we use args as a jsonfield. The event class is very complicated
+        and has alot of intermediate steps that must be validated. In this case
+        we deal with them with handlers for each event type
+        """
         if not set(request.data) <= {"room", "args", "event_type", "parent_event"}:
             return Response({"details": "bad arguments"}, status=400)
         room = Room.objects.get(pk=request.data["room"])
@@ -206,23 +159,23 @@ class RoomViewSet(viewsets.ViewSet):
 
     permission_classes = [UploaderOnly, InRoomOnly]
 
-    # GET
-    def list(self, request):
-        response_data = (
-            Room.objects.all()
-            .annotate(name=F("title"))
-            .values("name", "id")
-            .order_by("name")
-        )
-        return Response(response_data)
-
     # POST
     def create(self, request):
         deserializer = RoomSerializer(data=request.data)
         if not deserializer.is_valid():
-            return Response(status=404)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        title = request.data.get("title", None)
+        if not title:
+            return Response(
+                {"details": "title must not be empty"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if title == "Personal Room":
+            return Response(
+                {"details": "title must not be 'Personal Room'"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         room = deserializer.save(creator=request.user)
-        # TODO: Variable scoping with try/catch blocks
         room.save()
         member = Membership(user=request.user, room=room, role="A", state="A")
         member.save()
@@ -232,8 +185,14 @@ class RoomViewSet(viewsets.ViewSet):
     @action(methods=["get"], detail=True)
     def events(self, request, pk=None):
         # get all events at this room
-        events = (
-            Event.objects.filter(room=pk)
+        # TODO: paginate this and add filter
+        paginator = PageNumberPagination()
+        queryset = Event.objects.filter(room_id=pk).exclude(
+            event_type__in=["T", "PO", "V"]
+        )
+        filtered_set = EventFilter(request.GET, queryset=queryset).qs
+        renamed_set = (
+            filtered_set.order_by("-creation_time")
             .values("args", "parent_event_id", "creation_time", "event_type")
             .annotate(
                 username=F("author__username"),
@@ -241,13 +200,15 @@ class RoomViewSet(viewsets.ViewSet):
                 user_id=F("author"),
                 room_id=F("room"),
             )
-            .order_by("-creation_time")[:100]
+            .exclude(isDeleted=True)
         )
-        return Response(events)
+        context = paginator.paginate_queryset(renamed_set, request)
+        return paginator.get_paginated_response(context)
 
     @action(methods=["get"], detail=True)
     def users(self, request, pk=None):
         # get all user in this room
+        # TODO paginate this if theres time for jason
         users = (
             Membership.objects.filter(room=pk, state="A")
             .values("role", "state")
@@ -260,6 +221,32 @@ class RoomViewSet(viewsets.ViewSet):
     def tunesync(self, request, pk=None):
         result = TuneSync.get_tune_sync(pk)
         return Response(result)
+
+    @action(methods=["get"], detail=True)
+    def polls(self, request, pk=None):
+        paginator = PageNumberPagination()
+        active_polls = Poll.objects.filter(event__room_id=pk, is_active=True)
+        context = paginator.paginate_queryset(active_polls, request)
+        result = []
+        for poll in context:
+            result.append(poll.get_state())
+        return paginator.get_paginated_response(result)
+
+
+def extract_metadata(audio, key):
+    data = audio.get(key, None)
+    if not data:
+        result = ""
+    elif isinstance(data, list):
+        result = data[0]
+    return result
+
+
+def extract_all_metadata(audio):
+    result = {}
+    for meta in audio:
+        result[meta] = extract_metadata(audio, meta)
+    return result
 
 
 class TuneViewSet(viewsets.ViewSet):
@@ -305,10 +292,11 @@ class TuneViewSet(viewsets.ViewSet):
             else:
                 # this is so we dont store the same file multiple times but allow users to upload multiple songs
                 audio_file = file
+            meta = extract_all_metadata(audio)
             tune = Tune(
-                name=audio["title"],
-                artist=audio["artist"],
-                album=audio["album"],
+                name=meta["title"],
+                artist=meta["artist"],
+                album=meta["album"],
                 uploader=request.user,
                 length=audio.info.length,
                 mime=audio.mime[0],
@@ -323,6 +311,7 @@ class TuneViewSet(viewsets.ViewSet):
     # PATCH
     def partial_update(self, request, pk=None):
         # Check if given tune is even in the db
+        # TODO: check if this can be done better lol
         tune = Tune.objects.filter(id=pk)
         if tune:
             tune = tune[0]
@@ -349,7 +338,6 @@ class TuneViewSet(viewsets.ViewSet):
                 pk=pk
             )
             if not colliding_tunes:
-                print(tune.audio_file.path)
                 os.remove(tune.audio_file.path)
             tune.delete()
             return Response(status=status.HTTP_202_ACCEPTED)
@@ -357,13 +345,3 @@ class TuneViewSet(viewsets.ViewSet):
             return Response(
                 {"details": "invalid event id"}, status=status.HTTP_400_BAD_REQUEST
             )
-
-
-class MembershipViewSet(viewsets.ModelViewSet):
-    """
-    Proof of concept viewset using ModelViewSet implementation
-    Also, we need a membership viewset anyways
-    """
-
-    queryset = Membership.objects.all()
-    serializer_class = MembershipSerializer
