@@ -17,7 +17,6 @@ import {
   styleUrls: ['./create-poll.component.scss'],
 })
 export class CreatePollComponent implements OnInit, OnDestroy {
-  testVariable = 'Hello Michael!';
   subscription = new Subscription();
 
   regularUsers$: Observable<User[]>;
