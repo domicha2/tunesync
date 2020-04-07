@@ -84,6 +84,7 @@ export class QueueComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.store
         .select(selectAvailableSongs)
+        .pipe(filter((songs) => songs !== undefined))
         .subscribe((availableSongs: Song[]) => {
           this.availableSongs = availableSongs;
         }),
