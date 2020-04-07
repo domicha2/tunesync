@@ -1,13 +1,14 @@
 <div id="create-poll-wrapper" class="column">
   <h1 mat-dialog-title>Create Poll</h1>
   <mat-dialog-content>
-    <label id="poll type label"> Select a type of poll </label>
-    <mat-radio-group aria-labelledby="poll type label" [(ngModel)]="pollType">
+    <label id="poll-type-label">Select a type of poll</label>
+    <mat-radio-group aria-labelledby="poll-type-label" [(ngModel)]="pollType">
       <mat-radio-button *ngFor="let type of pollTypes" value="type">
         {{ type }}
       </mat-radio-button>
     </mat-radio-group>
     <div>Your poll type is: {{ pollType }}</div>
+
     <h1 mat-dialog-title>
       Kick User
     </h1>
@@ -17,6 +18,7 @@
         {{ user }}
       </mat-option>
     </mat-select>
+
     <h1>
       Add song: Have a dropdown of available songs to select from
     </h1>
