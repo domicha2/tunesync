@@ -87,7 +87,6 @@ export class ControlsComponent
           filter(songs => songs !== null && songs !== undefined),
           tap((queue: Song[]) => {
             this.queue = queue;
-            console.count('queued songs sub');
           }),
         ),
       ])

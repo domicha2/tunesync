@@ -54,7 +54,7 @@
         <mat-list-item
           role="listitem"
           class="list-el"
-          *ngFor="let song of availableSongs"
+          *ngFor="let song of availableSongs; trackBy: trackBySongId"
           cdkDrag
           [cdkDragDisabled]="(userRole$ | async) === 'R'"
         >

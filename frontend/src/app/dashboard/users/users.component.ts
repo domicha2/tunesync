@@ -7,6 +7,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { AppState } from '../../app.module';
 import { Role, User } from '../dashboard.models';
 import * as DashboardActions from '../store/dashboard.actions';
@@ -43,16 +44,19 @@ export class UsersComponent implements OnInit, OnDestroy {
     this.userRole$ = this.store.select(selectUserRole);
 
     this.subscription.add(
-      this.store.select(selectUsers).subscribe((users: User[]) => {
-        // clear existing list of users
-        this.users = {
-          admin: [],
-          dj: [],
-          regular: [],
-        };
-        if (users) {
+      this.store
+        .select(selectUsers)
+        .pipe(filter((users) => users !== undefined))
+        .subscribe((users: User[]) => {
+          // clear existing list of users
+          this.users = {
+            admin: [],
+            dj: [],
+            regular: [],
+          };
+
           // add users to their appropriate group
-          users.forEach(user => {
+          users.forEach((user) => {
             switch (user.role) {
               case Role.Admin:
                 this.users.admin.push(user);
@@ -65,8 +69,7 @@ export class UsersComponent implements OnInit, OnDestroy {
                 break;
             }
           });
-        }
-      }),
+        }),
     );
   }
 
@@ -131,5 +134,12 @@ export class UsersComponent implements OnInit, OnDestroy {
         }),
       );
     }
+  }
+
+  /**
+   * Used in the ngFor for each room's list
+   */
+  trackByUserId(index: number, item: User): number {
+    return item.userId;
   }
 }
