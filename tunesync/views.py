@@ -233,6 +233,22 @@ class RoomViewSet(viewsets.ViewSet):
         return paginator.get_paginated_response(result)
 
 
+def extract_metadata(audio, key):
+    data = audio.get(key, None)
+    if not data:
+        result = ""
+    elif isinstance(data, list):
+        result = data[0]
+    return result
+
+
+def extract_all_metadata(audio):
+    result = {}
+    for meta in audio:
+        result[meta] = extract_metadata(audio, meta)
+    return result
+
+
 class TuneViewSet(viewsets.ViewSet):
     permission_classes = [UploaderOnly]
     parser_classes = [MultiPartParser]
@@ -276,10 +292,11 @@ class TuneViewSet(viewsets.ViewSet):
             else:
                 # this is so we dont store the same file multiple times but allow users to upload multiple songs
                 audio_file = file
+            meta = extract_all_metadata(audio)
             tune = Tune(
-                name=audio["title"],
-                artist=audio["artist"],
-                album=audio["album"],
+                name=meta["title"],
+                artist=meta["artist"],
+                album=meta["album"],
                 uploader=request.user,
                 length=audio.info.length,
                 mime=audio.mime[0],
