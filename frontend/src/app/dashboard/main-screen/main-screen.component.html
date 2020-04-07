@@ -9,7 +9,7 @@
   </button>
   <mat-list class="column">
     <mat-list-item
-      *ngFor="let event of events"
+      *ngFor="let event of events; index as i"
       [ngClass]="{ 'current-user': userId === event.user_id }"
       [matTooltip]="event.creation_time"
       [matTooltipPosition]="userId === event.user_id ? 'right' : 'left'"
@@ -37,14 +37,14 @@
             </h3>
             <button
               mat-raised-button
-              (click)="onInviteResponse('A', event.args.room_id)"
+              (click)="onInviteResponse('A', event.args.room_id, i)"
             >
               Accept
             </button>
             <button
               mat-raised-button
               color="warn"
-              (click)="onInviteResponse('R', event.args.room_id)"
+              (click)="onInviteResponse('R', event.args.room_id, i)"
             >
               Reject
             </button>

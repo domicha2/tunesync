@@ -104,7 +104,11 @@ export class MainScreenComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  onInviteResponse(response: 'A' | 'R', roomId: number): void {
+  onInviteResponse(
+    response: 'A' | 'R',
+    roomId: number,
+    eventIndex: number,
+  ): void {
     this.store.dispatch(
       DashboardActions.createInviteResponseEvent({ roomId, response }),
     );
