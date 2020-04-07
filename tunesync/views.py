@@ -163,7 +163,13 @@ class RoomViewSet(viewsets.ViewSet):
     def create(self, request):
         deserializer = RoomSerializer(data=request.data)
         if not deserializer.is_valid():
-            return Response(status=404)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        title = request.data.get("title", None)
+        if not title:
+            return Response(
+                {"details": "title must not be empty"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         room = deserializer.save(creator=request.user)
         room.save()
         member = Membership(user=request.user, room=room, role="A", state="A")
