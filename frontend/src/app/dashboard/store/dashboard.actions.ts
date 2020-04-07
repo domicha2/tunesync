@@ -133,17 +133,17 @@ export const createMessage = createAction(
 
 export const getEventsByRoom = createAction(
   '[Rooms Component] Get Events By Room',
-  props<{ roomId: number }>(),
+  props<{ roomId: number; creationTime: Date }>(),
 );
 export const storeEvents = createAction(
   '[Events API] Store Events',
-  props<{ events: AppEvent[] }>(),
+  props<{ events: AppEvent[]; loadMore: boolean }>(),
 );
 
 /* Users */
 export const getUsersByUsername = createAction(
   '[Add Room Component] Get Users By Username',
-  props<{ username: string, filterByActiveRoom: boolean }>(),
+  props<{ username: string; filterByActiveRoom: boolean }>(),
 );
 export const storeAllUsers = createAction(
   '[Users API] Store All Users',

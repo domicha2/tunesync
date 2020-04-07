@@ -21,6 +21,8 @@ export interface DashboardState {
   queueIndex: number;
   tuneSyncEvent: any;
   userRole: Role;
+  // whether to show load more events
+  loadMore: boolean;
 }
 
 export const initialState: DashboardState = undefined;
@@ -66,6 +68,7 @@ const reducer = createReducer(
     return {
       ...state,
       events: action.events,
+      loadMore: action.loadMore,
     };
   }),
   on(DashboardActions.storeAllUsers, (state, action: any) => {

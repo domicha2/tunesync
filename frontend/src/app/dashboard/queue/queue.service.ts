@@ -10,17 +10,13 @@ export class QueueService {
   constructor(private httpWrapperService: HttpWrapperService) {}
 
   getAvailableSongs(filters: Filters): Observable<any> {
-    let getParams = '?';
+    const queryParams = {};
     for (const key in filters) {
       if (filters[key] !== '') {
-        getParams += `${key}__icontains=${filters[key]}&`;
+        queryParams[`${key}__icontains`] = filters[key];
       }
     }
-    if (getParams === '?') {
-      // no get params
-      getParams = '';
-    }
-    return this.httpWrapperService.get('/tunes/' + getParams);
+    return this.httpWrapperService.get('/tunes/', queryParams);
   }
 
   createModifyQueueEvent(queue: number[], roomId: number): Observable<any> {

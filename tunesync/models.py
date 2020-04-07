@@ -44,6 +44,7 @@ class Event(models.Model):
         (USER_CHANGE, "User Change"),
         (TUNESYNC, "Tune Sync"),
         (VOTE, "Vote"),
+        (MESSAGE, "M"),
     ]
     isDeleted = models.BooleanField(default=False)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
@@ -108,29 +109,48 @@ class Poll(models.Model):
     MODIFY_QUEUE = "MQ"
     PLAY = "PL"
     ACTIONS = [(KICK, "Kick"), (MODIFY_QUEUE, "Modify Queue"), (PLAY, "Play")]
-    # TODO:
     event = models.OneToOneField(Event, on_delete=models.DO_NOTHING, primary_key=True)
     action = models.CharField(max_length=2, choices=ACTIONS)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(auto_now_add=True)
     args = JSONField()
-    is_actve = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
     is_successful = models.BooleanField(default=False)
 
     class Meta:
         indexes = [models.Index(fields=["room", "action", "creation_time"])]
 
     @property
+    def votes_agreed(self):
+        return Vote.objects.filter(poll=self, agree=True)
+
+    @property
+    def votes_disagreed(self):
+        return Vote.objects.filter(poll=self, agree=False)
+
+    @property
     def vote_percentage(self):
         users = Membership.objects.filter(room=self.room)
-        votes_agreed = Vote.objects.filter(poll=self, agree=True)
         if users:
-            return len(votes_agreed) / len(users)
+            return len(self.votes_agreed) / len(users)
         else:
             return 0
 
     def is_majority(self):
         return self.vote_percentage > 0.5
+
+    def get_state(self):
+        result = {
+            "poll": self.event.id,
+            "args": self.args,
+            "vote_percentage": self.vote_percentage,
+            "agrees": len(self.votes_agreed),
+            "disagrees": len(self.votes_disagreed),
+            "is_actve": self.is_active,
+            "is_successful": self.is_successful,
+            "room_id": self.event.room.id,
+        }
+        return result
 
 
 class Vote(models.Model):
@@ -203,6 +223,16 @@ class Membership(models.Model):
             return False
 
 
+def send_update(room, data):
+    channel_layer = channels.layers.get_channel_layer()
+    users_in_room = Membership.objects.filter(room=room, state="A")
+    for user in users_in_room:
+        group_name = "user-{}".format(user.user_id)
+        async_to_sync(channel_layer.group_send)(
+            group_name, {"type": "user_notify_event", "text": data}
+        )
+
+
 @receiver(post_save, sender=Event, dispatch_uid="update_event_listeners")
 def update_event_listeners(sender, instance, **kwargs):
     """
@@ -210,7 +240,6 @@ def update_event_listeners(sender, instance, **kwargs):
     """
     if instance.event_type == "T":
         return
-
     message = {
         "room_id": instance.room.id,
         "event_id": instance.id,
@@ -221,33 +250,28 @@ def update_event_listeners(sender, instance, **kwargs):
         "args": instance.args,
         "username": instance.author.username,
     }
-    channel_layer = channels.layers.get_channel_layer()
-
     room = instance.room
-    users_in_room = Membership.objects.filter(room=room, state="A")
-    for user in users_in_room:
-        group_name = "user-{}".format(user.user_id)
-
-        async_to_sync(channel_layer.group_send)(
-            group_name, {"type": "user_notify_event", "text": message}
-        )
+    send_update(room, message)
 
 
 @receiver(post_save, sender=TuneSync, dispatch_uid="update_tunesync_listeners")
 def update_tunesync_listeners(sender, instance, **kwargs):
     room = instance.event.room
-
     tunesync = TuneSync.get_tune_sync(room.id)
-    channel_layer = channels.layers.get_channel_layer()
-
     if "play_time" in tunesync and tunesync["play_time"] is not None:
         tunesync["play_time"] = tunesync["play_time"].isoformat()
+    send_update(room, tunesync)
 
-    users_in_room = Membership.objects.filter(room=room, state="A")
-    for user in users_in_room:
-        group_name = "user-{}".format(user.user_id)
-        async_to_sync(channel_layer.group_send)(
-            group_name, {"type": "user_notify_event", "text": tunesync}
-        )
-    # need end point for websocket token
-    # signed with hmacs
+
+@receiver(post_save, sender=Poll, dispatch_uid="update_poll_listeners")
+def update_poll_listeners(sender, instance, **kwargs):
+    room = instance.event.room
+    status = instance.get_state()
+    send_update(room, status)
+
+
+@receiver(post_save, sender=Vote, dispatch_uid="update_vote_listeners")
+def update_vote_listeners(sender, instance, **kwargs):
+    room = instance.event.room
+    status = instance.poll.get_state()
+    send_update(room, status)

@@ -7,10 +7,15 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import { AppState } from '../../app.module';
 import { Role, User } from '../dashboard.models';
 import * as DashboardActions from '../store/dashboard.actions';
-import { selectUserRole, selectUsers } from '../store/dashboard.selectors';
+import {
+  selectActiveRoomName,
+  selectUserRole,
+  selectUsers,
+} from '../store/dashboard.selectors';
 import { InviteComponent } from './invite/invite.component';
 import { KickUserComponent } from './kick-user/kick-user.component';
 
@@ -21,6 +26,7 @@ import { KickUserComponent } from './kick-user/kick-user.component';
 })
 export class UsersComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
+  isDarkTheme = true;
 
   users = {
     admin: [] as User[],
@@ -29,23 +35,28 @@ export class UsersComponent implements OnInit, OnDestroy {
   };
 
   userRole$: Observable<Role>;
+  roomName$: Observable<string>;
 
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
+    this.roomName$ = this.store.select(selectActiveRoomName);
     this.userRole$ = this.store.select(selectUserRole);
 
     this.subscription.add(
-      this.store.select(selectUsers).subscribe((users: User[]) => {
-        // clear existing list of users
-        this.users = {
-          admin: [],
-          dj: [],
-          regular: [],
-        };
-        if (users) {
+      this.store
+        .select(selectUsers)
+        .pipe(filter((users) => users !== undefined))
+        .subscribe((users: User[]) => {
+          // clear existing list of users
+          this.users = {
+            admin: [],
+            dj: [],
+            regular: [],
+          };
+
           // add users to their appropriate group
-          users.forEach(user => {
+          users.forEach((user) => {
             switch (user.role) {
               case Role.Admin:
                 this.users.admin.push(user);
@@ -58,13 +69,21 @@ export class UsersComponent implements OnInit, OnDestroy {
                 break;
             }
           });
-        }
-      }),
+        }),
     );
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+  }
+
+  onToggleTheme(): void {
+    this.isDarkTheme = !this.isDarkTheme;
+    if (this.isDarkTheme) {
+      document.querySelector('body').classList.remove('light-theme');
+    } else {
+      document.querySelector('body').classList.add('light-theme');
+    }
   }
 
   onSignOut(): void {
@@ -115,5 +134,12 @@ export class UsersComponent implements OnInit, OnDestroy {
         }),
       );
     }
+  }
+
+  /**
+   * Used in the ngFor for each room's list
+   */
+  trackByUserId(index: number, item: User): number {
+    return item.userId;
   }
 }

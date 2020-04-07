@@ -8,11 +8,12 @@ import {
   ViewChild,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, filter, tap } from 'rxjs/operators';
 import { AppState } from '../../app.module';
-import { Role, Song, FileList2 } from '../dashboard.models';
+import { FileList2, Role, Song } from '../dashboard.models';
 import { QueueComponent } from '../queue/queue.component';
 import * as DashboardActions from '../store/dashboard.actions';
 import {
@@ -20,6 +21,7 @@ import {
   selectSongStatus,
   selectUserRole,
 } from '../store/dashboard.selectors';
+import { ControlsService } from './controls.service';
 
 @Component({
   selector: 'app-controls',
@@ -45,12 +47,24 @@ export class ControlsComponent
   userRole$: Observable<Role>;
 
   constructor(
+    private matSnackBar: MatSnackBar,
+    private controlsService: ControlsService,
     private cdr: ChangeDetectorRef,
     private store: Store<AppState>,
     private matDialog: MatDialog,
   ) {}
 
   ngOnInit(): void {
+    this.controlsService.songsUploaded.subscribe((songsUploaded: number) => {
+      this.matSnackBar.open(
+        `${songsUploaded} songs uploaded successfully!`,
+        undefined,
+        {
+          duration: 2500,
+        },
+      );
+    });
+
     this.userRole$ = this.store.select(selectUserRole);
 
     /**
@@ -73,7 +87,6 @@ export class ControlsComponent
           filter(songs => songs !== null && songs !== undefined),
           tap((queue: Song[]) => {
             this.queue = queue;
-            console.count('queued songs sub');
           }),
         ),
       ])
