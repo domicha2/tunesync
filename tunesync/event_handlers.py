@@ -177,8 +177,7 @@ class Handler:
         # save the poll and we're done
         poll_event.save()
         PollTask.initiate_poll(poll_event.event.id)
-        serializer = EventSerializer(event)
-        return Response(serializer.data)
+        return Response(poll_event.get_state())
 
     def handle_V(args, event, user, **kw):
         """
@@ -189,7 +188,13 @@ class Handler:
                 {"details": "missing arguments"}, status=status.HTTP_400_BAD_REQUEST
             )
         # save event to Event table
-        poll = Poll.objects.filter(event=event.parent_event)[0]
+        poll = Poll.objects.filter(event=event.parent_event)
+        if poll:
+            poll = poll[0]
+        else:
+            return Response(
+                {"details": "poll does not exist"}, status=status.HTTP_400_BAD_REQUEST
+            )
         if not poll.is_active:
             return Response(
                 {"details": "This vote is already completed"},
@@ -200,9 +205,8 @@ class Handler:
         vote_event = Vote.objects.update_or_create(
             poll=poll, user=user, defaults={"event": event, "agree": agree_field}
         )
-        # save the vote
-        serializer = EventSerializer(event)
-        return Response(serializer.data)
+        result = poll.get_state()
+        return Response(poll.get_state())
 
     def validate_V(args, event):
         if "agree" in args:
@@ -293,8 +297,8 @@ class Handler:
         invite_event = Event.objects.filter(
             room=system_room, args__type="I", args__room_id=event.room.id
         ).order_by("-creation_date")
-        invite_event.isDeleted = True
-        invite_event.save()
+        invite_event[0].isDeleted = True
+        invite_event[0].save()
         membership.save()
         return (None, status.HTTP_200_OK)
 
