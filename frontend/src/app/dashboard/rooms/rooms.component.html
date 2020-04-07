@@ -18,7 +18,7 @@
       <div
         class="list-el"
         *ngFor="let room of rooms.admin"
-        [ngClass]="{ active: activeRoom === room }"
+        [ngClass]="{ active: activeRoom && activeRoom.id === room.id }"
         (click)="onRoomClick(room)"
         [matBadge]="notifications[room.id]"
         [matTooltip]="room.subtitle"
@@ -40,7 +40,7 @@
       <div
         class="list-el"
         *ngFor="let room of rooms.dj"
-        [ngClass]="{ active: activeRoom === room }"
+        [ngClass]="{ active: activeRoom && activeRoom.id === room.id }"
         (click)="onRoomClick(room)"
         [matBadge]="notifications[room.id]"
         [matTooltip]="room.subtitle"
@@ -62,7 +62,7 @@
       <div
         class="list-el"
         *ngFor="let room of rooms.regular"
-        [ngClass]="{ active: activeRoom === room }"
+        [ngClass]="{ active: activeRoom && activeRoom.id === room.id }"
         (click)="onRoomClick(room)"
         [matBadge]="notifications[room.id]"
         [matTooltip]="room.subtitle"
