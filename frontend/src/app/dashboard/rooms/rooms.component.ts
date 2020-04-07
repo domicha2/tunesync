@@ -106,4 +106,11 @@ export class RoomsComponent implements OnInit, OnDestroy {
     // open modal
     this.dialog.open(AddRoomComponent);
   }
+
+  /**
+   * Used in the ngFor for each room's list
+   */
+  trackByRoomId(index: number, item: Room) {
+    return item.id;
+  }
 }
