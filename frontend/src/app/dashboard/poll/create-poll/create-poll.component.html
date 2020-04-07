@@ -1,10 +1,6 @@
 <div id="create-poll-wrapper" class="column">
   <h1 mat-dialog-title>Create Poll</h1>
   <mat-dialog-content>
-    <p>
-      Note: play is the most complex of the 3 actions so let's leave that for
-      the end
-    </p>
     <label id="poll type label"> Select a type of poll </label>
     <mat-radio-group aria-labelledby="poll type label" [(ngModel)]="pollType"
       ><mat-radio-button *ngFor="let type of pollTypes" value="type">
@@ -16,20 +12,20 @@
       Kick User
     </h1>
     <mat-label>User</mat-label>
-    <mat-select [(ngModel)]="users"
-      ><mat-option *ngFor="let user of users" value="user">
-        {{ user }}</mat-option
-      ></mat-select
-    >
+    <mat-select [(ngModel)]="users">
+      <mat-option *ngFor="let user of users" value="user">
+        {{ user }}
+      </mat-option>
+    </mat-select>
     <h1>
       Add song: Have a dropdown of available songs to select from
     </h1>
     <mat-label>Songs</mat-label>
-    <mat-select [(ngModel)]="songs"
-      ><mat-option *ngFor="let song of songs" value="song">
-        {{ song }}</mat-option
-      ></mat-select
-    >
+    <mat-select [(ngModel)]="songs">
+      <mat-option *ngFor="let song of songs" value="song">
+        {{ song }}
+      </mat-option>
+    </mat-select>
 
     <div>{{ regularUsers$ | async }}</div>
     <div>{{ availableSongs$ | async }}</div>
