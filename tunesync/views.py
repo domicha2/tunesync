@@ -170,6 +170,11 @@ class RoomViewSet(viewsets.ViewSet):
                 {"details": "title must not be empty"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        if title == "Personal Room":
+            return Response(
+                {"details": "title must not be 'Personal Room'"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         room = deserializer.save(creator=request.user)
         room.save()
         member = Membership(user=request.user, room=room, role="A", state="A")
@@ -182,9 +187,10 @@ class RoomViewSet(viewsets.ViewSet):
         # get all events at this room
         # TODO: paginate this and add filter
         paginator = PageNumberPagination()
-        filtered_set = EventFilter(
-            request.GET, queryset=Event.objects.filter(room_id=pk)
-        ).qs
+        queryset = Event.objects.filter(room_id=pk).exclude(
+            event_type__in=["T", "PO", "V"]
+        )
+        filtered_set = EventFilter(request.GET, queryset=queryset).qs
         renamed_set = (
             filtered_set.order_by("-creation_time")
             .values("args", "parent_event_id", "creation_time", "event_type")
