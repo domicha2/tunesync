@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
 import { debounceTime, filter, startWith } from 'rxjs/operators';
@@ -20,7 +20,7 @@ export class AddRoomComponent implements OnInit, OnDestroy {
   usernameControl = new FormControl('');
 
   roomForm = new FormGroup({
-    title: new FormControl(),
+    title: new FormControl(null, Validators.required),
     subtitle: new FormControl(),
   });
 

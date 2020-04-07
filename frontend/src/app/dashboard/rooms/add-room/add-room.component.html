@@ -31,7 +31,12 @@
     </form>
   </mat-dialog-content>
   <mat-dialog-actions>
-    <button mat-raised-button mat-dialog-close (click)="onAddRoom()">
+    <button
+      mat-raised-button
+      mat-dialog-close
+      (click)="onAddRoom()"
+      [disabled]="roomForm.invalid"
+    >
       Add
     </button>
     <button mat-raised-button mat-dialog-close>Close</button>
