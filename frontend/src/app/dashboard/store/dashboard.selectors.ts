@@ -10,29 +10,23 @@ export const selectLoadMore = createSelector(
 export const selectQueuedSongs = createSelector(
   (state: AppState) => state.dashboard,
   (dashboard: DashboardState) =>
-    dashboard && dashboard.queuedSongs
-      ? dashboard.queuedSongs.slice()
-      : undefined,
+    dashboard ? dashboard.queuedSongs : undefined,
 );
 
 export const selectAvailableSongs = createSelector(
   (state: AppState) => state.dashboard,
   (dashboard: DashboardState) =>
-    dashboard && dashboard.availableSongs
-      ? dashboard.availableSongs.slice()
-      : undefined,
+    dashboard ? dashboard.availableSongs : undefined,
 );
 
 export const selectRooms = createSelector(
   (state: AppState) => state.dashboard,
-  (dashboard: DashboardState) =>
-    dashboard && dashboard.rooms ? dashboard.rooms.slice() : undefined,
+  (dashboard: DashboardState) => (dashboard ? dashboard.rooms : undefined),
 );
 
 export const selectUsers = createSelector(
   (state: AppState) => state.dashboard,
-  (dashboard: DashboardState) =>
-    dashboard && dashboard.users ? dashboard.users.slice() : undefined,
+  (dashboard: DashboardState) => (dashboard ? dashboard.users : undefined),
 );
 
 export const selectEvents = createSelector(
@@ -48,8 +42,7 @@ export const selectActiveRoom = createSelector(
 
 export const selectAllUsers = createSelector(
   (state: AppState) => state.dashboard,
-  (dashboard: DashboardState) =>
-    dashboard && dashboard.allUsers ? dashboard.allUsers.slice() : undefined,
+  (dashboard: DashboardState) => (dashboard ? dashboard.allUsers : undefined),
 );
 
 export const selectIsPlaying = createSelector(
