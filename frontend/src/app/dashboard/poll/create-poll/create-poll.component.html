@@ -22,8 +22,14 @@
       ></mat-select
     >
     <h1>
-      3. Modify queue action: Have a dropdown of available songs to select from
+      Add song: Have a dropdown of available songs to select from
     </h1>
+    <mat-label>Songs</mat-label>
+    <mat-select [(ngModel)]="songs"
+      ><mat-option *ngFor="let song of songs" value="song">
+        {{ song }}</mat-option
+      ></mat-select
+    >
 
     <div>{{ regularUsers$ | async }}</div>
     <div>{{ availableSongs$ | async }}</div>
@@ -46,6 +52,7 @@
     </div>
   </mat-dialog-content>
   <mat-dialog-actions>
-    <h1>Add submit and cancel buttons</h1>
+    <button mat-raised-button>Submit</button>
+    <button mat-raised-button>Cancel</button>
   </mat-dialog-actions>
 </div>
