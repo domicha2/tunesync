@@ -11,4 +11,3 @@ application = ProtocolTypeRouter(
         "websocket": AuthMiddlewareStack(URLRouter([url(r"^events/$", EventConsumer)]))
     }
 )
-

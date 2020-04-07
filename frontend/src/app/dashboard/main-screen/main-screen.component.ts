@@ -1,10 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
-import { distinctUntilChanged, filter } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map } from 'rxjs/operators';
 import { AppState } from '../../app.module';
 import { selectUserId } from '../../auth/auth.selectors';
-import { AppEvent, TuneSyncEvent } from '../dashboard.models';
+import { AppEvent, EventType, TuneSyncEvent } from '../dashboard.models';
 import * as DashboardActions from '../store/dashboard.actions';
 import {
   selectActiveRoom,
@@ -39,7 +39,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadMore$ = this.store.select(selectLoadMore);
 
-    this.webSocketService.messageSubject.subscribe(messageData => {
+    this.webSocketService.messageSubject.subscribe((messageData) => {
       const updateView: boolean = this.eventsService.processWebSocketMessage(
         messageData,
         this.activeRoomId,
@@ -59,19 +59,19 @@ export class MainScreenComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.store
         .select(selectActiveRoomName)
-        .subscribe(name => (this.activeRoomName = name)),
+        .subscribe((name) => (this.activeRoomName = name)),
     );
 
     this.subscription.add(
       this.store
         .select(selectActiveRoom)
-        .subscribe(roomId => (this.activeRoomId = roomId)),
+        .subscribe((roomId) => (this.activeRoomId = roomId)),
     );
 
     this.subscription.add(
       this.store
         .select(selectTuneSyncEvent)
-        .pipe(filter(data => data !== undefined))
+        .pipe(filter((data) => data !== undefined))
         .subscribe((response: TuneSyncEvent) => {
           this.eventsService.processTuneSyncEvent(response);
         }),
@@ -88,10 +88,11 @@ export class MainScreenComponent implements OnInit, OnDestroy {
       this.store
         .select(selectEvents)
         .pipe(
-          filter(events => events !== undefined && events !== null),
+          filter((events) => events !== undefined && events !== null),
           distinctUntilChanged((prev, curr) => {
             return prev[0] && curr[0] && prev[0].event_id === curr[0].event_id;
           }),
+          map((events: AppEvent[]) => events.slice()),
         )
         .subscribe((events: AppEvent[]) => {
           this.handleEventsResponse(events);
@@ -103,10 +104,34 @@ export class MainScreenComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  onInviteResponse(response: 'A' | 'R', roomId: number): void {
+  onInviteResponse(
+    response: 'A' | 'R',
+    roomId: number,
+    eventIndex: number,
+  ): void {
     this.store.dispatch(
       DashboardActions.createInviteResponseEvent({ roomId, response }),
     );
+
+    const inviteEvent: AppEvent = this.events[eventIndex];
+
+    const content = `You have ${
+      response === 'A' ? 'accepted' : 'rejected'
+    } the invite to ${inviteEvent.args.room_name} from ${inviteEvent.username}`;
+    // cast the invite event to a msg event displaying what happened
+    const joinEvent: AppEvent = {
+      ...inviteEvent,
+      user_id: this.userId,
+      username: '',
+      event_type: EventType.Messaging,
+      args: {
+        content,
+      },
+    };
+    // remove the invite event (should not be able to respond again)
+    this.events.splice(eventIndex, 1);
+    // add a join message
+    this.events.push(joinEvent);
   }
 
   onLoadMore(): void {

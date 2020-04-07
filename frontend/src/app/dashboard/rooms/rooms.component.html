@@ -17,8 +17,8 @@
       </mat-expansion-panel-header>
       <div
         class="list-el"
-        *ngFor="let room of rooms.admin"
-        [ngClass]="{ active: activeRoom === room }"
+        *ngFor="let room of rooms.admin; trackBy: trackByRoomId"
+        [ngClass]="{ active: activeRoom && activeRoom.id === room.id }"
         (click)="onRoomClick(room)"
         [matBadge]="notifications[room.id]"
         [matTooltip]="room.subtitle"
@@ -39,8 +39,8 @@
       </mat-expansion-panel-header>
       <div
         class="list-el"
-        *ngFor="let room of rooms.dj"
-        [ngClass]="{ active: activeRoom === room }"
+        *ngFor="let room of rooms.dj; trackBy: trackByRoomId"
+        [ngClass]="{ active: activeRoom && activeRoom.id === room.id }"
         (click)="onRoomClick(room)"
         [matBadge]="notifications[room.id]"
         [matTooltip]="room.subtitle"
@@ -61,8 +61,8 @@
       </mat-expansion-panel-header>
       <div
         class="list-el"
-        *ngFor="let room of rooms.regular"
-        [ngClass]="{ active: activeRoom === room }"
+        *ngFor="let room of rooms.regular; trackBy: trackByRoomId"
+        [ngClass]="{ active: activeRoom && activeRoom.id === room.id }"
         (click)="onRoomClick(room)"
         [matBadge]="notifications[room.id]"
         [matTooltip]="room.subtitle"
