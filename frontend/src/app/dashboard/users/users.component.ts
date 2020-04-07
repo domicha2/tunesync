@@ -135,4 +135,11 @@ export class UsersComponent implements OnInit, OnDestroy {
       );
     }
   }
+
+  /**
+   * Used in the ngFor for each room's list
+   */
+  trackByUserId(index: number, item: User): number {
+    return item.userId;
+  }
 }

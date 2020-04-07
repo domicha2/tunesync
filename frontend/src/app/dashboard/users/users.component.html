@@ -43,7 +43,10 @@
         [cdkDropListData]="users.admin"
         (cdkDropListDropped)="drop($event, 'A')"
       >
-        <div class="list-el" *ngFor="let user of users.admin">
+        <div
+          class="list-el"
+          *ngFor="let user of users.admin; trackBy: trackByUserId"
+        >
           <h3>{{ user.name }}</h3>
         </div>
       </div>
@@ -66,7 +69,7 @@
       >
         <div
           class="list-el"
-          *ngFor="let user of users.dj"
+          *ngFor="let user of users.dj; trackBy: trackByUserId"
           cdkDrag
           [cdkDragDisabled]="(userRole$ | async) !== 'A'"
         >
@@ -92,7 +95,7 @@
       >
         <div
           class="list-el row"
-          *ngFor="let user of users.regular"
+          *ngFor="let user of users.regular; trackBy: trackByUserId"
           cdkDrag
           [cdkDragDisabled]="(userRole$ | async) !== 'A'"
         >
@@ -109,66 +112,4 @@
       </div>
     </mat-expansion-panel>
   </mat-accordion>
-
-  <!-- <div class="list-wrapper column" cdkDropListGroup>
-    <h2>Admin</h2>
-    <div
-      id="admin-users"
-      class="column"
-      cdkDropList
-      [cdkDropListData]="users.admin"
-      (cdkDropListDropped)="drop($event, 'A')"
-    >
-      <div
-        class="list-el"
-        *ngFor="let user of users.admin"
-        cdkDrag
-        [cdkDragDisabled]="(userRole$ | async) !== 'A'"
-      >
-        <h3>{{ user.name }}</h3>
-      </div>
-    </div>
-    <h2>DJ</h2>
-    <div
-      id="dj-users"
-      class="column"
-      cdkDropList
-      [cdkDropListData]="users.dj"
-      (cdkDropListDropped)="drop($event, 'D')"
-    >
-      <div
-        class="list-el"
-        *ngFor="let user of users.dj"
-        cdkDrag
-        [cdkDragDisabled]="(userRole$ | async) !== 'A'"
-      >
-        <h3>{{ user.name }}</h3>
-      </div>
-    </div>
-    <h2>Regular</h2>
-    <div
-      id="regular-users"
-      class="column"
-      cdkDropList
-      [cdkDropListData]="users.regular"
-      (cdkDropListDropped)="drop($event, 'R')"
-    >
-      <div
-        class="list-el row"
-        *ngFor="let user of users.regular"
-        cdkDrag
-        [cdkDragDisabled]="(userRole$ | async) !== 'A'"
-      >
-        <h3>{{ user.name }}</h3>
-        <button
-          *ngIf="(userRole$ | async) === 'A'"
-          mat-icon-button
-          matTooltip="Kick user"
-          (click)="onKickUser(user)"
-        >
-          <mat-icon>delete_forever</mat-icon>
-        </button>
-      </div>
-    </div>
-  </div> -->
 </div>
