@@ -29,8 +29,9 @@ export class CreatePollComponent implements OnInit, OnDestroy {
   pollType: string;
   pollTypes: string[] = ['Add Song to Queue', 'Kick'];
 
-  users: string[] = ['michael', 'jason'];
   songs: string[] = ['objection', 'Logic and Trick'];
+
+  selectedUser: User;
 
   constructor(private store: Store<AppState>) {}
 
