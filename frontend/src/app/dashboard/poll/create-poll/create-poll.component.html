@@ -23,9 +23,9 @@
       Add song: Have a dropdown of available songs to select from
     </h1>
     <mat-label>Songs</mat-label>
-    <mat-select [(ngModel)]="songs">
-      <mat-option *ngFor="let song of songs" value="song">
-        {{ song }}
+    <mat-select [(ngModel)]="selectedSong">
+      <mat-option *ngFor="let song of availableSongs$ | async" value="song">
+        {{ song.name }}
       </mat-option>
     </mat-select>
 
