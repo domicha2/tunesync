@@ -3,7 +3,10 @@
   <h6>You may change your vote later.</h6>
   <mat-list class="column" *ngIf="pollIds.length > 0; else noPolls">
     <mat-list-item *ngFor="let pollId of pollIds; trackBy: trackByPollId">
-      <app-poll [pollId]="pollId"></app-poll>
+      <app-poll
+        [pollId]="pollId"
+        [pollType]="pollState[pollId].args.action"
+      ></app-poll>
       <mat-divider></mat-divider>
       <app-poll-results
         [agree]="pollState[pollId].agrees"

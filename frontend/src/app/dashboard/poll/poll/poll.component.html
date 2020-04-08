@@ -1,5 +1,12 @@
 <div id="poll-wrapper" class="column">
-  <p class="poll-header">Poll Header Placeholder</p>
+  <p class="poll-question" [ngSwitch]="pollType">
+    <ng-container *ngSwitchCase="'U'">
+      Would you like to kick this user?
+    </ng-container>
+    <ng-container *ngSwitchCase="'MQ'">
+      Would you like to add this song to the queue?
+    </ng-container>
+  </p>
   <div id="vote-buttons" class="row">
     <button mat-raised-button (click)="onVote(true)">Yes</button>
     <button mat-raised-button color="warn" (click)="onVote(false)">No</button>

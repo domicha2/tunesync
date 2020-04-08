@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../app.module';
 import * as DashboardActions from '../../store/dashboard.actions';
+import { PollType } from '../poll.models';
 
 @Component({
   selector: 'app-poll',
@@ -10,6 +11,7 @@ import * as DashboardActions from '../../store/dashboard.actions';
 })
 export class PollComponent {
   @Input() pollId: number;
+  @Input() pollType: PollType;
 
   constructor(private store: Store<AppState>) {}
 
