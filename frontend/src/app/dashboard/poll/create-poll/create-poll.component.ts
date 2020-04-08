@@ -4,7 +4,14 @@ import { Store } from '@ngrx/store';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 import { debounceTime, map, startWith, tap } from 'rxjs/operators';
 import { AppState } from '../../../app.module';
-import { Filters, Role, Song, User, PollType } from '../../dashboard.models';
+import {
+  Filters,
+  PollType,
+  Role,
+  Song,
+  User,
+  UserChangeAction,
+} from '../../dashboard.models';
 import * as DashboardActions from '../../store/dashboard.actions';
 import {
   selectAvailableSongs,
@@ -26,8 +33,11 @@ export class CreatePollComponent implements OnInit, OnDestroy {
   albumControl = new FormControl('');
   artistControl = new FormControl('');
 
-  pollType: string;
-  pollTypes: string[] = ['Add Song to Queue', 'Kick'];
+  pollType: PollType;
+  pollTypes: any[] = [
+    { name: 'Add Song to Queue', enum: PollType.AddToQueue },
+    { name: 'Kick User', enum: PollType.Kick },
+  ];
 
   selectedUserId: number;
   selectedSongId: number;
@@ -73,15 +83,30 @@ export class CreatePollComponent implements OnInit, OnDestroy {
   }
 
   onCreatePoll(): void {
-    // ! mock data
-    this.store.dispatch(
-      DashboardActions.createPoll({
-        pollArgs: {
-          action: PollType.Kick,
-          type: 'K',
-          user: 2,
-        },
-      }),
-    );
+    switch (this.pollType) {
+      case PollType.AddToQueue:
+        this.store.dispatch(
+          DashboardActions.createPoll({
+            pollArgs: {
+              action: this.pollType,
+              song: this.selectedSongId,
+            },
+          }),
+        );
+        break;
+      case PollType.Kick:
+        this.store.dispatch(
+          DashboardActions.createPoll({
+            pollArgs: {
+              action: this.pollType,
+              type: UserChangeAction.Kick,
+              user: this.selectedUserId,
+            },
+          }),
+        );
+        break;
+      default:
+        console.error('bad poll type');
+    }
   }
 }

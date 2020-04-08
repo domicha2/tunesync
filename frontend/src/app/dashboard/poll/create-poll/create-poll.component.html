@@ -1,15 +1,14 @@
 <div id="create-poll-wrapper" class="column">
   <h1 mat-dialog-title>Create Poll</h1>
   <mat-dialog-content>
-    <label id="poll-type-label">Select a type of poll</label>
+    <label id="poll-type-label">Select a poll type:</label>
     <mat-radio-group aria-labelledby="poll-type-label" [(ngModel)]="pollType">
-      <mat-radio-button *ngFor="let type of pollTypes" [value]="type">
-        {{ type }}
+      <mat-radio-button *ngFor="let type of pollTypes" [value]="type.enum">
+        {{ type.name }}
       </mat-radio-button>
     </mat-radio-group>
-    <div>Your poll type is: {{ pollType }}</div>
 
-    <div id="user" class="column" *ngIf="pollType === 'Kick'">
+    <div id="user" class="column" *ngIf="pollType === 'U'">
       <mat-label>User</mat-label>
       <mat-select [(ngModel)]="selectedUserId">
         <mat-option
@@ -20,7 +19,7 @@
         </mat-option>
       </mat-select>
     </div>
-    <div id="song" class="column" *ngIf="pollType === 'Add Song to Queue'">
+    <div id="song" class="column" *ngIf="pollType === 'MQ'">
       <mat-label>Songs</mat-label>
       <mat-select [(ngModel)]="selectedSongId">
         <mat-option
