@@ -1,0 +1,8 @@
+div#poll-results-wrapper {
+  width: 100%;
+
+  div.agree,
+  div.disagree {
+    justify-content: space-between;
+  }
+}

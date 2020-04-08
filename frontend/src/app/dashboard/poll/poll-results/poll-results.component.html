@@ -1,16 +1,22 @@
 <div id="poll-results-wrapper" class="column">
-  <p>
-    Agree {{ agree + ' | ' }}
-    <ng-container *ngIf="agree + disagree !== 0; else zero">
-      {{ agree / (agree + disagree) | percent }}
-    </ng-container>
-  </p>
-  <p>
-    Disagree {{ disagree + ' | ' }}
-    <ng-container *ngIf="agree + disagree !== 0; else zero">
-      {{ disagree / (agree + disagree) | percent }}
-    </ng-container>
-  </p>
+  <div class="agree row">
+    <p>Agree: {{ agree }}</p>
+    <p>
+      <ng-container *ngIf="agree + disagree !== 0; else zero">
+        {{ agree / (agree + disagree) | percent }}
+      </ng-container>
+    </p>
+  </div>
+
+  <div class="disagree row">
+    <p>Disagree: {{ disagree }}</p>
+    <p>
+      <ng-container *ngIf="agree + disagree !== 0; else zero">
+        {{ disagree / (agree + disagree) | percent }}
+      </ng-container>
+    </p>
+  </div>
+
   <ng-template #zero>
     0%
   </ng-template>
