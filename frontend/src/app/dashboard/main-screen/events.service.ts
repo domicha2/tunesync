@@ -202,13 +202,11 @@ export class EventsService {
   }
 
   processWebSocketMessage(
-    data,
+    event: AppEvent,
     roomId: number,
     roomName: string,
     events: AppEvent[],
   ): boolean {
-    const event: AppEvent = JSON.parse(data);
-    console.log('payload from websocket: ', event);
     if (event.room_id !== roomId) {
       // the associated room does not match the active room add a notification
       // TODO: consider what events should trigger a notification
@@ -218,13 +216,10 @@ export class EventsService {
       });
       return false;
     }
-    if (event.event_id || event['last_modify_queue']) {
+
+    if (event.event_id) {
       // the associated room matches the active room continue
       switch (event.event_type) {
-        // ? this is a TUNESYNC EVENT
-        case undefined:
-          this.processWSTuneSyncEvent(event);
-          break;
         case EventType.UserChange:
           this.processWSUserChangeEvent(event, events, roomName, roomId);
           break;
@@ -294,45 +289,6 @@ export class EventsService {
       events.splice(inviteEventIndex, 1);
     } else {
       events.push(event);
-    }
-  }
-
-  /**
-   * Handle a TuneSync event from the WebSocket
-   */
-  private processWSTuneSyncEvent(event: AppEvent): void {
-    // determine what type of event it was
-    // if it is playing the dispatch set song stat
-    // if it is modifying the queue, need to dispatch a new queue
-    const tuneSyncEvent = {
-      last_modify_queue: event['last_modify_queue'],
-      last_play: event['last_play'],
-      play_time: event['play_time'],
-    } as TuneSyncEvent;
-    if (
-      tuneSyncEvent.last_play === null ||
-      tuneSyncEvent.last_modify_queue.event_id >
-        tuneSyncEvent.last_play.event_id
-    ) {
-      // the  DJ made a modify queue event
-      // need to dispatch new queue into my store
-      this.store.dispatch(
-        DashboardActions.storeQueue({
-          queue: tuneSyncEvent.last_modify_queue.queue.map(
-            ([id, length, name]) => ({ id, length, name }),
-          ),
-        }),
-      );
-    } else {
-      // the DJ made a play event
-      // ! could have race condition but handleTuneSync function has the same design
-      this.store.dispatch(
-        DashboardActions.setSongStatus({
-          isPlaying: tuneSyncEvent.last_play.is_playing,
-          seekTime: tuneSyncEvent.last_play.timestamp,
-          queueIndex: tuneSyncEvent.last_play.queue_index,
-        }),
-      );
     }
   }
 }

@@ -39,9 +39,9 @@ export class MainScreenComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadMore$ = this.store.select(selectLoadMore);
 
-    this.webSocketService.messageSubject.subscribe((messageData) => {
+    this.webSocketService.messageSubject.subscribe((event: AppEvent) => {
       const updateView: boolean = this.eventsService.processWebSocketMessage(
-        messageData,
+        event,
         this.activeRoomId,
         this.activeRoomName,
         this.events,

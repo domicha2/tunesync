@@ -6,6 +6,7 @@ import { AppState } from '../../../app.module';
 import { getPollsByRoom } from '../../store/dashboard.actions';
 import { selectPolls } from '../../store/dashboard.selectors';
 import { Poll, PollState } from '../poll.models';
+import { WebSocketService } from '../../web-socket.service';
 
 @Component({
   selector: 'app-polls-viewer',
@@ -19,9 +20,23 @@ export class PollsViewerComponent implements OnInit, OnDestroy {
   // used by ngFor instead of iterate over pollState
   pollIds: number[] = [];
 
-  constructor(private store: Store<AppState>) {}
+  constructor(
+    private webSocketService: WebSocketService,
+    private store: Store<AppState>,
+  ) {}
 
   ngOnInit(): void {
+    this.subscription.add(
+      this.webSocketService.pollsSubject.subscribe((poll: Poll) => {
+        if (this.pollState[poll.poll_id] === undefined) {
+          // add new entry to the view
+          this.pollIds.push(poll.poll_id);
+        }
+        // update the state
+        this.pollState[poll.poll_id] = poll;
+      }),
+    );
+
     this.subscription.add(
       this.store
         .select(selectPolls)

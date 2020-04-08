@@ -13,7 +13,7 @@ import { Store } from '@ngrx/store';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, filter, tap } from 'rxjs/operators';
 import { AppState } from '../../app.module';
-import { FileList2, Role, Song } from '../dashboard.models';
+import { FileList2, Role, Song, TuneSyncEvent } from '../dashboard.models';
 import { QueueComponent } from '../queue/queue.component';
 import * as DashboardActions from '../store/dashboard.actions';
 import {
@@ -21,6 +21,7 @@ import {
   selectSongStatus,
   selectUserRole,
 } from '../store/dashboard.selectors';
+import { WebSocketService } from '../web-socket.service';
 import { ControlsService } from './controls.service';
 
 @Component({
@@ -47,6 +48,7 @@ export class ControlsComponent
   userRole$: Observable<Role>;
 
   constructor(
+    private webSocketService: WebSocketService,
     private matSnackBar: MatSnackBar,
     private controlsService: ControlsService,
     private cdr: ChangeDetectorRef,
@@ -55,6 +57,12 @@ export class ControlsComponent
   ) {}
 
   ngOnInit(): void {
+    this.webSocketService.tuneSyncSubject.subscribe(
+      (tuneSyncEvent: TuneSyncEvent) => {
+        this.processWSTuneSyncEvent(tuneSyncEvent);
+      },
+    );
+
     this.controlsService.songsUploaded.subscribe((songsUploaded: number) => {
       this.matSnackBar.open(
         `${songsUploaded} songs uploaded successfully!`,
@@ -78,13 +86,13 @@ export class ControlsComponent
           .select(selectSongStatus)
           .pipe(
             filter(
-              status =>
+              (status) =>
                 typeof status.isPlaying === 'boolean' &&
                 typeof status.queueIndex === 'number',
             ),
           ),
         this.store.select(selectQueuedSongs).pipe(
-          filter(songs => songs !== null && songs !== undefined),
+          filter((songs) => songs !== null && songs !== undefined),
           tap((queue: Song[]) => {
             this.queue = queue;
           }),
@@ -110,6 +118,40 @@ export class ControlsComponent
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+  }
+
+  /**
+   * Handle a TuneSync event from the WebSocket
+   */
+  private processWSTuneSyncEvent(tuneSyncEvent: TuneSyncEvent): void {
+    // determine what type of event it was
+    // if it is playing the dispatch set song stat
+    // if it is modifying the queue, need to dispatch a new queue
+    if (
+      tuneSyncEvent.last_play === null ||
+      tuneSyncEvent.last_modify_queue.event_id >
+        tuneSyncEvent.last_play.event_id
+    ) {
+      // the  DJ made a modify queue event
+      // need to dispatch new queue into my store
+      this.store.dispatch(
+        DashboardActions.storeQueue({
+          queue: tuneSyncEvent.last_modify_queue.queue.map(
+            ([id, length, name]) => ({ id, length, name }),
+          ),
+        }),
+      );
+    } else {
+      // the DJ made a play event
+      // ! could have race condition but handleTuneSync function has the same design
+      this.store.dispatch(
+        DashboardActions.setSongStatus({
+          isPlaying: tuneSyncEvent.last_play.is_playing,
+          seekTime: tuneSyncEvent.last_play.timestamp,
+          queueIndex: tuneSyncEvent.last_play.queue_index,
+        }),
+      );
+    }
   }
 
   /**
