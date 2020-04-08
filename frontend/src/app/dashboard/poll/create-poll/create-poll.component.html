@@ -3,37 +3,34 @@
   <mat-dialog-content>
     <label id="poll-type-label">Select a type of poll</label>
     <mat-radio-group aria-labelledby="poll-type-label" [(ngModel)]="pollType">
-      <mat-radio-button *ngFor="let type of pollTypes" value="type">
+      <mat-radio-button *ngFor="let type of pollTypes" [value]="type">
         {{ type }}
       </mat-radio-button>
     </mat-radio-group>
     <div>Your poll type is: {{ pollType }}</div>
 
-    <h1 mat-dialog-title>
-      Kick User
-    </h1>
-    <mat-label>User</mat-label>
-    <mat-select [(ngModel)]="selectedUserId">
-      <mat-option
-        *ngFor="let user of regularUsers$ | async"
-        [value]="user.userId"
-      >
-        {{ user.name }}
-      </mat-option>
-    </mat-select>
-
-    <h1>
-      Add song: Have a dropdown of available songs to select from
-    </h1>
-    <mat-label>Songs</mat-label>
-    <mat-select [(ngModel)]="selectedSongId">
-      <mat-option
-        *ngFor="let song of availableSongs$ | async"
-        [value]="song.id"
-      >
-        {{ song.name }}
-      </mat-option>
-    </mat-select>
+    <div id="user" class="column" *ngIf="pollType === 'Kick'">
+      <mat-label>User</mat-label>
+      <mat-select [(ngModel)]="selectedUserId">
+        <mat-option
+          *ngFor="let user of regularUsers$ | async"
+          [value]="user.userId"
+        >
+          {{ user.name }}
+        </mat-option>
+      </mat-select>
+    </div>
+    <div id="song" class="column" *ngIf="pollType === 'Add Song to Queue'">
+      <mat-label>Songs</mat-label>
+      <mat-select [(ngModel)]="selectedSongId">
+        <mat-option
+          *ngFor="let song of availableSongs$ | async"
+          [value]="song.id"
+        >
+          {{ song.name }}
+        </mat-option>
+      </mat-select>
+    </div>
 
     <div id="song-filter" class="column">
       <mat-form-field appearance="outline">
