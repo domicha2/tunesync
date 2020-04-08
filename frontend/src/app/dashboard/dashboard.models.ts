@@ -103,6 +103,7 @@ export interface TuneSyncEvent {
   last_play: PlayState | null;
   play_time: string;
   room: number;
+  event_type: EventType.TuneSync;
 }
 
 export interface PlayState {

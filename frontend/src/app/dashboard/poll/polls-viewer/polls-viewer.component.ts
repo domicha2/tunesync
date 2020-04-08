@@ -34,8 +34,8 @@ export class PollsViewerComponent implements OnInit, OnDestroy {
 
           // iterate over the polls and set the poll state
           polls.forEach((poll: Poll) => {
-            this.pollState[poll.poll] = poll;
-            this.pollIds.push(poll.poll);
+            this.pollState[poll.poll_id] = poll;
+            this.pollIds.push(poll.poll_id);
           });
         }),
     );
