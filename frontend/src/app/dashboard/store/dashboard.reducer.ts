@@ -1,6 +1,7 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import { User as AuthUser } from '../../auth/auth.models';
 import { AppEvent, Role, Room, Song, User } from '../dashboard.models';
+import { Poll } from '../poll/poll.models';
 import * as DashboardActions from './dashboard.actions';
 
 export interface DashboardState {
