@@ -2,6 +2,11 @@ import { createSelector } from '@ngrx/store';
 import { AppState } from '../../app.module';
 import { DashboardState } from './dashboard.reducer';
 
+export const selectPolls = createSelector(
+  (state: AppState) => state.dashboard,
+  (dashboard: DashboardState) => (dashboard ? dashboard.polls : undefined),
+);
+
 export const selectLoadMore = createSelector(
   (state: AppState) => state.dashboard,
   (dashboard: DashboardState) => (dashboard ? dashboard.loadMore : undefined),

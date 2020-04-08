@@ -23,6 +23,14 @@ export const createVote = createAction(
   props<{ pollId: number; agree: boolean }>(),
 );
 
+export const getPollsByRoom = createAction(
+  '[Rooms Component] Get Polls By Room',
+);
+export const setPolls = createAction(
+  '[Polls API] Set Polls',
+  props<{ polls: Poll[] }>(),
+);
+
 /* Tunes */
 export const getTuneSyncEvent = createAction(
   '[Rooms Component] Get TuneSync Event',

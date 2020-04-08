@@ -9,6 +9,10 @@ import { EventType } from '../dashboard.models';
 export class PollService {
   constructor(private httpWrapperService: HttpWrapperService) {}
 
+  getPollsByRoom(roomId: number): Observable<any> {
+    return this.httpWrapperService.get(`/rooms/${roomId}/polls/`);
+  }
+
   createPoll(room: number, args: any): Observable<any> {
     return this.httpWrapperService.post('/events/', {
       room,

@@ -28,6 +28,7 @@ import {
   selectQueueIndexAndRoom,
   selectUsers,
 } from './dashboard.selectors';
+import { Poll } from '../poll/poll.models';
 
 @Injectable()
 export class DashboardEffects {
@@ -97,6 +98,22 @@ export class DashboardEffects {
               { type: DashboardActions.setUserRole.type, userRole },
             ];
           }),
+          catchError(() => EMPTY),
+        ),
+      ),
+    ),
+  );
+
+  getPollsByRoom$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardActions.getPollsByRoom),
+      withLatestFrom(this.store.select(selectActiveRoom)),
+      switchMap(([action, roomId]) =>
+        this.pollService.getPollsByRoom(roomId).pipe(
+          map((polls: Poll[]) => ({
+            type: DashboardActions.setPolls.type,
+            polls,
+          })),
           catchError(() => EMPTY),
         ),
       ),
