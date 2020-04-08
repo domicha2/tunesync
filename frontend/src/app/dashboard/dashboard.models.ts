@@ -28,11 +28,6 @@ export enum UserChangeAction {
   Join = 'J',
 }
 
-export enum PollType {
-  Kick = 'U',
-  AddToQueue = 'MQ',
-}
-
 export enum EventType {
   ModifyQueue = 'MQ',
   Messaging = 'M',

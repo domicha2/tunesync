@@ -6,7 +6,6 @@ import { debounceTime, map, startWith, tap } from 'rxjs/operators';
 import { AppState } from '../../../app.module';
 import {
   Filters,
-  PollType,
   Role,
   Song,
   User,
@@ -17,6 +16,7 @@ import {
   selectAvailableSongs,
   selectUsers,
 } from '../../store/dashboard.selectors';
+import { PollType } from '../poll.models';
 
 @Component({
   selector: 'app-create-poll',
