@@ -9,15 +9,17 @@
     </mat-radio-group>
 
     <div id="user" class="column" *ngIf="pollType === 'U'">
-      <mat-label>User</mat-label>
-      <mat-select [(ngModel)]="selectedUserId">
-        <mat-option
-          *ngFor="let user of regularUsers$ | async"
-          [value]="user.userId"
-        >
-          {{ user.name }}
-        </mat-option>
-      </mat-select>
+      <mat-form-field appearance="outline">
+        <mat-label>User</mat-label>
+        <mat-select [(ngModel)]="selectedUserId">
+          <mat-option
+            *ngFor="let user of regularUsers$ | async"
+            [value]="user.userId"
+          >
+            {{ user.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
 
     <div id="song" class="column" *ngIf="pollType === 'MQ'">
@@ -38,15 +40,17 @@
         </mat-form-field>
       </div>
 
-      <mat-label>Songs</mat-label>
-      <mat-select [(ngModel)]="selectedSongId">
-        <mat-option
-          *ngFor="let song of availableSongs$ | async"
-          [value]="song.id"
-        >
-          {{ song.name }}
-        </mat-option>
-      </mat-select>
+      <mat-form-field appearance="outline">
+        <mat-label>Songs</mat-label>
+        <mat-select [(ngModel)]="selectedSongId">
+          <mat-option
+            *ngFor="let song of availableSongs$ | async"
+            [value]="song.id"
+          >
+            {{ song.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
   </mat-dialog-content>
   <mat-dialog-actions>
