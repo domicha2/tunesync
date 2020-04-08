@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -62,6 +63,7 @@ import { UsersComponent } from './users/users.component';
     MatExpansionModule,
     MatMenuModule,
     MatListModule,
+    MatDividerModule,
     MatFormFieldModule,
     MatInputModule,
     MatTooltipModule,
