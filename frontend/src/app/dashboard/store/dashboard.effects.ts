@@ -178,7 +178,6 @@ export class DashboardEffects {
         withLatestFrom(this.store.select(selectActiveRoom)),
         switchMap(([action, room]) =>
           this.pollService.createPoll(room, action.pollArgs).pipe(
-            tap(response => console.log('createpoll response:' + response)),
             catchError(() => EMPTY),
           ),
         ),
