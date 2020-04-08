@@ -1,3 +1,16 @@
 <div id="polls-viewer-wrapper" class="column">
-  <p>polls-viewer works!</p>
+  <h1>Polls Viewer</h1>
+  <mat-list class="column" *ngIf="pollIds.length > 0; else noPolls">
+    <mat-list-item *ngFor="let pollId of pollIds; trackBy: trackByPollId">
+      <app-poll [pollId]="pollId"></app-poll>
+      <mat-divider></mat-divider>
+      <app-poll-results
+        [agree]="pollState[pollId].agrees"
+        [disagree]="pollState[pollId].disagrees"
+      ></app-poll-results>
+    </mat-list-item>
+  </mat-list>
+  <ng-template #noPolls>
+    <p>No polls to view.</p>
+  </ng-template>
 </div>

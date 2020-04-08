@@ -1,3 +1,25 @@
 div#polls-viewer-wrapper {
   height: 100%;
+
+  mat-list {
+    flex-grow: 1;
+
+    mat-list-item {
+      height: fit-content;
+      border: 1px solid white;
+      border-radius: 0.5rem;
+
+      ::ng-deep div.mat-list-item-content {
+        flex-direction: column;
+      }
+
+      mat-divider {
+        position: static;
+        margin: {
+          top: 0.5rem;
+          bottom: 0.5rem;
+        }
+      }
+    }
+  }
 }
