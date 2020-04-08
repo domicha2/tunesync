@@ -1,4 +1,4 @@
-import { UserChangeAction } from '../dashboard.models';
+import { UserChangeAction, EventType } from '../dashboard.models';
 
 export enum PollType {
   Kick = 'U',
@@ -17,7 +17,7 @@ export interface AddToQueueArgs {
 }
 
 export interface Poll {
-  poll: number;
+  poll_id: number;
   args: KickPollArgs | AddToQueueArgs;
   vote_percentage: number;
   agrees: number;
@@ -25,6 +25,7 @@ export interface Poll {
   is_active: boolean;
   is_successful: number;
   room_id: number;
+  event_type: EventType.CreatePoll;
 }
 
 export interface PollState {
