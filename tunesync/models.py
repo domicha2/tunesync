@@ -101,6 +101,7 @@ class TuneSync(models.Model):
         result["last_play"] = tunesync
         result["play_time"] = play_time
         result["room_id"] = pk
+        result["event_type"] = "T"
         return result
 
 
@@ -149,6 +150,7 @@ class Poll(models.Model):
             "is_actve": self.is_active,
             "is_successful": self.is_successful,
             "room_id": self.event.room.id,
+            "event_type": "P",
         }
         return result
 
@@ -238,7 +240,7 @@ def update_event_listeners(sender, instance, **kwargs):
     """
     Alerts consumer of new events
     """
-    if instance.event_type == "T":
+    if instance.event_type in ["T", "PO", "V"]:
         return
     message = {
         "room_id": instance.room.id,
