@@ -6,6 +6,7 @@ import {
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { isArray } from 'lodash';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 import { debounceTime, filter, map, startWith } from 'rxjs/operators';
 import { AppState } from '../../app.module';
@@ -84,7 +85,10 @@ export class QueueComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.store
         .select(selectAvailableSongs)
-        .pipe(filter((songs) => songs !== undefined))
+        .pipe(
+          filter(isArray),
+          map((songs) => songs.slice()),
+        )
         .subscribe((availableSongs: Song[]) => {
           this.availableSongs = availableSongs;
         }),
