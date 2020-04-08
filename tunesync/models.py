@@ -146,7 +146,7 @@ class Poll(models.Model):
             "vote_percentage": self.vote_percentage,
             "agrees": len(self.votes_agreed),
             "disagrees": len(self.votes_disagreed),
-            "is_actve": self.is_active,
+            "is_active": self.is_active,
             "is_successful": self.is_successful,
             "room_id": self.event.room.id,
         }
