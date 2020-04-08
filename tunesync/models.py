@@ -142,7 +142,7 @@ class Poll(models.Model):
 
     def get_state(self):
         result = {
-            "poll": self.event.id,
+            "poll_id": self.event.id,
             "args": self.args,
             "vote_percentage": self.vote_percentage,
             "agrees": len(self.votes_agreed),
@@ -150,7 +150,7 @@ class Poll(models.Model):
             "is_active": self.is_active,
             "is_successful": self.is_successful,
             "room_id": self.event.room.id,
-            "event_type": "P",
+            "event_type": "PO",
         }
         return result
 
