@@ -13,8 +13,11 @@
       Kick User
     </h1>
     <mat-label>User</mat-label>
-    <mat-select [(ngModel)]="selectedUser">
-      <mat-option *ngFor="let user of regularUsers$ | async" value="user">
+    <mat-select [(ngModel)]="selectedUserId">
+      <mat-option
+        *ngFor="let user of regularUsers$ | async"
+        [value]="user.userId"
+      >
         {{ user.name }}
       </mat-option>
     </mat-select>
@@ -23,8 +26,11 @@
       Add song: Have a dropdown of available songs to select from
     </h1>
     <mat-label>Songs</mat-label>
-    <mat-select [(ngModel)]="selectedSong">
-      <mat-option *ngFor="let song of availableSongs$ | async" value="song">
+    <mat-select [(ngModel)]="selectedSongId">
+      <mat-option
+        *ngFor="let song of availableSongs$ | async"
+        [value]="song.id"
+      >
         {{ song.name }}
       </mat-option>
     </mat-select>
