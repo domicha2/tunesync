@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { AppState } from '../app.module';
 import { Role } from './dashboard.models';
 import { CreatePollComponent } from './poll/create-poll/create-poll.component';
+import { PollsViewerComponent } from './poll/polls-viewer/polls-viewer.component';
 import { selectActiveRoom, selectUserRole } from './store/dashboard.selectors';
 
 @Component({
@@ -25,6 +26,13 @@ export class DashboardComponent implements OnInit {
 
   openCreatePollDialog(): void {
     this.matDialog.open(CreatePollComponent, {
+      width: '50%',
+      height: '70%',
+    });
+  }
+
+  openPollsViewerDialog(): void {
+    this.matDialog.open(PollsViewerComponent, {
       width: '50%',
       height: '70%',
     });
