@@ -1,14 +1,15 @@
 import { createAction, props } from '@ngrx/store';
 import {
   AppEvent,
+  FileList2,
+  Filters,
   Role,
   Room,
   Song,
   User as AuthUser,
   User,
-  Filters,
-  FileList2,
 } from '../dashboard.models';
+import { Poll } from '../poll/poll.models';
 
 export const resetState = createAction('[Rooms Component] Reset State');
 

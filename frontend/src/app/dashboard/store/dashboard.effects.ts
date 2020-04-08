@@ -110,9 +110,9 @@ export class DashboardEffects {
       withLatestFrom(this.store.select(selectActiveRoom)),
       switchMap(([action, roomId]) =>
         this.pollService.getPollsByRoom(roomId).pipe(
-          map((polls: Poll[]) => ({
+          map((response) => ({
             type: DashboardActions.setPolls.type,
-            polls,
+            polls: response.results as Poll[],
           })),
           catchError(() => EMPTY),
         ),
