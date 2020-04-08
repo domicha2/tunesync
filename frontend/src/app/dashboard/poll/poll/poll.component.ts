@@ -13,9 +13,9 @@ export class PollComponent {
 
   constructor(private store: Store<AppState>) {}
 
-  onVote(): void {
+  onVote(agree: boolean): void {
     this.store.dispatch(
-      DashboardActions.createVote({ pollId: this.pollId, agree: true }),
+      DashboardActions.createVote({ pollId: this.pollId, agree }),
     );
   }
 }
