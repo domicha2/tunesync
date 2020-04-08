@@ -277,10 +277,15 @@ class TuneViewSet(viewsets.ViewSet):
 
     # post
     def create(self, request):
-        result = []
+        tunes = []
         for song in request.FILES:
             file = request.FILES[song]
             audio = mutagen.File(file, easy=True)
+            if audio is None:
+                return Response(
+                    {"details": "{} is not an audio file".format(song)},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             file.seek(0)
             hash_object = sha256()
             for chunk in file.chunks():
@@ -303,6 +308,9 @@ class TuneViewSet(viewsets.ViewSet):
                 audio_file=audio_file,
                 hash_value=hash_value,
             )
+            tunes.append(tune)
+        result = []
+        for tune in tunes:
             tune.save()
             serializer = TuneSerializer(tune)
             result.append(serializer.data)
