@@ -135,8 +135,9 @@ class EventViewSet(viewsets.ViewSet):
                     {"details": "invalid parent event"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-        handle_event = getattr(Handler, "handle_" + event.event_type)
-        result = handle_event(request.data["args"], event, user=request.user)
+        handler = Handler(event, request.user)
+        handle_event = getattr(handler, "handle_" + event.event_type)
+        result = handle_event()
         return result
 
     # DELETE
