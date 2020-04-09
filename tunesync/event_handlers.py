@@ -62,18 +62,23 @@ class Handler:
         self.args = event.args  # just make it easier to access
 
     def validate_PL(self):
-        if not (set(self.args.keys()) >= {"queue_index", "is_playing", "timestamp"}):
+        if not (
+            set(self.args["play"].keys()) >= {"queue_index", "is_playing", "timestamp"}
+        ):
             return Response(
                 {"details": "missing args"}, status=status.HTTP_400_BAD_REQUEST
             )
-        if not Handler.validate_PL_argtypes(args):
+        if not self.validate_PL_argtypes():
             return Response(
                 {"details": "args are bad types"}, status=status.HTTP_400_BAD_REQUEST
             )
-        last_tunesync = TuneSync.get_tune_sync(event.room.id)
+        last_tunesync = TuneSync.get_tune_sync(self.event.room.id)
         if last_tunesync["last_modify_queue"]:
             queue = last_tunesync["last_modify_queue"]["queue"]
-            if len(queue) - 1 < args["queue_index"] or args["queue_index"] < 0:
+            if (
+                len(queue) - 1 < self.args["play"]["queue_index"]
+                or self.args["play"]["queue_index"] < 0
+            ):
                 return Response(
                     {"details": "Invalid song index for queue"},
                     status=status.HTTP_400_BAD_REQUEST,
@@ -87,11 +92,11 @@ class Handler:
 
     def validate_PL_argtypes(self):
         return (
-            isinstance(self.args["queue_index"], int)
-            and isinstance(self.args["is_playing"], bool)
+            isinstance(self.args["play"]["queue_index"], int)
+            and isinstance(self.args["play"]["is_playing"], bool)
             and (
-                isinstance(self.args["timestamp"], float)
-                or isinstance(self.args["timestamp"], int)
+                isinstance(self.args["play"]["timestamp"], float)
+                or isinstance(self.args["play"]["timestamp"], int)
             )
         )
 
