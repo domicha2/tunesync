@@ -6,18 +6,18 @@
   </div>
 
   <mat-form-field appearance="outline">
-    <mat-label>Name</mat-label>
-    <input type="text" matInput [formControl]="nameControl" />
+    <mat-label>Search songs by name</mat-label>
+    <input type="search" matInput [formControl]="nameControl" />
   </mat-form-field>
 
   <mat-form-field appearance="outline">
-    <mat-label>Artist</mat-label>
-    <input type="text" matInput [formControl]="artistControl" />
+    <mat-label>Search songs by artist</mat-label>
+    <input type="search" matInput [formControl]="artistControl" />
   </mat-form-field>
 
   <mat-form-field appearance="outline">
-    <mat-label>Album</mat-label>
-    <input type="text" matInput [formControl]="albumControl" />
+    <mat-label>Search songs by album</mat-label>
+    <input type="search" matInput [formControl]="albumControl" />
   </mat-form-field>
 
   <div id="song-lists" class="row" cdkDropListGroup>
