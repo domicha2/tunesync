@@ -1,8 +1,3 @@
-div.top-bar {
-  justify-content: flex-start;
-  height: 5%;
-}
-
 div.list-el {
   cursor: pointer;
 
@@ -14,4 +9,9 @@ div.list-el {
 
 div#rooms-wrapper {
   height: 100%;
+
+  mat-accordion {
+    flex-grow: 1;
+    margin-bottom: 0 !important;
+  }
 }

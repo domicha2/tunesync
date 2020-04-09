@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Title } from '@angular/platform-browser';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { AppState } from '../app.module';
@@ -17,9 +18,15 @@ export class DashboardComponent implements OnInit {
   activeRoom$: Observable<number>;
   userRole$: Observable<Role>;
 
-  constructor(private matDialog: MatDialog, private store: Store<AppState>) {}
+  constructor(
+    private matDialog: MatDialog,
+    private title: Title,
+    private store: Store<AppState>,
+  ) {}
 
   ngOnInit(): void {
+    this.title.setTitle('TuneSync');
+
     this.activeRoom$ = this.store.select(selectActiveRoom);
     this.userRole$ = this.store.select(selectUserRole);
   }
