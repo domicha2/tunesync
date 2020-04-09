@@ -135,8 +135,9 @@ class EventViewSet(viewsets.ViewSet):
                     {"details": "invalid parent event"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-        handle_event = getattr(Handler, "handle_" + event.event_type)
-        result = handle_event(request.data["args"], event, user=request.user)
+        handler = Handler(event, request.user)
+        handle_event = getattr(handler, "handle_" + event.event_type)
+        result = handle_event()
         return result
 
     # DELETE
@@ -255,7 +256,9 @@ class TuneViewSet(viewsets.ViewSet):
 
     def list(self, request):
         paginator = PageNumberPagination()
-        filtered_set = TuneFilter(request.GET, queryset=Tune.objects.all()).qs
+        filtered_set = TuneFilter(request.GET, queryset=Tune.objects.all()).qs.order_by(
+            "name"
+        )
         context = paginator.paginate_queryset(filtered_set, request)
         serializer = TuneSerializer(context, many=True)
         return paginator.get_paginated_response(serializer.data)

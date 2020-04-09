@@ -7,16 +7,21 @@ from django.contrib.auth.models import User
 
 
 class PollTask:
+    def __init__(self, poll_id):
+        self.poll_id = poll_id
+        self.args = Poll.objects.get(pk=self.poll_id).args
+
+    @staticmethod
     @background(schedule=60)
-    def initiate_poll(poll):
-        poll = Poll.objects.get(pk=poll)
+    def initiate_poll(poll_id):
+        self = PollTask(poll_id)
+        poll = Poll.objects.get(pk=self.poll_id)
         if poll.is_majority():
             event = Event(
                 room=poll.room, parent_event=poll.event, author=poll.event.author
             )
-            args = poll.args
-            execute = getattr(PollTask, "execute_" + poll.action)
-            result = execute(args, event)
+            execute = getattr(self, "execute_" + poll.action)
+            result = execute(event)
             if result.status_code == 200:
                 poll.is_successful = True
             else:
@@ -34,29 +39,30 @@ class PollTask:
         poll.is_active = False
         poll.save()
 
-    def execute_PL(args, event):
-        del args["action"]
-        data = {"play": args}
-        event.args = data
+    def execute_MQ(self, event):
         event.event_type = "T"
-        return Handler.handle_T(data, event, event.author)
+        ts = TuneSync.get_tune_sync
+        current_queue = ts["last_modify_queue"]["queue"]
+        current_queue.append(self.args["song"])
+        event.args = {"modify_queue": {"queue": current_queue}}
+        handler = Handler(event, event.author)
+        return handler.handle_T()
 
-    def execute_MQ(args, event):
-        del args["action"]
-        data = {"modify_queue": args}
-        event.args = data
-        event.event_type = "T"
-        return Handler.handle_T(data, event, event.author)
-
-    def execute_K(args, event):
-        event.args = args
+    def execute_K(self, event):
         event.event_type = "U"
-        return Handler.handle_U(data, event, event.author)
+        event.args = {"user": self.args["user"], "type": "K"}
+        handler = Handler(event, event.author)
+        return handler.handle_U_K()
 
 
 class Handler:
-    def validate_PL(args, event):
-        if not (set(args.keys()) >= {"queue_index", "is_playing", "timestamp"}):
+    def __init__(self, event, user, **kwargs):
+        self.event = event
+        self.user = user
+        self.args = event.args  # just make it easier to access
+
+    def validate_PL(self):
+        if not (set(self.args.keys()) >= {"queue_index", "is_playing", "timestamp"}):
             return Response(
                 {"details": "missing args"}, status=status.HTTP_400_BAD_REQUEST
             )
@@ -79,19 +85,19 @@ class Handler:
             )
         return
 
-    def validate_PL_argtypes(args):
+    def validate_PL_argtypes(self):
         return (
-            isinstance(args["queue_index"], int)
-            and isinstance(args["is_playing"], bool)
+            isinstance(self.args["queue_index"], int)
+            and isinstance(self.args["is_playing"], bool)
             and (
-                isinstance(args["timestamp"], float)
-                or isinstance(args["timestamp"], int)
+                isinstance(self.args["timestamp"], float)
+                or isinstance(self.args["timestamp"], int)
             )
         )
 
-    def validate_MQ(args, event):
-        if "queue" in args:
-            if not isinstance(args["queue"], list):
+    def validate_MQ(self):
+        if "queue" in self.args:
+            if not isinstance(self.args["queue"], list):
                 return Response(
                     {"details": "args are bad types"},
                     status=status.HTTP_400_BAD_REQUEST,
@@ -100,7 +106,7 @@ class Handler:
             return Response(
                 {"details": "missing args"}, status=status.HTTP_400_BAD_REQUEST
             )
-        for song_id in args["queue"]:
+        for song_id in self.args["queue"]:
             try:
                 tune = Tune.objects.get(pk=song_id)
             except:
@@ -110,19 +116,19 @@ class Handler:
                 )
         return
 
-    def handle_T(args, event, user, **kwargs):
+    def handle_T(self):
         """
         Returns status code to use
         """
-        event.save()
-        tunesync = TuneSync(event_id=event.id)
-        if "modify_queue" in args:
-            handler_result = Handler.validate_MQ(args["modify_queue"], event)
+        self.event.save()
+        tunesync = TuneSync(event_id=self.event.id)
+        if "modify_queue" in self.args:
+            handler_result = self.validate_MQ()
             if handler_result:
-                event.delete()
+                self.event.delete()
                 return handler_result
             result = []
-            for song_id in args["modify_queue"]["queue"]:
+            for song_id in self.args["modify_queue"]["queue"]:
                 try:
                     tune = Tune.objects.get(pk=song_id)
                     result.append([song_id, tune.length, tune.name])
@@ -134,61 +140,70 @@ class Handler:
                     )
             result = {"queue": result}
             tunesync.modify_queue = result
-        if "play" in args:
-            handler_result = Handler.validate_PL(args["play"], event)
+        if "play" in self.args:
+            handler_result = self.validate_PL()
             if handler_result:
-                event.delete()
+                self.event.delete()
                 return handler_result
-            tunesync.play = args["play"]
+            tunesync.play = self.args["play"]
         tunesync.save()
-        result = TuneSync.get_tune_sync(event.room.id)
+        result = TuneSync.get_tune_sync(self.event.room.id)
         return Response(result, status=status.HTTP_200_OK)
 
-    def handle_M(args, event, **kw):
+    def handle_M(self):
         """
         we just need to confirm that there is a content value in the payload
         """
-        if "content" in args:
-            if isinstance(args["content"], str):
-                event.save()
-                serializer = EventSerializer(event)
+        if "content" in self.args:
+            if isinstance(self.args["content"], str):
+                self.event.save()
+                serializer = EventSerializer(self.event)
                 return Response(serializer.data)
         return Response(
             {"details": "Incorrect content in args"}, status=status.HTTP_400_BAD_REQUEST
         )
 
-    def handle_PO(args, event, **kw):
+    def handle_PO(self):
         """
         Handler for all types of polling:
-        Play(PL), Kick(U), Modify Queue(MQ)
+        Kick(U), Modify Queue(MQ)
         """
-        event_handler_result = Handler.validate_PO(args, event)
+        event_handler_result = self.validate_PO()
         if event_handler_result:
             return event_handler_result
         # save event to table
-        event.save()
+        self.event.save()
         # retrieve room the poll is happening in
-        polling_room = event.room
-        action_type = args["action"]
+        polling_room = self.event.room
+        action_type = self.args["action"]
         # Check if the action is a kick, we want to store K
         if action_type == "U":
             action_type = "K"
-        poll_event = Poll(event=event, action=action_type, room=polling_room, args=args)
+            self.args["username"] = Users.objects.get(pk=self.args["user"]).username
+        elif action_type == "MQ":
+            song_id = self.args["song"]
+            self.args["song_name"] = Tune.objects.get(pk=song_id).name
+        poll_event = Poll(
+            event=self.event, action=action_type, room=polling_room, args=self.args
+        )
+        print(poll_event, type(poll_event), dir(poll_event))
         # save the poll and we're done
         poll_event.save()
+        # pt = PollTask(poll_event.event.id)
+        # print(pt, type(pt), dir(pt))
         PollTask.initiate_poll(poll_event.event.id)
         return Response(poll_event.get_state())
 
-    def handle_V(args, event, user, **kw):
+    def handle_V(self):
         """
         Handler for the voting on any polls in a room
         """
-        if not Handler.validate_V(args, event):
+        if not self.validate_V():
             return Response(
                 {"details": "missing arguments"}, status=status.HTTP_400_BAD_REQUEST
             )
         # save event to Event table
-        poll = Poll.objects.filter(event=event.parent_event)
+        poll = Poll.objects.filter(event=self.event.parent_event)
         if poll:
             poll = poll[0]
         else:
@@ -200,46 +215,46 @@ class Handler:
                 {"details": "This vote is already completed"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        event.save()
-        agree_field = args["agree"]
+        self.event.save()
+        agree_field = self.args["agree"]
         vote_event = Vote.objects.update_or_create(
-            poll=poll, user=user, defaults={"event": event, "agree": agree_field}
+            poll=poll,
+            user=self.user,
+            defaults={"event": self.event, "agree": agree_field},
         )
         result = poll.get_state()
         return Response(poll.get_state())
 
-    def validate_V(args, event):
-        if "agree" in args:
-            return isinstance(args["agree"], bool)
+    def validate_V(self):
+        if "agree" in self.args:
+            return isinstance(self.args["agree"], bool)
         else:
             return False
 
-    # TODO: This is ugly. Refractor into multiple functions if time allows
-
-    def validate_U(args, event):
-        event_type = args["type"]
+    def validate_U(self):
+        event_type = self.args["type"]
         if event_type == "K":
-            if "user" not in args:
+            if "user" not in self.args:
                 return Response(
                     {"details": "bad args"}, status=status.HTTP_400_BAD_REQUEST
                 )
         elif event_type == "I":
-            if "users" not in args:
+            if "users" not in self.args:
                 return Response(
                     {"details": "bad args"}, status=status.HTTP_400_BAD_REQUEST
                 )
-            if event.room.system_user:
+            if self.event.room.system_user:
                 return Response(
                     {"details": "cannot invite others to personal room"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         elif event_type == "J":
-            if "is_accepted" not in args:
+            if "is_accepted" not in self.args:
                 return Response(
                     {"details": "bad args"}, status=status.HTTP_400_BAD_REQUEST
                 )
         elif event_type == "C":
-            if set(args.keys()) != {"type", "user", "role"}:
+            if set(self.args.keys()) != {"type", "user", "role"}:
                 return Response(
                     {"details": "bad args"}, status=status.HTTP_400_BAD_REQUEST
                 )
@@ -251,9 +266,9 @@ class Handler:
             )
         return
 
-    def handle_U_I(args, event, user, **kw):
+    def handle_U_I(self):
         added_users = []
-        for invited_user in args["users"]:
+        for invited_user in self.args["users"]:
             try:
                 system_room = Room.objects.get(system_user__id=invited_user)
             except:
@@ -262,54 +277,58 @@ class Handler:
                     status.HTTP_400_BAD_REQUEST,
                 )
             u_obj = User.objects.get(pk=invited_user)
-            membership = Membership.objects.filter(user=u_obj, room=event.room)
+            membership = Membership.objects.filter(user=u_obj, room=self.event.room)
             if membership:
                 return (
                     {"details": "user {} is already invited".format(invited_user)},
                     status.HTTP_400_BAD_REQUEST,
                 )
-            membership = Membership(room=event.room, user=u_obj, state="P", role="R")
+            membership = Membership(
+                room=self.event.room, user=u_obj, state="P", role="R"
+            )
             new_user = {"membership": membership, "system_room": system_room}
             added_users.append(new_user)
         for new_user in added_users:
             new_user["membership"].save()
             invite_event = Event(
                 room=new_user["system_room"],
-                author=user,
+                author=self.user,
                 event_type="U",
                 args={
                     "type": "I",
-                    "room_id": event.room.id,
-                    "room_name": event.room.title,
+                    "room_id": self.event.room.id,
+                    "room_name": self.event.room.title,
                 },
             )
             invite_event.save()
         return (None, status.HTTP_200_OK)
 
-    def handle_U_J(args, event, user, **kw):
-        system_room = Room.objects.get(system_user=user)
+    def handle_U_J(self):
+        system_room = Room.objects.get(system_user=self.user)
         if args["is_accepted"]:
-            membership = Membership.objects.get(room=event.room, user=user)
+            membership = Membership.objects.get(room=self.event.room, user=user)
             membership.state = "A"
         else:
-            membership = Membership.objects.get(room=event.room, user=user)
+            membership = Membership.objects.get(room=self.event.room, user=user)
             membership.state = "R"
         invite_event = Event.objects.filter(
-            room=system_room, args__type="I", args__room_id=event.room.id
+            room=system_room, args__type="I", args__room_id=self.event.room.id
         ).update(isDeleted=True)
         membership.save()
         return (None, status.HTTP_200_OK)
 
-    def handle_U_K(args, event, user, **kw):
-        kicked_user = Membership.objects.filter(room=event.room, user__id=args["user"])
+    def handle_U_K(self):
+        kicked_user = Membership.objects.filter(
+            room=event.room, user__id=self.args["user"]
+        )
         if not kicked_user:
             return ({"details": "user is not in the room"}, status.HTTP_400_BAD_REQUEST)
-        system_room = Room.objects.get(system_user__id=args["user"])
+        system_room = Room.objects.get(system_user__id=self.args["user"])
         kick_event = Event(
-            author=user,
+            author=self.user,
             room=system_room,
             event_type="U",
-            args={"type": "K", "room": event.room.id},
+            args={"type": "K", "room": self.event.room.id},
         )
         # let them know they've been kicked lol
         kick_event.save()
@@ -317,40 +336,48 @@ class Handler:
         kicked_user.delete()
         return (None, status.HTTP_200_OK)
 
-    def handle_U_C(args, event, **kw):
-        membership = Membership.objects.filter(user__id=args["user"], room=event.room)
+    def handle_U_C(self):
+        membership = Membership.objects.filter(
+            user__id=self.args["user"], room=self.event.room
+        )
         if not membership:
             return ({"details": "user is not in the room"}, status.HTTP_400_BAD_REQUEST)
         membership[0].role = args["role"]
         membership[0].save()
         return (None, status.HTTP_200_OK)
 
-    def handle_U(args, event, user, **kw):
-        if "type" in args:
-            handler_result = Handler.validate_U(args, event)
+    def handle_U(self):
+        if "type" in self.args:
+            handler_result = self.validate_U()
             if handler_result:
                 return handler_result
-            handle_event = getattr(Handler, "handle_U_" + args["type"])
-            result = handle_event(args, event, user=user)
+            handle_event = getattr(self, "handle_U_" + self.args["type"])
+            result = handle_event()
             if result[1] >= 400:
                 data = result[0]
             else:
-                event.save()
-                serializer = EventSerializer(event)
+                self.event.save()
+                serializer = EventSerializer(self.event)
                 data = serializer.data
             return Response(data, status=result[1])
         return Response(
             {"details": "Incorrect content in args"}, status=status.HTTP_400_BAD_REQUEST
         )
 
-    def validate_PO(args, event):
+    def validate_PO(self):
         if "action":
-            if args["action"] == "U":
-                return Handler.validate_U(args, event)
-            elif args["action"] == "MQ":
-                return Handler.validate_MQ(args, event)
-            elif args["action"] == "PL":
-                return Handler.validate_PL(args, event)
+            if self.args["action"] == "U":
+                return Handler.validate_U()
+            elif self.args["action"] == "MQ":
+                if "song" in self.args:
+                    try:
+                        tune = Tune.objects.get(pk=self.args["song"])
+                    except:
+                        return Response(
+                            {"details": "not a valid song id"},
+                            status=status.HTTP_400_BAD_REQUEST,
+                        )
+                    return
         return Response(
             {"details": "Incorrect content in args"}, status=status.HTTP_400_BAD_REQUEST
         )
