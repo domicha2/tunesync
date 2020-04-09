@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
@@ -25,12 +26,15 @@ export class AuthComponent implements OnInit, OnDestroy {
   errorMessage: string;
 
   constructor(
+    private title: Title,
     private webSocketService: WebSocketService,
     private router: Router,
     private store: Store<AppState>,
   ) {}
 
   ngOnInit(): void {
+    this.title.setTitle('TuneSync | Auth');
+
     this.subscription.add(
       this.store
         .select(selectErrorMessage)

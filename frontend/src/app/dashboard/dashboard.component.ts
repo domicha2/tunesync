@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { AppState } from '../app.module';
 import { selectActiveRoom } from './store/dashboard.selectors';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,9 +13,11 @@ import { selectActiveRoom } from './store/dashboard.selectors';
 export class DashboardComponent implements OnInit {
   activeRoom$: Observable<number>;
 
-  constructor(private store: Store<AppState>) {}
+  constructor(private title: Title, private store: Store<AppState>) {}
 
   ngOnInit(): void {
+    this.title.setTitle('TuneSync');
+
     this.activeRoom$ = this.store.select(selectActiveRoom);
   }
 }
