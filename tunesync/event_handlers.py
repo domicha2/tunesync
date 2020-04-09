@@ -305,11 +305,11 @@ class Handler:
 
     def handle_U_J(self):
         system_room = Room.objects.get(system_user=self.user)
-        if args["is_accepted"]:
-            membership = Membership.objects.get(room=self.event.room, user=user)
+        if self.args["is_accepted"]:
+            membership = Membership.objects.get(room=self.event.room, user=self.user)
             membership.state = "A"
         else:
-            membership = Membership.objects.get(room=self.event.room, user=user)
+            membership = Membership.objects.get(room=self.event.room, user=self.user)
             membership.state = "R"
         invite_event = Event.objects.filter(
             room=system_room, args__type="I", args__room_id=self.event.room.id
