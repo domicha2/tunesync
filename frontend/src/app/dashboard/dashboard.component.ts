@@ -33,8 +33,8 @@ export class DashboardComponent implements OnInit {
 
   openCreatePollDialog(): void {
     this.matDialog.open(CreatePollComponent, {
-      width: '40%',
-      height: '70%',
+      width: '50%',
+      height: '80%',
     });
   }
 

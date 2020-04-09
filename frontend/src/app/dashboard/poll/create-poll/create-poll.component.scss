@@ -11,5 +11,13 @@ div#create-poll-wrapper {
     div#poll-type {
       margin-top: 0.5rem;
     }
+
+    div.stepper-buttons {
+      margin-top: 1rem;
+
+      button {
+        margin-right: 1rem;
+      }
+    }
   }
 }
