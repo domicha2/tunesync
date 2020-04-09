@@ -1,6 +1,12 @@
 div#users-wrapper {
   height: 100%;
 
+  div.top-bar {
+    button#settings {
+      margin-left: auto;
+    }
+  }
+
   mat-accordion {
     flex-grow: 1;
     margin-bottom: 0 !important;
