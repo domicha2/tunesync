@@ -78,3 +78,12 @@ mat-accordion {
     }
   }
 }
+
+.cdk-drag {
+  cursor: move;
+}
+
+.cdk-drag-preview {
+  background-color: #434343;
+  opacity: 0.85;
+}
