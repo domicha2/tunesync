@@ -1,11 +1,16 @@
 <div id="polls-viewer-wrapper" class="column">
   <h1>Polls Viewer</h1>
   <h6>You may change your vote later.</h6>
-  <mat-list class="column" *ngIf="pollIds.length > 0; else noPolls">
+  <mat-list id="polls" class="row" *ngIf="pollIds.length > 0; else noPolls">
     <mat-list-item *ngFor="let pollId of pollIds; trackBy: trackByPollId">
       <app-poll
         [pollId]="pollId"
         [pollType]="pollState[pollId].args.action"
+        [name]="
+          pollState[pollId].args.action === 'U'
+            ? pollState[pollId].args['username']
+            : pollState[pollId].args['song_name']
+        "
       ></app-poll>
       <mat-divider></mat-divider>
       <app-poll-results

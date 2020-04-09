@@ -40,7 +40,7 @@ export class DashboardComponent implements OnInit {
 
   openPollsViewerDialog(): void {
     this.matDialog.open(PollsViewerComponent, {
-      width: '25%',
+      width: '75%',
       height: '85%',
     });
   }
