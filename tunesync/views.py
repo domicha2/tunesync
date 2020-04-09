@@ -256,7 +256,9 @@ class TuneViewSet(viewsets.ViewSet):
 
     def list(self, request):
         paginator = PageNumberPagination()
-        filtered_set = TuneFilter(request.GET, queryset=Tune.objects.all()).qs
+        filtered_set = TuneFilter(request.GET, queryset=Tune.objects.all()).qs.order_by(
+            "name"
+        )
         context = paginator.paginate_queryset(filtered_set, request)
         serializer = TuneSerializer(context, many=True)
         return paginator.get_paginated_response(serializer.data)
