@@ -96,8 +96,8 @@ class Handler:
         )
 
     def validate_MQ(self):
-        if "queue" in self.args:
-            if not isinstance(self.args["queue"], list):
+        if "queue" in self.args["modify_queue"]:
+            if not isinstance(self.args["modify_queue"]["queue"], list):
                 return Response(
                     {"details": "args are bad types"},
                     status=status.HTTP_400_BAD_REQUEST,
@@ -106,7 +106,7 @@ class Handler:
             return Response(
                 {"details": "missing args"}, status=status.HTTP_400_BAD_REQUEST
             )
-        for song_id in self.args["queue"]:
+        for song_id in self.args["modify_queue"]["queue"]:
             try:
                 tune = Tune.objects.get(pk=song_id)
             except:
