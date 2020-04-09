@@ -1,28 +1,29 @@
 <div id="queue-wrapper" class="column">
   <div *ngIf="(userRole$ | async) !== 'R'" id="instructions">
-    <h3>Drag the song from the available songs to the queued songs.</h3>
-    <h3>Remove a song from the queue, by dragging it to the songs.</h3>
+    <h3>Drag songs between the pool of available songs and the queue.</h3>
     <h3>You may also reorder the songs in the queue</h3>
   </div>
 
   <h2>Search songs</h2>
-  <mat-form-field appearance="outline">
-    <mat-label>Search by name</mat-label>
-    <mat-icon matPrefix>search</mat-icon>
-    <input type="search" matInput [formControl]="nameControl" />
-  </mat-form-field>
+  <div id="filters" class="row">
+    <mat-form-field appearance="outline">
+      <mat-label>Name</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input type="search" matInput [formControl]="nameControl" />
+    </mat-form-field>
 
-  <mat-form-field appearance="outline">
-    <mat-label>Search by artist</mat-label>
-    <mat-icon matPrefix>search</mat-icon>
-    <input type="search" matInput [formControl]="artistControl" />
-  </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Artist</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input type="search" matInput [formControl]="artistControl" />
+    </mat-form-field>
 
-  <mat-form-field appearance="outline">
-    <mat-label>Search by album</mat-label>
-    <mat-icon matPrefix>search</mat-icon>
-    <input type="search" matInput [formControl]="albumControl" />
-  </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Album</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input type="search" matInput [formControl]="albumControl" />
+    </mat-form-field>
+  </div>
 
   <div id="song-lists" class="row" cdkDropListGroup>
     <div id="queued-songs">
