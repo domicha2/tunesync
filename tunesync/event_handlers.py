@@ -347,7 +347,7 @@ class Handler:
         )
         if not membership:
             return ({"details": "user is not in the room"}, status.HTTP_400_BAD_REQUEST)
-        membership[0].role = args["role"]
+        membership[0].role = self.args["role"]
         membership[0].save()
         return (None, status.HTTP_200_OK)
 
