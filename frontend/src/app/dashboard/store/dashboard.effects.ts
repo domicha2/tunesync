@@ -15,7 +15,7 @@ import { AppState } from '../../app.module';
 import { selectUserAndRoom } from '../../app.selectors';
 import { selectUserId } from '../../auth/auth.selectors';
 import { ControlsService } from '../controls/controls.service';
-import { AppEvent, Room, SYSTEM_USER_ID, User } from '../dashboard.models';
+import { AppEvent, Room, SYSTEM_USER_ID, User, PERSONAL_ROOM_NAME } from '../dashboard.models';
 import { MainScreenService } from '../main-screen/main-screen.service';
 import { MessagingService } from '../messaging/messaging.service';
 import { QueueService } from '../queue/queue.service';
@@ -73,7 +73,15 @@ export class DashboardEffects {
         this.roomsService.getRooms(userId).pipe(
           map((rooms: Room[]) => ({
             type: DashboardActions.storeRooms.type,
-            rooms,
+            rooms: rooms.sort((a, b) => {
+              if (a.title === PERSONAL_ROOM_NAME) {
+                return -1;
+              } else if (b.title === PERSONAL_ROOM_NAME) {
+                return 1;
+              } else {
+                return a.title < b.title ? -1 : 1;
+              }
+            }),
           })),
           catchError(() => EMPTY),
         ),

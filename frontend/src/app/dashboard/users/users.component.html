@@ -1,5 +1,5 @@
 <div id="users-wrapper" class="column">
-  <div id="top-bar" class="row">
+  <div class="row top-bar">
     <h1>Users</h1>
     <button
       *ngIf="(roomName$ | async) !== 'Personal Room'"
@@ -10,7 +10,7 @@
       <mat-icon>add_circle</mat-icon>
     </button>
 
-    <button mat-icon-button [matMenuTriggerFor]="menu">
+    <button id="settings" mat-icon-button [matMenuTriggerFor]="menu">
       <mat-icon>settings</mat-icon>
     </button>
 

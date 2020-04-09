@@ -1,24 +1,46 @@
 <div id="queue-wrapper" class="column">
   <div *ngIf="(userRole$ | async) !== 'R'" id="instructions">
-    <h3>Drag the song from the available songs to the queued songs.</h3>
-    <h3>Remove a song from the queue, by dragging it to the songs.</h3>
+    <h3>Drag songs between the pool of available songs and the queue.</h3>
     <h3>You may also reorder the songs in the queue</h3>
   </div>
 
-  <mat-form-field appearance="outline">
-    <mat-label>Name</mat-label>
-    <input type="text" matInput [formControl]="nameControl" />
-  </mat-form-field>
+  <h2>Search songs</h2>
+  <div id="filters" class="row">
+    <mat-form-field appearance="fill">
+      <mat-label>Name</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input type="search" matInput [formControl]="nameControl" />
+      <button mat-icon-button matSuffix (click)="clearFormControl(nameControl)">
+        <mat-icon>clear</mat-icon>
+      </button>
+    </mat-form-field>
 
-  <mat-form-field appearance="outline">
-    <mat-label>Artist</mat-label>
-    <input type="text" matInput [formControl]="artistControl" />
-  </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Artist</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input type="search" matInput [formControl]="artistControl" />
+      <button
+        mat-icon-button
+        matSuffix
+        (click)="clearFormControl(artistControl)"
+      >
+        <mat-icon>clear</mat-icon>
+      </button>
+    </mat-form-field>
 
-  <mat-form-field appearance="outline">
-    <mat-label>Album</mat-label>
-    <input type="text" matInput [formControl]="albumControl" />
-  </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Album</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input type="search" matInput [formControl]="albumControl" />
+      <button
+        mat-icon-button
+        matSuffix
+        (click)="clearFormControl(albumControl)"
+      >
+        <mat-icon>clear</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
 
   <div id="song-lists" class="row" cdkDropListGroup>
     <div id="queued-songs">
