@@ -83,3 +83,20 @@ mat-accordion {
   background-color: #434343;
   opacity: 0.85;
 }
+
+div.top-bar {
+  justify-content: flex-start;
+  align-items: center;
+  height: fit-content;
+  padding: 0.5rem;
+  margin-bottom: 0 !important;
+
+  h1 {
+    margin-right: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  button {
+    margin-right: 0 !important;
+  }
+}
