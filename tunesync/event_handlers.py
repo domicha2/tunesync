@@ -184,7 +184,7 @@ class Handler:
         # Check if the action is a kick, we want to store K
         if action_type == "U":
             action_type = "K"
-            self.args["username"] = Users.objects.get(pk=self.args["user"]).username
+            self.args["username"] = User.objects.get(pk=self.args["user"]).username
         elif action_type == "MQ":
             song_id = self.args["song"]
             self.args["song_name"] = Tune.objects.get(pk=song_id).name
@@ -372,7 +372,7 @@ class Handler:
     def validate_PO(self):
         if "action":
             if self.args["action"] == "U":
-                return Handler.validate_U()
+                return self.validate_U()
             elif self.args["action"] == "MQ":
                 if "song" in self.args:
                     try:
