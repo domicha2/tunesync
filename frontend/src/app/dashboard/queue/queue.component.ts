@@ -8,7 +8,13 @@ import { FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { isArray } from 'lodash';
 import { combineLatest, Observable, Subscription } from 'rxjs';
-import { debounceTime, filter, map, startWith } from 'rxjs/operators';
+import {
+  debounceTime,
+  filter,
+  map,
+  startWith,
+  distinctUntilChanged,
+} from 'rxjs/operators';
 import { AppState } from '../../app.module';
 import { Filters, Role, Song } from '../dashboard.models';
 import * as DashboardActions from '../store/dashboard.actions';
@@ -17,6 +23,7 @@ import {
   selectQueueIndexAndSongs,
   selectUserRole,
 } from '../store/dashboard.selectors';
+import { isEqual } from 'lodash';
 
 @Component({
   selector: 'app-queue',
@@ -48,6 +55,7 @@ export class QueueComponent implements OnInit, OnDestroy {
       ])
         .pipe(
           debounceTime(250),
+          distinctUntilChanged(isEqual),
           map(([name, album, artist]) => ({
             name,
             album,
