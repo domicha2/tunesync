@@ -3,7 +3,12 @@ div#users-wrapper {
 
   div#top-bar {
     justify-content: space-between;
-    height: 5%;
+    height: 3.5%;
+    padding: {
+      top: 1rem;
+      left: 1rem;
+      right: 1rem;
+    }
 
     h1 {
       margin-right: 0.5rem !important;

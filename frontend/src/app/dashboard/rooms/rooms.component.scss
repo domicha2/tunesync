@@ -1,6 +1,11 @@
 div.top-bar {
   justify-content: flex-start;
-  height: 5%;
+  height: 3.5%;
+  padding: {
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+  }
 }
 
 div.list-el {
