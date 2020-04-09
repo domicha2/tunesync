@@ -16,6 +16,13 @@
         <mat-label>Search users</mat-label>
         <mat-icon matPrefix>search</mat-icon>
         <input type="search" matInput [formControl]="usernameControl" />
+        <button
+          mat-icon-button
+          matSuffix
+          (click)="usernameControl.setValue('')"
+        >
+          <mat-icon>clear</mat-icon>
+        </button>
       </mat-form-field>
 
       <mat-form-field appearance="outline">

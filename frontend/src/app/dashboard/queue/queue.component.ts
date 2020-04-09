@@ -107,6 +107,10 @@ export class QueueComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
+  clearFormControl(formControl: FormControl): void {
+    formControl.setValue('');
+  }
+
   drop(event: CdkDragDrop<string[]>, container: 'queue' | 'available'): void {
     if (event.previousContainer === event.container) {
       // reorder list

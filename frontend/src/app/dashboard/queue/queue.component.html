@@ -10,18 +10,35 @@
       <mat-label>Name</mat-label>
       <mat-icon matPrefix>search</mat-icon>
       <input type="search" matInput [formControl]="nameControl" />
+      <button mat-icon-button matSuffix (click)="clearFormControl(nameControl)">
+        <mat-icon>clear</mat-icon>
+      </button>
     </mat-form-field>
 
     <mat-form-field appearance="fill">
       <mat-label>Artist</mat-label>
       <mat-icon matPrefix>search</mat-icon>
       <input type="search" matInput [formControl]="artistControl" />
+      <button
+        mat-icon-button
+        matSuffix
+        (click)="clearFormControl(artistControl)"
+      >
+        <mat-icon>clear</mat-icon>
+      </button>
     </mat-form-field>
 
     <mat-form-field appearance="fill">
       <mat-label>Album</mat-label>
       <mat-icon matPrefix>search</mat-icon>
       <input type="search" matInput [formControl]="albumControl" />
+      <button
+        mat-icon-button
+        matSuffix
+        (click)="clearFormControl(albumControl)"
+      >
+        <mat-icon>clear</mat-icon>
+      </button>
     </mat-form-field>
   </div>
 
