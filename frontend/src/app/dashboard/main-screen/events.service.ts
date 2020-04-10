@@ -150,7 +150,7 @@ export class EventsService {
           : -1,
       );
 
-    result = result.filter((event) => {
+    result = result.filter(event => {
       // ? revisit user change events (join/kick/role change to be displayed)
       if (
         roomName !== PERSONAL_ROOM_NAME &&
@@ -166,13 +166,13 @@ export class EventsService {
     // iterate through all events looking for join events (event type: 'M" and args : {is_accepted: boolean})
     // if found event remove invitation event with a meaningful message about the join event
     const eventsToDelete = [];
-    result = result.map((outerEvent) => {
+    result = result.map(outerEvent => {
       if (
         outerEvent.event_type === EventType.Messaging &&
         typeof outerEvent.args.is_accepted === 'boolean'
       ) {
         // look back for the join event
-        const inviteEvent = result.find((innerEvent) => {
+        const inviteEvent = result.find(innerEvent => {
           return (
             innerEvent.event_type === EventType.UserChange &&
             innerEvent.args.type === UserChangeAction.Invite &&
@@ -199,7 +199,7 @@ export class EventsService {
     });
 
     // filter events
-    result = result.filter((event) => !eventsToDelete.includes(event.event_id));
+    result = result.filter(event => !eventsToDelete.includes(event.event_id));
     return result;
   }
 
@@ -300,7 +300,7 @@ export class EventsService {
     ) {
       // need to look for the invite event to delete and change the contents of the message
       const inviteEventIndex = events.findIndex(
-        (innerEvent) => event.args.room === innerEvent.args.room_id,
+        innerEvent => event.args.room === innerEvent.args.room_id,
       );
       const inviteEvent = events[inviteEventIndex];
       const message = `You have ${

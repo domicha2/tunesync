@@ -75,19 +75,19 @@ export class MainScreenComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.store
         .select(selectActiveRoomName)
-        .subscribe((name) => (this.activeRoomName = name)),
+        .subscribe(name => (this.activeRoomName = name)),
     );
 
     this.subscription.add(
       this.store
         .select(selectActiveRoom)
-        .subscribe((roomId) => (this.activeRoomId = roomId)),
+        .subscribe(roomId => (this.activeRoomId = roomId)),
     );
 
     this.subscription.add(
       this.store
         .select(selectTuneSyncEvent)
-        .pipe(filter((data) => data !== undefined))
+        .pipe(filter(data => data !== undefined))
         .subscribe((response: TuneSyncEvent) => {
           this.eventsService.processTuneSyncEvent(response);
         }),
@@ -104,7 +104,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
       this.store
         .select(selectEvents)
         .pipe(
-          filter((events) => events !== undefined && events !== null),
+          filter(events => events !== undefined && events !== null),
           distinctUntilChanged((prev, curr) => {
             return prev[0] && curr[0] && prev[0].event_id === curr[0].event_id;
           }),

@@ -15,7 +15,13 @@ import { AppState } from '../../app.module';
 import { selectUserAndRoom } from '../../app.selectors';
 import { selectUserId } from '../../auth/auth.selectors';
 import { ControlsService } from '../controls/controls.service';
-import { AppEvent, Room, SYSTEM_USER_ID, User, PERSONAL_ROOM_NAME } from '../dashboard.models';
+import {
+  AppEvent,
+  Room,
+  SYSTEM_USER_ID,
+  User,
+  PERSONAL_ROOM_NAME,
+} from '../dashboard.models';
 import { MainScreenService } from '../main-screen/main-screen.service';
 import { MessagingService } from '../messaging/messaging.service';
 import { PollService } from '../poll/poll.service';
@@ -118,7 +124,7 @@ export class DashboardEffects {
       withLatestFrom(this.store.select(selectActiveRoom)),
       switchMap(([action, roomId]) =>
         this.pollService.getPollsByRoom(roomId).pipe(
-          map((response) => ({
+          map(response => ({
             type: DashboardActions.setPolls.type,
             polls: response.results as Poll[],
           })),
@@ -176,18 +182,20 @@ export class DashboardEffects {
     { dispatch: false },
   );
 
-  removeUserFromRoom$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(DashboardActions.removeUserFromRoom),
-      concatMap(action =>
-        of(action).pipe(
-          withLatestFrom(this.store.pipe(select(selectActiveRoom))),
+  removeUserFromRoom$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(DashboardActions.removeUserFromRoom),
+        concatMap(action =>
+          of(action).pipe(
+            withLatestFrom(this.store.pipe(select(selectActiveRoom))),
+          ),
+        ),
+        switchMap(([action, room]) =>
+          this.usersService.removeUserFromRoom(room, action.userId),
         ),
       ),
-      switchMap(([action, room]) =>
-        this.usersService.removeUserFromRoom(room, action.userId)
-      ),
-    ), {dispatch: false}
+    { dispatch: false },
   );
 
   createPoll$ = createEffect(
@@ -196,9 +204,9 @@ export class DashboardEffects {
         ofType(DashboardActions.createPoll),
         withLatestFrom(this.store.select(selectActiveRoom)),
         switchMap(([action, room]) =>
-          this.pollService.createPoll(room, action.pollArgs).pipe(
-            catchError(() => EMPTY),
-          ),
+          this.pollService
+            .createPoll(room, action.pollArgs)
+            .pipe(catchError(() => EMPTY)),
         ),
       ),
     { dispatch: false },

@@ -68,7 +68,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.store
         .select(selectUsers)
-        .pipe(filter((users) => users !== undefined))
+        .pipe(filter(users => users !== undefined))
         .subscribe((users: User[]) => {
           // clear existing list of users
           this.users = {
@@ -78,7 +78,7 @@ export class UsersComponent implements OnInit, OnDestroy {
           };
 
           // add users to their appropriate group
-          users.forEach((user) => {
+          users.forEach(user => {
             switch (user.role) {
               case Role.Admin:
                 this.users.admin.push(user);

@@ -40,16 +40,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.userRole$ = this.store.select(selectUserRole);
 
     this.subscription.add(
-      this.activeRoom$.pipe(skip(1), filter(isUndefined)).subscribe(() => {
-        // skip the first time active room is undefined because that is the default
-        // whenever the active room is cleared (user got kicked)
-        if (
-          this.pollsViewerDialogRef &&
-          this.pollsViewerDialogRef.getState() === MatDialogState.OPEN
-        ) {
-          this.pollsViewerDialogRef.close();
-        }
-      }),
+      this.activeRoom$
+        .pipe(
+          skip(1),
+          filter(isUndefined),
+        )
+        .subscribe(() => {
+          // skip the first time active room is undefined because that is the default
+          // whenever the active room is cleared (user got kicked)
+          if (
+            this.pollsViewerDialogRef &&
+            this.pollsViewerDialogRef.getState() === MatDialogState.OPEN
+          ) {
+            this.pollsViewerDialogRef.close();
+          }
+        }),
     );
   }
 

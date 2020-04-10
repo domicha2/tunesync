@@ -36,7 +36,7 @@ export class RoomsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.notificationsService.notificationsSubject.subscribe((payload) => {
+    this.notificationsService.notificationsSubject.subscribe(payload => {
       if (payload.action === 'reset') {
         // undefined makes it so that it does not render
         this.notifications[payload.roomId] = undefined;
@@ -51,12 +51,12 @@ export class RoomsComponent implements OnInit, OnDestroy {
 
     this.store
       .select(selectRooms)
-      .pipe(filter((rooms) => rooms !== undefined))
+      .pipe(filter(rooms => rooms !== undefined))
       .subscribe((rooms: Room[]) => {
         // clear existing value
         this.rooms = { admin: [], dj: [], regular: [] };
 
-        rooms.forEach((room) => {
+        rooms.forEach(room => {
           switch (room.role) {
             case Role.Admin:
               this.rooms.admin.push(room);

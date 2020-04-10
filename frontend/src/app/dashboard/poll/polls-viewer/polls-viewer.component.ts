@@ -55,7 +55,10 @@ export class PollsViewerComponent implements OnInit, OnDestroy {
       this.store
         .select(selectPolls)
         // ignore the initial value, let the api request override it
-        .pipe(skip(1), first())
+        .pipe(
+          skip(1),
+          first(),
+        )
         .subscribe((polls: Poll[]) => {
           // clear the poll
           this.pollState = {};

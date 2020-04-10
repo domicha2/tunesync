@@ -38,7 +38,10 @@ export class AddRoomComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscription.add(
       this.usernameControl.valueChanges
-        .pipe(startWith(''), debounceTime(250))
+        .pipe(
+          startWith(''),
+          debounceTime(250),
+        )
         .subscribe((username: string) => {
           this.store.dispatch(
             DashboardActions.getUsersByUsername({
@@ -50,7 +53,7 @@ export class AddRoomComponent implements OnInit, OnDestroy {
     );
 
     this.allUsers$ = this.store.select(selectAllUsers).pipe(
-      filter((users) => users !== undefined),
+      filter(users => users !== undefined),
       startWith([]),
     );
   }

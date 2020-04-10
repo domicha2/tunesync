@@ -109,13 +109,13 @@ export class ControlsComponent
           .select(selectSongStatus)
           .pipe(
             filter(
-              (status) =>
+              status =>
                 typeof status.isPlaying === 'boolean' &&
                 typeof status.queueIndex === 'number',
             ),
           ),
         this.store.select(selectQueuedSongs).pipe(
-          filter((songs) => songs !== null && songs !== undefined),
+          filter(songs => songs !== null && songs !== undefined),
           tap((queue: Song[]) => {
             this.queue = queue;
           }),
