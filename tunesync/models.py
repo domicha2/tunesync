@@ -263,7 +263,7 @@ def update_event_listeners(sender, instance, **kwargs):
 
 def handle_poll_update(instance):
     room = instance.event.room
-    if type(instance) == "Poll":
+    if type(instance) == Poll:
         status = instance.get_state()
     else:
         status = instance.poll.get_state()
