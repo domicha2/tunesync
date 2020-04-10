@@ -17,6 +17,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatStepperModule } from '@angular/material/stepper';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ControlsComponent } from './controls/controls.component';
 import { SongUrlPipe } from './controls/song-url.pipe';
@@ -63,6 +64,7 @@ import { UsersComponent } from './users/users.component';
     MatExpansionModule,
     MatMenuModule,
     MatListModule,
+    MatStepperModule,
     MatDividerModule,
     MatFormFieldModule,
     MatInputModule,

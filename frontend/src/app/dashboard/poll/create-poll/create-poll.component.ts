@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 import { debounceTime, map, startWith, tap } from 'rxjs/operators';
@@ -33,14 +33,14 @@ export class CreatePollComponent implements OnInit, OnDestroy {
   albumControl = new FormControl('');
   artistControl = new FormControl('');
 
-  pollType: PollType;
   pollTypes: any[] = [
     { name: 'Add Song to Queue', enum: PollType.AddToQueue },
     { name: 'Kick User', enum: PollType.Kick },
   ];
 
-  selectedUserId: number;
-  selectedSongId: number;
+  pollType = new FormControl(null, Validators.required);
+  userId = new FormControl(null, Validators.required);
+  songId = new FormControl(null, Validators.required);
 
   constructor(private store: Store<AppState>) {}
 
@@ -83,13 +83,13 @@ export class CreatePollComponent implements OnInit, OnDestroy {
   }
 
   onCreatePoll(): void {
-    switch (this.pollType) {
+    switch (this.pollType.value) {
       case PollType.AddToQueue:
         this.store.dispatch(
           DashboardActions.createPoll({
             pollArgs: {
-              action: this.pollType,
-              song: this.selectedSongId,
+              action: this.pollType.value,
+              song: this.songId.value,
             },
           }),
         );
@@ -98,9 +98,9 @@ export class CreatePollComponent implements OnInit, OnDestroy {
         this.store.dispatch(
           DashboardActions.createPoll({
             pollArgs: {
-              action: this.pollType,
+              action: this.pollType.value,
               type: UserChangeAction.Kick,
-              user: this.selectedUserId,
+              user: this.userId.value,
             },
           }),
         );

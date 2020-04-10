@@ -8,12 +8,14 @@ export enum PollType {
 export interface KickPollArgs {
   action: PollType.Kick;
   user: number;
+  username: string;
   type: UserChangeAction.Kick;
 }
 
 export interface AddToQueueArgs {
   action: PollType.AddToQueue;
   song: number;
+  song_name: string;
 }
 
 export interface Poll {

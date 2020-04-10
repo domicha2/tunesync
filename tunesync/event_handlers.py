@@ -184,7 +184,7 @@ class Handler:
         # Check if the action is a kick, we want to store K
         if action_type == "U":
             action_type = "K"
-            self.args["username"] = Users.objects.get(pk=self.args["user"]).username
+            self.args["username"] = User.objects.get(pk=self.args["user"]).username
         elif action_type == "MQ":
             song_id = self.args["song"]
             self.args["song_name"] = Tune.objects.get(pk=song_id).name
@@ -347,7 +347,7 @@ class Handler:
         )
         if not membership:
             return ({"details": "user is not in the room"}, status.HTTP_400_BAD_REQUEST)
-        membership[0].role = args["role"]
+        membership[0].role = self.args["role"]
         membership[0].save()
         return (None, status.HTTP_200_OK)
 
@@ -372,7 +372,7 @@ class Handler:
     def validate_PO(self):
         if "action":
             if self.args["action"] == "U":
-                return Handler.validate_U()
+                return self.validate_U()
             elif self.args["action"] == "MQ":
                 if "song" in self.args:
                     try:

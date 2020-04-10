@@ -5,6 +5,7 @@ div#polls-viewer-wrapper {
     flex-grow: 1;
 
     mat-list-item {
+      width: 15rem;
       height: fit-content;
       border: 1px solid white;
       border-radius: 0.5rem;

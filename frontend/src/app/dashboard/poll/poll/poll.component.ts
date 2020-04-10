@@ -12,6 +12,8 @@ import { PollType } from '../poll.models';
 export class PollComponent {
   @Input() pollId: number;
   @Input() pollType: PollType;
+  // the name of the thing being voted (username/songname)
+  @Input() name: string;
 
   constructor(private store: Store<AppState>) {}
 

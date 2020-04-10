@@ -1,5 +1,5 @@
 <div id="poll-results-wrapper" class="column">
-  <div class="agree row">
+  <div class="agree row" [ngClass]="agree > disagree ? 'greater' : undefined">
     <p>Agree: {{ agree }}</p>
     <p>
       <ng-container *ngIf="agree + disagree !== 0; else zero">
@@ -8,7 +8,10 @@
     </p>
   </div>
 
-  <div class="disagree row">
+  <div
+    class="disagree row"
+    [ngClass]="disagree > agree ? 'greater' : undefined"
+  >
     <p>Disagree: {{ disagree }}</p>
     <p>
       <ng-container *ngIf="agree + disagree !== 0; else zero">
