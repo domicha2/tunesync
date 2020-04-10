@@ -1,12 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
-import { skip } from 'rxjs/operators';
+import { skip, withLatestFrom } from 'rxjs/operators';
 import { AppState } from '../../../app.module';
 import { getPollsByRoom } from '../../store/dashboard.actions';
-import { selectPolls } from '../../store/dashboard.selectors';
-import { Poll, PollState } from '../poll.models';
+import { selectPolls, selectActiveRoom } from '../../store/dashboard.selectors';
 import { WebSocketService } from '../../web-socket.service';
+import { Poll, PollState } from '../poll.models';
+import { NotificationsService } from '../../notifications.service';
 
 @Component({
   selector: 'app-polls-viewer',
@@ -21,20 +22,33 @@ export class PollsViewerComponent implements OnInit, OnDestroy {
   pollIds: number[] = [];
 
   constructor(
+    private notificationsService: NotificationsService,
     private webSocketService: WebSocketService,
     private store: Store<AppState>,
   ) {}
 
   ngOnInit(): void {
     this.subscription.add(
-      this.webSocketService.pollsSubject.subscribe((poll: Poll) => {
-        if (this.pollState[poll.poll_id] === undefined) {
-          // add new entry to the view
-          this.pollIds.push(poll.poll_id);
-        }
-        // update the state
-        this.pollState[poll.poll_id] = poll;
-      }),
+      this.webSocketService.pollsSubject
+        .pipe(withLatestFrom(this.store.select(selectActiveRoom)))
+        .subscribe(([poll, roomId]) => {
+          if (this.pollState[poll.poll_id] === undefined) {
+            if (poll.room_id !== roomId) {
+              this.notificationsService.notificationsSubject.next({
+                roomId: poll.room_id,
+                action: 'increment',
+              });
+            } else {
+              // add new entry to the view
+              this.pollIds.push(poll.poll_id);
+            }
+          }
+
+          if (poll.room_id === roomId) {
+            // update the state
+            this.pollState[poll.poll_id] = poll;
+          }
+        }),
     );
 
     this.subscription.add(
