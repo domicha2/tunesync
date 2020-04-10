@@ -22,7 +22,7 @@
         </div>
 
         <div class="stepper-buttons">
-          <button mat-raised-button matStepperNext>Next</button>
+          <button color="accent" mat-raised-button matStepperNext>Next</button>
         </div>
       </mat-step>
 
@@ -86,7 +86,7 @@
 
         <div class="stepper-buttons">
           <button mat-raised-button matStepperPrevious>Back</button>
-          <button mat-raised-button matStepperNext>Next</button>
+          <button color="accent" mat-raised-button matStepperNext>Next</button>
         </div>
       </mat-step>
 
@@ -99,7 +99,12 @@
           <button mat-raised-button color="warn" (click)="stepper.reset()">
             Reset
           </button>
-          <button mat-raised-button mat-dialog-close (click)="onCreatePoll()">
+          <button
+            color="accent"
+            mat-raised-button
+            mat-dialog-close
+            (click)="onCreatePoll()"
+          >
             Submit
           </button>
         </div>
