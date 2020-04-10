@@ -185,15 +185,9 @@ export class DashboardEffects {
         ),
       ),
       switchMap(([action, room]) =>
-        this.usersService.removeUserFromRoom(room, action.userId).pipe(
-          map(() => ({
-            type: DashboardActions.getUsersByRoom.type,
-            roomId: room,
-          })),
-          catchError(() => EMPTY),
-        ),
+        this.usersService.removeUserFromRoom(room, action.userId)
       ),
-    ),
+    ), {dispatch: false}
   );
 
   createPoll$ = createEffect(
