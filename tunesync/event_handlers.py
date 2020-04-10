@@ -48,10 +48,8 @@ class PollTask:
                     },
                 )
                 event.save()
-                handle_event_update(event)
         poll.is_active = False
         poll.save()
-        handle_poll_update(poll)
 
     def execute_MQ(self, event):
         event.event_type = "T"
@@ -65,14 +63,12 @@ class PollTask:
         handler = Handler(event, event.author)
         # the following is janky, not proud at all.
         poll = Poll.objects.get(pk=self.poll_id)
-        handle_tunesync_update(poll)
         return handler.handle_T()
 
     def execute_K(self, event):
         event.event_type = "U"
         event.args = {"user": self.args["user"], "type": "K"}
         handler = Handler(event, event.author)
-        handle_event_update(event)
         return handler.handle_U_K()
 
 
