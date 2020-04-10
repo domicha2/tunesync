@@ -1,18 +1,7 @@
 from background_task import background
 from rest_framework import status
 from .serializers import EventSerializer
-from .models import (
-    Membership,
-    Event,
-    Room,
-    Vote,
-    Poll,
-    TuneSync,
-    Tune,
-    handle_poll_update,
-    handle_event_update,
-    handle_tunesync_update,
-)
+from .models import Membership, Event, Room, Vote, Poll, TuneSync, Tune
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 
