@@ -1,6 +1,6 @@
 <div id="polls-viewer-wrapper" class="column">
   <h1>Polls Viewer</h1>
-  <h6>You may change your vote later.</h6>
+  <h4>You can only vote once, but you may change your vote.</h4>
   <mat-list id="polls" class="row" *ngIf="pollIds.length > 0; else noPolls">
     <mat-list-item *ngFor="let pollId of pollIds; trackBy: trackByPollId">
       <app-poll
