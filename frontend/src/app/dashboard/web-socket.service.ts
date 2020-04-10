@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { EventType, AppEvent, TuneSyncEvent } from './dashboard.models';
+import { AppEvent, EventType, TuneSyncEvent } from './dashboard.models';
 import { Poll } from './poll/poll.models';
 
 @Injectable({ providedIn: 'root' })
