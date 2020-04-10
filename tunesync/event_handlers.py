@@ -43,8 +43,11 @@ class PollTask:
     def execute_MQ(self, event):
         event.event_type = "T"
         ts = TuneSync.get_tune_sync(event.room.id)
-        current_queue = ts["last_modify_queue"]["queue"]
-        current_queue.append(self.args["song"])
+        if current_queue = ts["last_modify_queue"]:
+            current_queue = ts["last_modify_queue"]["queue"]
+            current_queue.append(self.args["song"])
+        else:
+            current_queue = [self.args["song"]]
         event.args = {"modify_queue": {"queue": current_queue}}
         handler = Handler(event, event.author)
         return handler.handle_T()
