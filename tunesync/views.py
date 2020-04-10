@@ -28,6 +28,16 @@ class IndexPage(TemplateView):
     template_name = "index.html"
 
 
+class PollViewSet(viewsets.ViewSet):
+
+    permission_classes = [inRoomOnlyPolls]
+
+    def retrieve(self, request, pk=None):
+        poll = Poll.objects.get(event_id=pk)
+        status = poll.get_state()
+        return Response(status)
+
+
 class UserViewSet(viewsets.ViewSet):
     """
     Example empty viewset demonstrating the standard
@@ -340,19 +350,23 @@ class TuneViewSet(viewsets.ViewSet):
                 {"details": "invalid tune id"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-    # READ
-    def destroy(self, request, pk=None):
-        tune = Tune.objects.filter(id=pk)
-        if tune:
-            tune = tune[0]
-            colliding_tunes = Tune.objects.filter(hash_value=tune.hash_value).exclude(
-                pk=pk
-            )
-            if not colliding_tunes:
-                os.remove(tune.audio_file.path)
-            tune.delete()
-            return Response(status=status.HTTP_202_ACCEPTED)
-        else:
-            return Response(
-                {"details": "invalid event id"}, status=status.HTTP_400_BAD_REQUEST
-            )
+    # DELETE
+    # we aren't ready for this end point to be exposed right now.
+    # deleting could cause issues to other functions so we may need to consider how we'll do this
+    # also spotify doesn't let people delete so i think its fine
+
+    # def destroy(self, request, pk=None):
+    #     tune = Tune.objects.filter(id=pk)
+    #     if tune:
+    #         tune = tune[0]
+    #         colliding_tunes = Tune.objects.filter(hash_value=tune.hash_value).exclude(
+    #             pk=pk
+    #         )
+    #         if not colliding_tunes:
+    #             os.remove(tune.audio_file.path)
+    #         tune.delete()
+    #         return Response(status=status.HTTP_202_ACCEPTED)
+    #     else:
+    #         return Response(
+    #             {"details": "invalid event id"}, status=status.HTTP_400_BAD_REQUEST
+    #         )
