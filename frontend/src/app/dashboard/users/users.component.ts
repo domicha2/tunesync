@@ -4,14 +4,20 @@ import {
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import {
+  MatDialog,
+  MatDialogRef,
+  MatDialogState,
+} from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
+import { isUndefined } from 'lodash';
 import { Observable, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { AppState } from '../../app.module';
 import { Role, User } from '../dashboard.models';
 import * as DashboardActions from '../store/dashboard.actions';
 import {
+  selectActiveRoom,
   selectActiveRoomName,
   selectUserRole,
   selectUsers,
@@ -37,9 +43,25 @@ export class UsersComponent implements OnInit, OnDestroy {
   userRole$: Observable<Role>;
   roomName$: Observable<string>;
 
+  inviteDialogRef: MatDialogRef<InviteComponent>;
+
   constructor(private store: Store<AppState>, private dialog: MatDialog) {}
 
   ngOnInit(): void {
+    this.subscription.add(
+      this.store
+        .select(selectActiveRoom)
+        .pipe(filter(isUndefined))
+        .subscribe(() => {
+          if (
+            this.inviteDialogRef &&
+            this.inviteDialogRef.getState() === MatDialogState.OPEN
+          ) {
+            this.inviteDialogRef.close();
+          }
+        }),
+    );
+
     this.roomName$ = this.store.select(selectActiveRoomName);
     this.userRole$ = this.store.select(selectUserRole);
 
@@ -98,7 +120,7 @@ export class UsersComponent implements OnInit, OnDestroy {
   }
 
   onInvite(): void {
-    this.dialog.open(InviteComponent, {
+    this.inviteDialogRef = this.dialog.open(InviteComponent, {
       height: 'fit-content',
     });
   }

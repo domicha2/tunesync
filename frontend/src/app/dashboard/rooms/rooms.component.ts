@@ -6,7 +6,6 @@ import { filter } from 'rxjs/operators';
 import { AppState } from '../../app.module';
 import { Role, Room } from '../dashboard.models';
 import { NotificationsService } from '../notifications.service';
-import * as DashboardActions from '../store/dashboard.actions';
 import { selectRooms } from '../store/dashboard.selectors';
 import { AddRoomComponent } from './add-room/add-room.component';
 import { RoomsService } from './rooms.service';
