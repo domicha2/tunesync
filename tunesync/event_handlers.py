@@ -19,7 +19,8 @@ class PollTask:
         self.args = Poll.objects.get(pk=self.poll_id).args
 
     @staticmethod
-    @background(schedule=30)
+    # ! change this back later to 60 seconds
+    @background(schedule=15)
     def initiate_poll(poll_id):
         print("initiating poll")
         self = PollTask(poll_id)

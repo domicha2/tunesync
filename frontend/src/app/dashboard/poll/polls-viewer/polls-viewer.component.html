@@ -4,6 +4,7 @@
   <mat-list id="polls" class="row" *ngIf="pollIds.length > 0; else noPolls">
     <mat-list-item *ngFor="let pollId of pollIds; trackBy: trackByPollId">
       <app-poll
+        [isActive]="pollState[pollId].is_active"
         [pollId]="pollId"
         [pollType]="pollState[pollId].args.action"
         [name]="

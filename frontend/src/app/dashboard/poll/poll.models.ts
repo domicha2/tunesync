@@ -25,7 +25,7 @@ export interface Poll {
   agrees: number;
   disagrees: number;
   is_active: boolean;
-  is_successful: number;
+  is_successful: boolean;
   room_id: number;
   event_type: EventType.CreatePoll;
 }
