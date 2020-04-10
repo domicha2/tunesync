@@ -1,10 +1,8 @@
 <div id="poll-wrapper" class="column">
   <p class="poll-question" [ngSwitch]="pollType">
-    <ng-container *ngSwitchCase="'U'">
-      Would you like to kick {{ name }}?
-    </ng-container>
+    <ng-container *ngSwitchCase="'U'"> Kick {{ name }}? </ng-container>
     <ng-container *ngSwitchCase="'MQ'">
-      Would you like to add {{ name }} to the queue?
+      Add {{ name }} to the queue?
     </ng-container>
   </p>
   <div id="vote-buttons" class="row">
