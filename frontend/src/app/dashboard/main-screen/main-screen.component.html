@@ -16,14 +16,8 @@
       [matTooltipShowDelay]="500"
     >
       <div class="list-el" [ngSwitch]="event.event_type">
-        <ng-container *ngSwitchCase="'MQ'">
-          {{ event.username + ' modified the queue' }}
-        </ng-container>
         <ng-container *ngSwitchCase="'M'">
           {{ event.username + ': ' + event.args.content }}
-        </ng-container>
-        <ng-container *ngSwitchCase="'PL'">
-          {{ event.username + ' played a song' }}
         </ng-container>
         <ng-container *ngSwitchCase="'U'">
           <div class="user-invite-form">
