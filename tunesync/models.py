@@ -235,13 +235,7 @@ def send_update(room, data):
         )
 
 
-@receiver(post_save, sender=Event, dispatch_uid="update_event_listeners")
-def update_event_listeners(sender, instance, **kwargs):
-    """
-    Alerts consumer of new events
-    """
-    if instance.event_type in ["T", "PO", "V"]:
-        return
+def handle_event_update(instance):
     message = {
         "room_id": instance.room.id,
         "event_id": instance.id,
@@ -255,9 +249,23 @@ def update_event_listeners(sender, instance, **kwargs):
     room = instance.room
     send_update(room, message)
 
+@receiver(post_save, sender=Event, dispatch_uid="update_event_listeners")
+def update_event_listeners(sender, instance, **kwargs):
+    """
+    Alerts consumer of new events
+    """
+    if instance.event_type in ["T", "PO", "V"]:
+        return
+    else:
+        handle_event_update(instance):
 
-@receiver(post_save, sender=TuneSync, dispatch_uid="update_tunesync_listeners")
-def update_tunesync_listeners(sender, instance, **kwargs):
+
+def handle_poll_update(instance):
+    room = instance.event.room
+    status = instance.get_state()
+    send_update(room, status)
+
+def handle_tunesync_update(instance):
     room = instance.event.room
     tunesync = TuneSync.get_tune_sync(room.id)
     if "play_time" in tunesync and tunesync["play_time"] is not None:
@@ -265,15 +273,12 @@ def update_tunesync_listeners(sender, instance, **kwargs):
     send_update(room, tunesync)
 
 
-@receiver(post_save, sender=Poll, dispatch_uid="update_poll_listeners")
+@receiver(post_save, sender=TuneSync, dispatch_uid="update_tunesync_listeners")
+def update_tunesync_listeners(sender, instance, **kwargs):
+    handle_tunesync_update(instance)
+
+@receiver(post_save, dispatch_uid="update_poll_listeners")
 def update_poll_listeners(sender, instance, **kwargs):
-    room = instance.event.room
-    status = instance.get_state()
-    send_update(room, status)
-
-
-@receiver(post_save, sender=Vote, dispatch_uid="update_vote_listeners")
-def update_vote_listeners(sender, instance, **kwargs):
-    room = instance.event.room
-    status = instance.poll.get_state()
-    send_update(room, status)
+    list_of_models = ("Poll", "Vote")
+    if sender.__name__ in list_of_models:
+        handle_poll_update(instance)

@@ -1,7 +1,18 @@
 from background_task import background
 from rest_framework import status
 from .serializers import EventSerializer
-from .models import Membership, Event, Room, Vote, Poll, TuneSync, Tune
+from .models import (
+    Membership,
+    Event,
+    Room,
+    Vote,
+    Poll,
+    TuneSync,
+    Tune,
+    handle_poll_update,
+    handle_event_update,
+    handle_tunesync_update,
+)
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 
@@ -37,25 +48,31 @@ class PollTask:
                     },
                 )
                 event.save()
+                handle_event_update(event)
         poll.is_active = False
         poll.save()
+        handle_poll_update(poll)
 
     def execute_MQ(self, event):
         event.event_type = "T"
         ts = TuneSync.get_tune_sync(event.room.id)
-        if ts["last_modify_queue"] == None:
+        if ts["last_modify_queue"]:
             current_queue = ts["last_modify_queue"]["queue"]
             current_queue.append(self.args["song"])
         else:
             current_queue = [self.args["song"]]
         event.args = {"modify_queue": {"queue": current_queue}}
         handler = Handler(event, event.author)
+        # the following is janky, not proud at all.
+        poll = Poll.objects.get(pk=self.poll_id)
+        handle_tunesync_update(poll)
         return handler.handle_T()
 
     def execute_K(self, event):
         event.event_type = "U"
         event.args = {"user": self.args["user"], "type": "K"}
         handler = Handler(event, event.author)
+        handle_event_update(event)
         return handler.handle_U_K()
 
 
