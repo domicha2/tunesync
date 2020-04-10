@@ -12,8 +12,9 @@ class PollTask:
         self.args = Poll.objects.get(pk=self.poll_id).args
 
     @staticmethod
-    @background(schedule=60)
+    @background(schedule=30)
     def initiate_poll(poll_id):
+        print('initiating poll')
         self = PollTask(poll_id)
         poll = Poll.objects.get(pk=self.poll_id)
         if poll.is_majority():
@@ -41,7 +42,7 @@ class PollTask:
 
     def execute_MQ(self, event):
         event.event_type = "T"
-        ts = TuneSync.get_tune_sync
+        ts = TuneSync.get_tune_sync(event.room.id)
         current_queue = ts["last_modify_queue"]["queue"]
         current_queue.append(self.args["song"])
         event.args = {"modify_queue": {"queue": current_queue}}
@@ -324,7 +325,7 @@ class Handler:
 
     def handle_U_K(self):
         kicked_user = Membership.objects.filter(
-            room=event.room, user__id=self.args["user"]
+            room=self.event.room, user__id=self.args["user"]
         )
         if not kicked_user:
             return ({"details": "user is not in the room"}, status.HTTP_400_BAD_REQUEST)
@@ -339,6 +340,7 @@ class Handler:
         kick_event.save()
         # delete user from room
         kicked_user.delete()
+        print('kicked user')
         return (None, status.HTTP_200_OK)
 
     def handle_U_C(self):
