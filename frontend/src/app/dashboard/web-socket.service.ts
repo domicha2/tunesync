@@ -9,6 +9,7 @@ export class WebSocketService {
   private webSocket: WebSocket;
   messageSubject = new Subject<AppEvent>();
   pollsSubject = new Subject<Poll>();
+  finishedPollsSubject = new Subject<Poll>();
   tuneSyncSubject = new Subject<TuneSyncEvent>();
 
   /**
@@ -40,6 +41,10 @@ export class WebSocketService {
       switch (payload.event_type) {
         case EventType.CreatePoll:
           this.pollsSubject.next(payload as Poll);
+          if (!(payload as Poll).is_active) {
+            // if the poll is no longer active
+            this.finishedPollsSubject.next(payload as Poll);
+          }
           return;
         case EventType.TuneSync:
           this.tuneSyncSubject.next(payload as TuneSyncEvent);

@@ -1,10 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription } from 'rxjs';
-import { distinctUntilChanged, filter, map } from 'rxjs/operators';
+import {
+  distinctUntilChanged,
+  filter,
+  map,
+  withLatestFrom,
+} from 'rxjs/operators';
 import { AppState } from '../../app.module';
 import { selectUserId } from '../../auth/auth.selectors';
 import { AppEvent, EventType, TuneSyncEvent } from '../dashboard.models';
+import { PollService } from '../poll/poll.service';
 import * as DashboardActions from '../store/dashboard.actions';
 import {
   selectActiveRoom,
@@ -31,6 +37,7 @@ export class MainScreenComponent implements OnInit, OnDestroy {
   loadMore$: Observable<boolean>;
 
   constructor(
+    private pollService: PollService,
     private eventsService: EventsService,
     private webSocketService: WebSocketService,
     private store: Store<AppState>,
@@ -39,6 +46,15 @@ export class MainScreenComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadMore$ = this.store.select(selectLoadMore);
 
+    this.subscription.add(
+      this.webSocketService.finishedPollsSubject
+        .pipe(withLatestFrom(this.store.select(selectActiveRoom)))
+        .subscribe(([poll, roomId]) => {
+          this.pollService.processFinishedPoll(poll, roomId);
+        }),
+    );
+
+    // ! wrap this inside a subscription and check any other instances of this
     this.webSocketService.messageSubject.subscribe((event: AppEvent) => {
       const updateView: boolean = this.eventsService.processWebSocketMessage(
         event,
