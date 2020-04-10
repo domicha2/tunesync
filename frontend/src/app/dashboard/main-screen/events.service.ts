@@ -266,10 +266,13 @@ export class EventsService {
     roomId: number,
   ): void {
     if (roomName === PERSONAL_ROOM_NAME) {
-      if (event.args.type === UserChangeAction.Invite) {
-        events.push(event);
-      } else {
-        console.error('user change action from ws not supported yet');
+      switch (event.args.type) {
+        case UserChangeAction.Invite:
+        case UserChangeAction.Kick:
+          events.push(event);
+          break;
+        default:
+          console.error('user change action from ws not supported yet');
       }
     } else if (event.args['type'] === UserChangeAction.RoleChange) {
       this.store.dispatch(DashboardActions.getUsersByRoom({ roomId }));
