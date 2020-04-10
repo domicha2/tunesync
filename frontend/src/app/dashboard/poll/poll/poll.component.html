@@ -5,8 +5,18 @@
       Add {{ name }} to the queue?
     </ng-container>
   </p>
+  <p *ngIf="!isActive">The poll has ended.</p>
   <div id="vote-buttons" class="row">
-    <button mat-raised-button (click)="onVote(true)">Yes</button>
-    <button mat-raised-button color="warn" (click)="onVote(false)">No</button>
+    <button [disabled]="!isActive" mat-raised-button (click)="onVote(true)">
+      Yes
+    </button>
+    <button
+      [disabled]="!isActive"
+      mat-raised-button
+      color="warn"
+      (click)="onVote(false)"
+    >
+      No
+    </button>
   </div>
 </div>
