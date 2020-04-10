@@ -249,6 +249,7 @@ def handle_event_update(instance):
     room = instance.room
     send_update(room, message)
 
+
 @receiver(post_save, sender=Event, dispatch_uid="update_event_listeners")
 def update_event_listeners(sender, instance, **kwargs):
     """
@@ -257,13 +258,14 @@ def update_event_listeners(sender, instance, **kwargs):
     if instance.event_type in ["T", "PO", "V"]:
         return
     else:
-        handle_event_update(instance):
+        handle_event_update(instance)
 
 
 def handle_poll_update(instance):
     room = instance.event.room
     status = instance.get_state()
     send_update(room, status)
+
 
 def handle_tunesync_update(instance):
     room = instance.event.room
@@ -276,6 +278,7 @@ def handle_tunesync_update(instance):
 @receiver(post_save, sender=TuneSync, dispatch_uid="update_tunesync_listeners")
 def update_tunesync_listeners(sender, instance, **kwargs):
     handle_tunesync_update(instance)
+
 
 @receiver(post_save, dispatch_uid="update_poll_listeners")
 def update_poll_listeners(sender, instance, **kwargs):
