@@ -9,6 +9,7 @@ import { NotificationsService } from '../notifications.service';
 import * as DashboardActions from '../store/dashboard.actions';
 import { selectRooms } from '../store/dashboard.selectors';
 import { AddRoomComponent } from './add-room/add-room.component';
+import { RoomsService } from './rooms.service';
 
 @Component({
   selector: 'app-rooms',
@@ -30,6 +31,7 @@ export class RoomsComponent implements OnInit, OnDestroy {
 
   constructor(
     private notificationsService: NotificationsService,
+    private roomsService: RoomsService,
     private store: Store<AppState>,
     private dialog: MatDialog,
   ) {}
@@ -81,25 +83,7 @@ export class RoomsComponent implements OnInit, OnDestroy {
     if (this.activeRoom && room.id === this.activeRoom.id) return;
 
     this.activeRoom = room;
-    this.store.dispatch(DashboardActions.resetState());
-    this.store.dispatch(
-      DashboardActions.setActiveRoom({
-        activeRoomId: room.id,
-        activeRoomName: room.title,
-      }),
-    );
-    this.notificationsService.notificationsSubject.next({
-      roomId: room.id,
-      action: 'reset',
-    });
-    this.store.dispatch(DashboardActions.getUsersByRoom({ roomId: room.id }));
-    this.store.dispatch(
-      DashboardActions.getEventsByRoom({
-        roomId: room.id,
-        creationTime: new Date(),
-      }),
-    );
-    this.store.dispatch(DashboardActions.getTuneSyncEvent({ roomId: room.id }));
+    this.roomsService.enterRoom(room.id, room.title);
   }
 
   onAddRoom(): void {
