@@ -40,33 +40,9 @@ export class QueueComponent implements OnInit, OnDestroy {
 
   userRole$: Observable<Role>;
 
-  nameControl = new FormControl();
-  albumControl = new FormControl();
-  artistControl = new FormControl();
-
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
-    this.subscription.add(
-      combineLatest([
-        this.nameControl.valueChanges.pipe(startWith('')),
-        this.albumControl.valueChanges.pipe(startWith('')),
-        this.artistControl.valueChanges.pipe(startWith('')),
-      ])
-        .pipe(
-          debounceTime(250),
-          distinctUntilChanged(isEqual),
-          map(([name, album, artist]) => ({
-            name,
-            album,
-            artist,
-          })),
-        )
-        .subscribe((filters: Filters) => {
-          this.store.dispatch(DashboardActions.getAvailableSongs({ filters }));
-        }),
-    );
-
     this.userRole$ = this.store.select(selectUserRole);
 
     this.subscription.add(
@@ -103,10 +79,6 @@ export class QueueComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
-  }
-
-  clearFormControl(formControl: FormControl): void {
-    formControl.setValue('');
   }
 
   drop(event: CdkDragDrop<string[]>, container: 'queue' | 'available'): void {

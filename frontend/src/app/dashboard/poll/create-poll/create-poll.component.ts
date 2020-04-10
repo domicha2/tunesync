@@ -29,10 +29,6 @@ export class CreatePollComponent implements OnInit, OnDestroy {
   regularUsers$: Observable<User[]>;
   availableSongs$: Observable<Song[]>;
 
-  nameControl = new FormControl('');
-  albumControl = new FormControl('');
-  artistControl = new FormControl('');
-
   pollTypes: any[] = [
     { name: 'Add Song to Queue', enum: PollType.AddToQueue },
     { name: 'Kick User', enum: PollType.Kick },
@@ -45,34 +41,17 @@ export class CreatePollComponent implements OnInit, OnDestroy {
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
-    this.subscription.add(
-      combineLatest([
-        this.nameControl.valueChanges.pipe(startWith('')),
-        this.albumControl.valueChanges.pipe(startWith('')),
-        this.artistControl.valueChanges.pipe(startWith('')),
-      ])
-        .pipe(
-          debounceTime(250),
-          map(([name, album, artist]) => ({
-            name,
-            album,
-            artist,
-          })),
-        )
-        .subscribe((filters: Filters) => {
-          this.store.dispatch(DashboardActions.getAvailableSongs({ filters }));
-        }),
-    );
-
     // get a list of filtered songs
     this.availableSongs$ = this.store
       .select(selectAvailableSongs)
-      .pipe(tap(songs => console.log(songs)));
+      .pipe(tap((songs) => console.log(songs)));
 
     // get a list of users in the current room
     this.regularUsers$ = this.store.select(selectUsers).pipe(
-      map((users: User[]) => users.filter(user => user.role === Role.Regular)),
-      tap(users => console.log('users', users)),
+      map((users: User[]) =>
+        users.filter((user) => user.role === Role.Regular),
+      ),
+      tap((users) => console.log('users', users)),
     );
   }
 

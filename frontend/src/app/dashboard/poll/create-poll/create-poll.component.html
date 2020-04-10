@@ -54,22 +54,7 @@
         </div>
 
         <div id="song" class="column" *ngIf="pollType.value === 'MQ'">
-          <div id="song-filter" class="column">
-            <mat-form-field appearance="outline">
-              <mat-label>Name</mat-label>
-              <input type="text" matInput [formControl]="nameControl" />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Artist</mat-label>
-              <input type="text" matInput [formControl]="artistControl" />
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Album</mat-label>
-              <input type="text" matInput [formControl]="albumControl" />
-            </mat-form-field>
-          </div>
+          <app-available-song-filter></app-available-song-filter>
 
           <mat-form-field appearance="outline">
             <mat-label>Songs</mat-label>
