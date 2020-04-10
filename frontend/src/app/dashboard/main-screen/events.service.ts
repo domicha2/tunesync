@@ -278,6 +278,9 @@ export class EventsService {
         event.args.content = 'joined the room';
         events.push(event);
       }
+    } else if (event.args['type'] === UserChangeAction.Kick) {
+      // everyone needs to update their users list
+      this.store.dispatch(DashboardActions.getUsersByRoom({ roomId }));
     }
   }
 
