@@ -6,6 +6,13 @@ from rest_framework.response import Response
 from django.contrib.auth.models import User
 
 
+def extract_song_ids(songs):
+    result = []
+    for item in songs:
+        result.append(item[0])
+    return result
+
+
 class PollTask:
     def __init__(self, poll_id):
         self.poll_id = poll_id
@@ -45,10 +52,11 @@ class PollTask:
         event.event_type = "T"
         ts = TuneSync.get_tune_sync(event.room.id)
         if ts["last_modify_queue"]:
-            current_queue = ts["last_modify_queue"]["queue"]
+            current_queue = extract_song_ids(ts["last_modify_queue"]["queue"])
             current_queue.append(self.args["song"])
         else:
             current_queue = [self.args["song"]]
+        print(current_queue)
         event.args = {"modify_queue": {"queue": current_queue}}
         handler = Handler(event, event.author)
         # the following is janky, not proud at all.
@@ -59,7 +67,7 @@ class PollTask:
         event.event_type = "U"
         event.args = {"user": self.args["user"], "type": "K"}
         handler = Handler(event, event.author)
-        return handler.handle_U_K()
+        return handler.handle_U()
 
 
 class Handler:
@@ -198,11 +206,8 @@ class Handler:
         poll_event = Poll(
             event=self.event, action=action_type, room=polling_room, args=self.args
         )
-        print(poll_event, type(poll_event), dir(poll_event))
         # save the poll and we're done
         poll_event.save()
-        # pt = PollTask(poll_event.event.id)
-        # print(pt, type(pt), dir(pt))
         PollTask.initiate_poll(poll_event.event.id)
         return Response(poll_event.get_state())
 
