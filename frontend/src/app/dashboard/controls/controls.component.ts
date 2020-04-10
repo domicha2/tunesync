@@ -7,9 +7,14 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import {
+  MatDialog,
+  MatDialogRef,
+  MatDialogState,
+} from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
+import { isUndefined } from 'lodash';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, filter, tap } from 'rxjs/operators';
 import { AppState } from '../../app.module';
@@ -17,6 +22,7 @@ import { FileList2, Role, Song, TuneSyncEvent } from '../dashboard.models';
 import { QueueComponent } from '../queue/queue.component';
 import * as DashboardActions from '../store/dashboard.actions';
 import {
+  selectActiveRoom,
   selectQueuedSongs,
   selectSongStatus,
   selectUserRole,
@@ -47,6 +53,8 @@ export class ControlsComponent
 
   userRole$: Observable<Role>;
 
+  queueDialogRef: MatDialogRef<QueueComponent>;
+
   constructor(
     private webSocketService: WebSocketService,
     private matSnackBar: MatSnackBar,
@@ -57,6 +65,21 @@ export class ControlsComponent
   ) {}
 
   ngOnInit(): void {
+    this.subscription.add(
+      this.store
+        .select(selectActiveRoom)
+        .pipe(filter(isUndefined))
+        .subscribe(() => {
+          // whenever the active room is cleared (user got kicked)
+          if (
+            this.queueDialogRef &&
+            this.queueDialogRef.getState() === MatDialogState.OPEN
+          ) {
+            this.queueDialogRef.close();
+          }
+        }),
+    );
+
     this.webSocketService.tuneSyncSubject.subscribe(
       (tuneSyncEvent: TuneSyncEvent) => {
         this.processWSTuneSyncEvent(tuneSyncEvent);
@@ -339,7 +362,7 @@ export class ControlsComponent
   }
 
   onQueueClick(): void {
-    this.matDialog.open(QueueComponent, {
+    this.queueDialogRef = this.matDialog.open(QueueComponent, {
       height: '85%',
       width: '65%',
     });

@@ -1,8 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  MatDialog,
+  MatDialogRef,
+  MatDialogState,
+} from '@angular/material/dialog';
 import { Title } from '@angular/platform-browser';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { isUndefined } from 'lodash';
+import { Observable, Subscription } from 'rxjs';
+import { filter, skip } from 'rxjs/operators';
 import { AppState } from '../app.module';
 import { Role } from './dashboard.models';
 import { CreatePollComponent } from './poll/create-poll/create-poll.component';
@@ -14,9 +20,12 @@ import { selectActiveRoom, selectUserRole } from './store/dashboard.selectors';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
+  subscription = new Subscription();
   activeRoom$: Observable<number>;
   userRole$: Observable<Role>;
+
+  pollsViewerDialogRef: MatDialogRef<PollsViewerComponent>;
 
   constructor(
     private matDialog: MatDialog,
@@ -29,6 +38,23 @@ export class DashboardComponent implements OnInit {
 
     this.activeRoom$ = this.store.select(selectActiveRoom);
     this.userRole$ = this.store.select(selectUserRole);
+
+    this.subscription.add(
+      this.activeRoom$.pipe(skip(1), filter(isUndefined)).subscribe(() => {
+        // skip the first time active room is undefined because that is the default
+        // whenever the active room is cleared (user got kicked)
+        if (
+          this.pollsViewerDialogRef &&
+          this.pollsViewerDialogRef.getState() === MatDialogState.OPEN
+        ) {
+          this.pollsViewerDialogRef.close();
+        }
+      }),
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   openCreatePollDialog(): void {
@@ -39,7 +65,7 @@ export class DashboardComponent implements OnInit {
   }
 
   openPollsViewerDialog(): void {
-    this.matDialog.open(PollsViewerComponent, {
+    this.pollsViewerDialogRef = this.matDialog.open(PollsViewerComponent, {
       width: '75%',
       height: '85%',
     });
