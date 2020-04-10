@@ -131,7 +131,7 @@ class Poll(models.Model):
 
     @property
     def vote_percentage(self):
-        users = Membership.objects.filter(room=self.room)
+        users = Membership.objects.filter(room=self.room, state="A")
         if users:
             return len(self.votes_agreed) / len(users)
         else:
