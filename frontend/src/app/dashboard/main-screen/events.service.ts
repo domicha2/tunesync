@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import * as moment from 'moment';
 import { AppState } from '../../app.module';
@@ -20,6 +21,7 @@ import * as DashboardActions from '../store/dashboard.actions';
 })
 export class EventsService {
   constructor(
+    private matSnackBar: MatSnackBar,
     private store: Store<AppState>,
     private notificationsService: NotificationsService,
   ) {}
@@ -207,6 +209,24 @@ export class EventsService {
     roomName: string,
     events: AppEvent[],
   ): boolean {
+    if (
+      event.event_type === EventType.UserChange &&
+      event.args.type === UserChangeAction.Kick &&
+      typeof event.args.room === 'number'
+    ) {
+      // user got kicked need to update their rooms list
+      // remove the room from the rooms list
+      this.store.dispatch(DashboardActions.getRooms());
+      // ! add the room name
+      this.matSnackBar.open(
+        'You got kicked from room ID: ' + event.args.room,
+        undefined,
+        {
+          duration: 5000,
+        },
+      );
+    }
+
     if (event.room_id !== roomId) {
       // the associated room does not match the active room add a notification
       // TODO: consider what events should trigger a notification
