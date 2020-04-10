@@ -1,13 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
-import { skip, withLatestFrom } from 'rxjs/operators';
+import { first, skip, withLatestFrom } from 'rxjs/operators';
 import { AppState } from '../../../app.module';
+import { NotificationsService } from '../../notifications.service';
 import { getPollsByRoom } from '../../store/dashboard.actions';
-import { selectPolls, selectActiveRoom } from '../../store/dashboard.selectors';
+import { selectActiveRoom, selectPolls } from '../../store/dashboard.selectors';
 import { WebSocketService } from '../../web-socket.service';
 import { Poll, PollState } from '../poll.models';
-import { NotificationsService } from '../../notifications.service';
 
 @Component({
   selector: 'app-polls-viewer',
@@ -55,7 +55,7 @@ export class PollsViewerComponent implements OnInit, OnDestroy {
       this.store
         .select(selectPolls)
         // ignore the initial value, let the api request override it
-        .pipe(skip(1))
+        .pipe(skip(1), first())
         .subscribe((polls: Poll[]) => {
           // clear the poll
           this.pollState = {};

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import * as moment from 'moment';
 import { AppState } from '../../app.module';
@@ -20,6 +21,7 @@ import * as DashboardActions from '../store/dashboard.actions';
 })
 export class EventsService {
   constructor(
+    private matSnackBar: MatSnackBar,
     private store: Store<AppState>,
     private notificationsService: NotificationsService,
   ) {}
@@ -207,6 +209,29 @@ export class EventsService {
     roomName: string,
     events: AppEvent[],
   ): boolean {
+    if (
+      event.event_type === EventType.UserChange &&
+      event.args.type === UserChangeAction.Kick &&
+      typeof event.args.room === 'number'
+    ) {
+      // user got kicked need to update their rooms list
+      // remove the room from the rooms list
+      this.store.dispatch(DashboardActions.getRooms());
+      // ! add the room name
+      this.matSnackBar.open(
+        'You got kicked from room ID: ' + event.args.room,
+        undefined,
+        {
+          duration: 5000,
+        },
+      );
+
+      // check if the user is also inside that room
+      if (roomId === event.args.room) {
+        this.store.dispatch(DashboardActions.resetState());
+      }
+    }
+
     if (event.room_id !== roomId) {
       // the associated room does not match the active room add a notification
       // TODO: consider what events should trigger a notification
@@ -241,10 +266,13 @@ export class EventsService {
     roomId: number,
   ): void {
     if (roomName === PERSONAL_ROOM_NAME) {
-      if (event.args.type === UserChangeAction.Invite) {
-        events.push(event);
-      } else {
-        console.error('user change action from ws not supported yet');
+      switch (event.args.type) {
+        case UserChangeAction.Invite:
+        case UserChangeAction.Kick:
+          events.push(event);
+          break;
+        default:
+          console.error('user change action from ws not supported yet');
       }
     } else if (event.args['type'] === UserChangeAction.RoleChange) {
       this.store.dispatch(DashboardActions.getUsersByRoom({ roomId }));
@@ -258,6 +286,9 @@ export class EventsService {
         event.args.content = 'joined the room';
         events.push(event);
       }
+    } else if (event.args['type'] === UserChangeAction.Kick) {
+      // everyone needs to update their users list
+      this.store.dispatch(DashboardActions.getUsersByRoom({ roomId }));
     }
   }
 
