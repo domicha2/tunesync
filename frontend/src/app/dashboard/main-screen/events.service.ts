@@ -225,6 +225,11 @@ export class EventsService {
           duration: 5000,
         },
       );
+
+      // check if the user is also inside that room
+      if (roomId === event.args.room) {
+        this.store.dispatch(DashboardActions.resetState());
+      }
     }
 
     if (event.room_id !== roomId) {
