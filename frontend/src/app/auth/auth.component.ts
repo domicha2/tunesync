@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { select, Store } from '@ngrx/store';
@@ -16,10 +16,13 @@ import { selectErrorMessage, selectToken } from './auth.selectors';
   styleUrls: ['./auth.component.scss'],
 })
 export class AuthComponent implements OnInit, OnDestroy {
-  authForm = new FormGroup({
-    username: new FormControl(),
-    password: new FormControl(),
-  });
+  authForm = new FormGroup(
+    {
+      username: new FormControl(),
+      password: new FormControl(),
+    },
+    Validators.required,
+  );
 
   subscription = new Subscription();
 
@@ -72,6 +75,8 @@ export class AuthComponent implements OnInit, OnDestroy {
    * Attempts to authenticate the user
    */
   onSignIn(): void {
+    if (this.authForm.invalid) return;
+
     this.store.dispatch(AuthActions.signIn(this.authForm.value));
   }
 }
