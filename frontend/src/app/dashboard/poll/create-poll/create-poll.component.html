@@ -1,7 +1,7 @@
 <div id="create-poll-wrapper" class="column">
   <h1 mat-dialog-title>Create Poll</h1>
   <mat-dialog-content class="column">
-    <mat-horizontal-stepper [linear]="true" #stepper>
+    <mat-horizontal-stepper [linear]="true">
       <mat-step [stepControl]="pollType">
         <ng-template matStepLabel>Pick the poll type</ng-template>
 
@@ -22,7 +22,14 @@
         </div>
 
         <div class="stepper-buttons">
-          <button color="accent" mat-raised-button matStepperNext>Next</button>
+          <button
+            color="accent"
+            mat-raised-button
+            matStepperNext
+            [disabled]="pollType.value === null"
+          >
+            Next
+          </button>
         </div>
       </mat-step>
 
@@ -73,6 +80,7 @@
             </div>
 
             <mat-selection-list
+              id="songs"
               [multiple]="false"
               (selectionChange)="onSongChange($event)"
             >
@@ -101,19 +109,33 @@
         </div>
 
         <div class="stepper-buttons">
-          <button mat-raised-button matStepperPrevious>Back</button>
-          <button color="accent" mat-raised-button matStepperNext>Next</button>
+          <button mat-raised-button color="warn" matStepperPrevious>
+            Back
+          </button>
+          <button
+            color="accent"
+            mat-raised-button
+            matStepperNext
+            [disabled]="
+              (pollType.value === 'U' ? userId : songId).value === null
+            "
+          >
+            Next
+          </button>
         </div>
       </mat-step>
 
       <mat-step>
         <ng-template matStepLabel>Done</ng-template>
         <p>You are now done.</p>
+        <p>
+          Polls last 1 minute and require more than 50% of the room to vote YES
+          to pass the poll.
+        </p>
 
         <div class="stepper-buttons">
-          <button mat-raised-button matStepperPrevious>Back</button>
-          <button mat-raised-button color="warn" (click)="stepper.reset()">
-            Reset
+          <button mat-raised-button matStepperPrevious color="warn">
+            Back
           </button>
           <button
             color="accent"

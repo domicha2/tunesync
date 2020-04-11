@@ -25,14 +25,14 @@ export class PollService {
     } else {
       let snackBarMessage = '';
       if (poll.is_successful) {
-        snackBarMessage += 'Poll Win: ';
+        snackBarMessage += 'Poll got enough votes to pass: ';
         if (poll.args.action === PollType.AddToQueue) {
           snackBarMessage += `Added ${poll.args.song_name} to the queue.`;
         } else if (poll.args.action === PollType.Kick) {
           snackBarMessage += `Kicked ${poll.args.username}.`;
         }
       } else {
-        snackBarMessage += 'Poll Lose: ';
+        snackBarMessage += 'Poll did not get enough votes to pass: ';
         if (poll.args.action === PollType.AddToQueue) {
           snackBarMessage += `${poll.args.song_name} did not get added to the queue.`;
         } else if (poll.args.action === PollType.Kick) {

@@ -6,12 +6,18 @@
   <form class="column" [formGroup]="authForm">
     <mat-form-field appearance="outline">
       <mat-label>Username</mat-label>
-      <input matInput type="text" formControlName="username" />
+      <input matInput type="text" formControlName="username" required />
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Password</mat-label>
-      <input matInput type="password" formControlName="password" />
+      <input
+        matInput
+        type="password"
+        formControlName="password"
+        required
+        (keyup.enter)="onSignIn()"
+      />
     </mat-form-field>
   </form>
 
@@ -20,8 +26,20 @@
   </p>
 
   <div id="buttons" class="row">
-    <button mat-raised-button (click)="onSignUp()">Sign Up</button>
-    <button mat-raised-button (click)="onSignIn()" color="primary">
+    <button
+      mat-raised-button
+      (click)="onSignUp()"
+      color="accent"
+      [disabled]="authForm.invalid"
+    >
+      Sign Up
+    </button>
+    <button
+      mat-raised-button
+      (click)="onSignIn()"
+      color="primary"
+      [disabled]="authForm.invalid"
+    >
       Sign In
     </button>
   </div>

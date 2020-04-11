@@ -1,6 +1,13 @@
 div#users-wrapper {
   height: 100%;
 
+  mat-expansion-panel-header {
+    mat-icon {
+      margin-left: 0.5rem;
+      align-self: center;
+    }
+  }
+
   div.top-bar {
     button#settings {
       margin-left: auto;
