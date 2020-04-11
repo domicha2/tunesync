@@ -36,6 +36,7 @@ import { AddRoomComponent } from './rooms/add-room/add-room.component';
 import { RoomsComponent } from './rooms/rooms.component';
 import { InviteComponent } from './users/invite/invite.component';
 import { KickUserComponent } from './users/kick-user/kick-user.component';
+import { UsersSearchSelectComponent } from './users/users-search-select/users-search-select.component';
 import { UsersComponent } from './users/users.component';
 
 @NgModule({
@@ -56,6 +57,7 @@ import { UsersComponent } from './users/users.component';
     PollResultsComponent,
     PollsViewerComponent,
     AvailableSongFilterComponent,
+    UsersSearchSelectComponent,
   ],
   imports: [
     ReactiveFormsModule,
