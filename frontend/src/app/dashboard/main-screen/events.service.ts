@@ -214,18 +214,6 @@ export class EventsService {
       event.args.type === UserChangeAction.Kick &&
       typeof event.args.room === 'number'
     ) {
-      // user got kicked need to update their rooms list
-      // remove the room from the rooms list
-      this.store.dispatch(DashboardActions.getRooms());
-      // ! add the room name
-      this.matSnackBar.open(
-        'You got kicked from room ID: ' + event.args.room,
-        undefined,
-        {
-          duration: 5000,
-        },
-      );
-
       // check if the user is also inside that room
       if (roomId === event.args.room) {
         this.store.dispatch(DashboardActions.resetState());
