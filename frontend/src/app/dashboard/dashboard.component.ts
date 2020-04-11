@@ -64,7 +64,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   openCreatePollDialog(): void {
     this.matDialog.open(CreatePollComponent, {
-      width: '50%',
+      width: '75%',
       height: 'fit-content',
     });
   }

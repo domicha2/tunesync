@@ -87,7 +87,7 @@ export class RoomsComponent implements OnInit, OnDestroy {
 
   onAddRoom(): void {
     // open modal
-    this.dialog.open(AddRoomComponent, { width: '30%' });
+    this.dialog.open(AddRoomComponent, { width: '45%' });
   }
 
   /**
