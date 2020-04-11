@@ -1,22 +1,18 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
+import { MatSelectionListChange } from '@angular/material/list';
 import { Store } from '@ngrx/store';
-import { combineLatest, Observable, Subscription } from 'rxjs';
-import { debounceTime, map, startWith, tap } from 'rxjs/operators';
+import { Observable, Subscription } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import { AppState } from '../../../app.module';
-import {
-  Filters,
-  Role,
-  Song,
-  User,
-  UserChangeAction,
-} from '../../dashboard.models';
+import { Role, Song, User, UserChangeAction } from '../../dashboard.models';
 import * as DashboardActions from '../../store/dashboard.actions';
 import {
   selectAvailableSongs,
   selectUsers,
 } from '../../store/dashboard.selectors';
 import { PollType } from '../poll.models';
+import { QueueService } from '../../queue/queue.service';
 
 @Component({
   selector: 'app-create-poll',
@@ -38,9 +34,26 @@ export class CreatePollComponent implements OnInit, OnDestroy {
   userId = new FormControl(null, Validators.required);
   songId = new FormControl(null, Validators.required);
 
-  constructor(private store: Store<AppState>) {}
+  songName: string;
+
+  prevPage: string;
+  nextPage: string;
+
+  constructor(
+    private queueService: QueueService,
+    private store: Store<AppState>,
+  ) {}
 
   ngOnInit(): void {
+    this.subscription.add(
+      this.queueService.availSongsPrevNextSubject.subscribe(
+        ({ prev, next }) => {
+          this.prevPage = prev;
+          this.nextPage = next;
+        },
+      ),
+    );
+
     // get a list of filtered songs
     this.availableSongs$ = this.store
       .select(selectAvailableSongs)
@@ -55,6 +68,15 @@ export class CreatePollComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+  }
+
+  onSongChange(event: MatSelectionListChange): void {
+    if (event.source.selectedOptions.hasValue) {
+      this.songId.setValue(event.source.selectedOptions.selected[0].value.id);
+      this.songName = event.source.selectedOptions.selected[0].value.name;
+    } else {
+      this.songId.setValue(null);
+    }
   }
 
   onCreatePoll(): void {
