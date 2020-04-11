@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpWrapperService } from '../../http-wrapper.service';
 import { EventType, Filters } from '../dashboard.models';
 
@@ -7,10 +7,15 @@ import { EventType, Filters } from '../dashboard.models';
   providedIn: 'root',
 })
 export class QueueService {
+  availSongsPrevNextSubject = new BehaviorSubject<{
+    prev: string;
+    next: string;
+  }>({ prev: null, next: null });
+
   constructor(private httpWrapperService: HttpWrapperService) {}
 
-  getAvailableSongs(filters: Filters): Observable<any> {
-    const queryParams = {};
+  getAvailableSongs(filters: Filters, page: string): Observable<any> {
+    const queryParams = { page };
     for (const key in filters) {
       if (filters[key] !== '') {
         queryParams[`${key}__icontains`] = filters[key];

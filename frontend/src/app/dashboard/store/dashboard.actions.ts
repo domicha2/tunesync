@@ -100,6 +100,7 @@ export const getAvailableSongs = createAction(
   '[Queue Component] Get Available Songs',
   props<{
     filters: Filters;
+    page: string;
   }>(),
 );
 

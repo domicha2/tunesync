@@ -29,6 +29,7 @@ import { CreatePollComponent } from './poll/create-poll/create-poll.component';
 import { PollResultsComponent } from './poll/poll-results/poll-results.component';
 import { PollComponent } from './poll/poll/poll.component';
 import { PollsViewerComponent } from './poll/polls-viewer/polls-viewer.component';
+import { AvailableSongFilterComponent } from './queue/available-song-filter/available-song-filter.component';
 import { QueueComponent } from './queue/queue.component';
 import { AddRoomComponent } from './rooms/add-room/add-room.component';
 import { RoomsComponent } from './rooms/rooms.component';
@@ -53,6 +54,7 @@ import { UsersComponent } from './users/users.component';
     PollComponent,
     PollResultsComponent,
     PollsViewerComponent,
+    AvailableSongFilterComponent,
   ],
   imports: [
     ReactiveFormsModule,
