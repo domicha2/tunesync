@@ -214,18 +214,6 @@ export class EventsService {
       event.args.type === UserChangeAction.Kick &&
       typeof event.args.room === 'number'
     ) {
-      // user got kicked need to update their rooms list
-      // remove the room from the rooms list
-      this.store.dispatch(DashboardActions.getRooms());
-      // ! add the room name
-      this.matSnackBar.open(
-        'You got kicked from room ID: ' + event.args.room,
-        undefined,
-        {
-          duration: 5000,
-        },
-      );
-
       // check if the user is also inside that room
       if (roomId === event.args.room) {
         this.store.dispatch(DashboardActions.resetState());
@@ -233,12 +221,7 @@ export class EventsService {
     }
 
     if (event.room_id !== roomId) {
-      // the associated room does not match the active room add a notification
-      // TODO: consider what events should trigger a notification
-      this.notificationsService.notificationsSubject.next({
-        roomId: event.room_id,
-        action: 'increment',
-      });
+      // don't need to update the view since the event came from a different room
       return false;
     }
 
