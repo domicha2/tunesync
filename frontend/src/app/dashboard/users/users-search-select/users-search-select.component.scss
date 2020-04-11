@@ -1,6 +1,10 @@
 div#users-search-select-wrapper {
   height: 100%;
 
+  div.buttons {
+    margin-left: auto;
+  }
+
   mat-selection-list {
     height: 15rem;
     overflow-y: scroll;

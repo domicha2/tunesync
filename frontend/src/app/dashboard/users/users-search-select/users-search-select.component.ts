@@ -12,6 +12,7 @@ import { AppState } from '../../../app.module';
 import { User } from '../../../auth/auth.models';
 import { getUsersByUsername } from '../../store/dashboard.actions';
 import { selectAllUsers } from '../../store/dashboard.selectors';
+import { UsersService } from '../users.service';
 
 @Component({
   selector: 'app-users-search-select',
@@ -32,9 +33,23 @@ export class UsersSearchSelectComponent implements OnInit, OnDestroy {
 
   subscription = new Subscription();
 
-  constructor(private store: Store<AppState>) {}
+  // pagination controls
+  prevPage: string;
+  nextPage: string;
+
+  constructor(
+    private usersService: UsersService,
+    private store: Store<AppState>,
+  ) {}
 
   ngOnInit(): void {
+    this.subscription.add(
+      this.usersService.usersPrevNextSubject.subscribe(({ prev, next }) => {
+        this.prevPage = prev;
+        this.nextPage = next;
+      }),
+    );
+
     this.users$ = this.store.select(selectAllUsers).pipe(
       filter(isArray),
       map(users =>
@@ -57,6 +72,7 @@ export class UsersSearchSelectComponent implements OnInit, OnDestroy {
             getUsersByUsername({
               username,
               filterByActiveRoom: this.filterByActiveRoom,
+              page: '1',
             }),
           );
         }),
@@ -65,6 +81,16 @@ export class UsersSearchSelectComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+  }
+
+  getUsers(page: string): void {
+    this.store.dispatch(
+      getUsersByUsername({
+        username: this.username.value,
+        filterByActiveRoom: this.filterByActiveRoom,
+        page,
+      }),
+    );
   }
 
   removeUser(index: number): void {
@@ -82,6 +108,7 @@ export class UsersSearchSelectComponent implements OnInit, OnDestroy {
       getUsersByUsername({
         username: this.username.value,
         filterByActiveRoom: this.filterByActiveRoom,
+        page: '1',
       }),
     );
   }
