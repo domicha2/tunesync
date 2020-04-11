@@ -267,7 +267,13 @@ export class DashboardEffects {
         this.store.select(selectUsers),
       ),
       switchMap(([action, userId, roomUsers]) =>
-        this.usersService.getUsersByUsername(action.username).pipe(
+        this.usersService.getUsersByUsername(action.username, action.page).pipe(
+          tap(response => {
+            this.usersService.usersPrevNextSubject.next({
+              prev: getPageFromURL(response.previous),
+              next: getPageFromURL(response.next),
+            });
+          }),
           map(response => ({
             type: DashboardActions.storeAllUsers.type,
             allUsers: response.results

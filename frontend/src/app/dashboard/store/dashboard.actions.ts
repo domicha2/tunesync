@@ -164,7 +164,7 @@ export const storeEvents = createAction(
 /* Users */
 export const getUsersByUsername = createAction(
   '[Add Room Component] Get Users By Username',
-  props<{ username: string; filterByActiveRoom: boolean }>(),
+  props<{ username: string; filterByActiveRoom: boolean; page: string }>(),
 );
 export const storeAllUsers = createAction(
   '[Users API] Store All Users',

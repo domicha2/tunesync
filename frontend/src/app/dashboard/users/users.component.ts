@@ -122,6 +122,7 @@ export class UsersComponent implements OnInit, OnDestroy {
   onInvite(): void {
     this.inviteDialogRef = this.dialog.open(InviteComponent, {
       height: 'fit-content',
+      width: '20%',
     });
   }
 

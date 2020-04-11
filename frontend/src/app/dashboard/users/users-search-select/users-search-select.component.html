@@ -22,7 +22,22 @@
     </mat-chip-list>
   </div>
 
-  <p *ngIf="(users$ | async).length === 0">No users found.</p>
+  <div class="buttons row">
+    <button
+      mat-icon-button
+      [disabled]="prevPage === null"
+      (click)="getUsers(prevPage)"
+    >
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      [disabled]="nextPage === null"
+      (click)="getUsers(nextPage)"
+    >
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
 
   <mat-selection-list
     #selectionList
