@@ -8,12 +8,14 @@ import { Title } from '@angular/platform-browser';
 import { Store } from '@ngrx/store';
 import { isUndefined } from 'lodash';
 import { Observable, Subscription } from 'rxjs';
-import { filter, skip } from 'rxjs/operators';
+import { filter, skip, tap, withLatestFrom } from 'rxjs/operators';
 import { AppState } from '../app.module';
-import { Role } from './dashboard.models';
+import { AppEvent, Role } from './dashboard.models';
+import { NotificationsService } from './notifications.service';
 import { CreatePollComponent } from './poll/create-poll/create-poll.component';
 import { PollsViewerComponent } from './poll/polls-viewer/polls-viewer.component';
 import { selectActiveRoom, selectUserRole } from './store/dashboard.selectors';
+import { WebSocketService } from './web-socket.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -28,6 +30,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   pollsViewerDialogRef: MatDialogRef<PollsViewerComponent>;
 
   constructor(
+    private notificationsService: NotificationsService,
+    private webSocketService: WebSocketService,
     private matDialog: MatDialog,
     private title: Title,
     private store: Store<AppState>,
@@ -38,6 +42,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     this.activeRoom$ = this.store.select(selectActiveRoom);
     this.userRole$ = this.store.select(selectUserRole);
+
+    this.subscription.add(
+      this.webSocketService.notificationsSubject
+        .pipe(withLatestFrom(this.activeRoom$))
+        .subscribe(([appEvent, activeRoom]) => {
+          // the associated room does not match the active room add a notification
+          // TODO: consider what events should trigger a notification
+          if (activeRoom !== appEvent.room_id) {
+            this.notificationsService.notificationsSubject.next({
+              roomId: appEvent.room_id,
+              action: 'increment',
+            });
+          }
+        }),
+    );
 
     this.subscription.add(
       this.activeRoom$.pipe(skip(1), filter(isUndefined)).subscribe(() => {

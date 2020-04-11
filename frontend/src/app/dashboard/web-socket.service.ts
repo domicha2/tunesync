@@ -20,6 +20,7 @@ export class WebSocketService {
   pollsSubject = new Subject<Poll>();
   finishedPollsSubject = new Subject<Poll>();
   tuneSyncSubject = new Subject<TuneSyncEvent>();
+  notificationsSubject = new Subject<AppEvent>();
 
   constructor(
     private store: Store<AppState>,
@@ -83,6 +84,8 @@ export class WebSocketService {
           }
           // alert subscribers that a new message was received
           this.messageSubject.next(payload as AppEvent);
+          // alert dashboard component to potentially send notifications
+          this.notificationsSubject.next(payload as AppEvent);
       }
     };
   }

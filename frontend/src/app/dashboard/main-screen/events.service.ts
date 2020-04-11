@@ -221,12 +221,7 @@ export class EventsService {
     }
 
     if (event.room_id !== roomId) {
-      // the associated room does not match the active room add a notification
-      // TODO: consider what events should trigger a notification
-      this.notificationsService.notificationsSubject.next({
-        roomId: event.room_id,
-        action: 'increment',
-      });
+      // don't need to update the view since the event came from a different room
       return false;
     }
 
