@@ -4,26 +4,19 @@ import {
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { isArray } from 'lodash';
-import { combineLatest, Observable, Subscription } from 'rxjs';
-import {
-  debounceTime,
-  filter,
-  map,
-  startWith,
-  distinctUntilChanged,
-} from 'rxjs/operators';
+import { Observable, Subscription } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 import { AppState } from '../../app.module';
-import { Filters, Role, Song } from '../dashboard.models';
+import { Role, Song } from '../dashboard.models';
 import * as DashboardActions from '../store/dashboard.actions';
 import {
   selectAvailableSongs,
   selectQueueIndexAndSongs,
   selectUserRole,
 } from '../store/dashboard.selectors';
-import { isEqual } from 'lodash';
+import { QueueService } from './queue.service';
 
 @Component({
   selector: 'app-queue',
@@ -40,9 +33,24 @@ export class QueueComponent implements OnInit, OnDestroy {
 
   userRole$: Observable<Role>;
 
-  constructor(private store: Store<AppState>) {}
+  prevPage: string | null;
+  nextPage: string | null;
+
+  constructor(
+    private queueService: QueueService,
+    private store: Store<AppState>,
+  ) {}
 
   ngOnInit(): void {
+    this.subscription.add(
+      this.queueService.availSongsPrevNextSubject.subscribe(
+        ({ prev, next }) => {
+          this.prevPage = prev;
+          this.nextPage = next;
+        },
+      ),
+    );
+
     this.userRole$ = this.store.select(selectUserRole);
 
     this.subscription.add(

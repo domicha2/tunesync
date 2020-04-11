@@ -35,6 +35,7 @@ import {
   selectUsers,
 } from './dashboard.selectors';
 import { Poll } from '../poll/poll.models';
+import { getPageFromURL } from '../../utility';
 
 @Injectable()
 export class DashboardEffects {
@@ -59,9 +60,15 @@ export class DashboardEffects {
   getAvailableSongs$ = createEffect(() =>
     this.actions$.pipe(
       ofType(DashboardActions.getAvailableSongs),
-      switchMap(action =>
-        this.queueService.getAvailableSongs(action.filters).pipe(
-          map(response => ({
+      switchMap((action) =>
+        this.queueService.getAvailableSongs(action.filters, action.page).pipe(
+          tap((response) => {
+            this.queueService.availSongsPrevNextSubject.next({
+              prev: getPageFromURL(response.previous),
+              next: getPageFromURL(response.next),
+            });
+          }),
+          map((response) => ({
             type: DashboardActions.storeAvailableSongs.type,
             availableSongs: response.results,
           })),

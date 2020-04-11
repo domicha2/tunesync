@@ -1,11 +1,11 @@
 <div id="queue-wrapper" class="column">
-  <div *ngIf="(userRole$ | async) !== 'R'" id="instructions">
+  <div *ngIf="(userRole$ | async) !== 'R'" id="instructions" class="row">
     <h3>Drag songs between the pool of available songs and the queue.</h3>
     <h3>You may also reorder the songs in the queue</h3>
   </div>
 
   <h2>Search songs</h2>
-  <app-available-song-filter></app-available-song-filter>
+  <app-available-song-filter #availableSongFilter></app-available-song-filter>
 
   <div id="song-lists" class="row" cdkDropListGroup>
     <div id="queued-songs">
@@ -29,8 +29,27 @@
       </mat-list>
     </div>
 
-    <div id="available-songs">
-      <h2>Available Songs</h2>
+    <div id="available-songs" class="column">
+      <div class="header row">
+        <h2>Available Songs</h2>
+        <div class="buttons row">
+          <button
+            mat-icon-button
+            [disabled]="prevPage === null"
+            (click)="availableSongFilter.getAvailableSongs(prevPage)"
+          >
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            [disabled]="nextPage === null"
+            (click)="availableSongFilter.getAvailableSongs(nextPage)"
+          >
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      </div>
+
       <mat-list
         class="song-list"
         role="list"

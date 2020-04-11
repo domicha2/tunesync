@@ -21,9 +21,9 @@ import { getAvailableSongs } from '../../store/dashboard.actions';
 export class AvailableSongFilterComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
 
-  name = new FormControl();
-  album = new FormControl();
-  artist = new FormControl();
+  name = new FormControl('');
+  album = new FormControl('');
+  artist = new FormControl('');
 
   constructor(private store: Store<AppState>) {}
 
@@ -44,7 +44,7 @@ export class AvailableSongFilterComponent implements OnInit, OnDestroy {
           })),
         )
         .subscribe((filters: Filters) => {
-          this.store.dispatch(getAvailableSongs({ filters }));
+          this.store.dispatch(getAvailableSongs({ filters, page: '1' }));
         }),
     );
   }
@@ -55,5 +55,18 @@ export class AvailableSongFilterComponent implements OnInit, OnDestroy {
 
   clearFormControl(formControl: FormControl): void {
     formControl.setValue('');
+  }
+
+  getAvailableSongs(page: string): void {
+    this.store.dispatch(
+      getAvailableSongs({
+        filters: {
+          name: this.name.value,
+          album: this.album.value,
+          artist: this.artist.value,
+        },
+        page,
+      }),
+    );
   }
 }
