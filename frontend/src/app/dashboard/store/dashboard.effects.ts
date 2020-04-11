@@ -183,6 +183,10 @@ export class DashboardEffects {
               // emit a snackbar event
               this.controlsService.songsUploaded.next(response.length);
             }),
+            catchError(() => {
+              this.controlsService.songsUploaded.next(0);
+              return EMPTY;
+            }),
           ),
         ),
       ),

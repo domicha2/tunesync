@@ -80,21 +80,29 @@ export class ControlsComponent
         }),
     );
 
-    this.webSocketService.tuneSyncSubject.subscribe(
-      (tuneSyncEvent: TuneSyncEvent) => {
-        this.processWSTuneSyncEvent(tuneSyncEvent);
-      },
+    this.subscription.add(
+      this.webSocketService.tuneSyncSubject.subscribe(
+        (tuneSyncEvent: TuneSyncEvent) => {
+          this.processWSTuneSyncEvent(tuneSyncEvent);
+        },
+      ),
     );
 
-    this.controlsService.songsUploaded.subscribe((songsUploaded: number) => {
-      this.matSnackBar.open(
-        `${songsUploaded} songs uploaded successfully!`,
-        undefined,
-        {
+    this.subscription.add(
+      this.controlsService.songsUploaded.subscribe((songsUploaded: number) => {
+        let message: string;
+        if (songsUploaded === 0) {
+          message = 'Error uploading song(s)!';
+        } else if (songsUploaded === 1) {
+          message = 'Song uploaded successfully!';
+        } else {
+          message = `${songsUploaded} songs uploaded successfully!`;
+        }
+        this.matSnackBar.open(message, undefined, {
           duration: 2500,
-        },
-      );
-    });
+        });
+      }),
+    );
 
     this.userRole$ = this.store.select(selectUserRole);
 
