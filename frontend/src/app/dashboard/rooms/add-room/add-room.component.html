@@ -1,41 +1,27 @@
 <div id="add-room-wrapper">
   <h1 mat-dialog-title>Add Room</h1>
   <mat-dialog-content>
-    <form class="column" [formGroup]="roomForm">
-      <mat-form-field appearance="outline">
-        <mat-label>Title</mat-label>
-        <input matInput type="text" formControlName="title" required />
-      </mat-form-field>
+    <form class="row" [formGroup]="roomForm">
+      <div class="column">
+        <mat-form-field appearance="outline">
+          <mat-label>Title</mat-label>
+          <input matInput type="text" formControlName="title" required />
+        </mat-form-field>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Subtitle</mat-label>
-        <input matInput type="text" formControlName="subtitle" />
-      </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Subtitle</mat-label>
+          <input matInput type="text" formControlName="subtitle" />
+        </mat-form-field>
+      </div>
 
-      <mat-form-field appearance="fill">
-        <mat-label>Search users</mat-label>
-        <mat-icon matPrefix>search</mat-icon>
-        <input type="search" matInput [formControl]="usernameControl" />
-        <button
-          mat-icon-button
-          matSuffix
-          (click)="usernameControl.setValue('')"
-        >
-          <mat-icon>clear</mat-icon>
-        </button>
-      </mat-form-field>
+      <mat-divider [vertical]="true"></mat-divider>
 
-      <mat-form-field appearance="outline">
-        <mat-label>Invite users</mat-label>
-        <mat-select multiple [formControl]="users">
-          <mat-option
-            *ngFor="let user of allUsers$ | async"
-            [value]="user.userId"
-          >
-            {{ user.username }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+      <div id="users" class="column">
+        <app-users-search-select
+          [filterByActiveRoom]="false"
+          [(selectedUsers)]="selectedUsers"
+        ></app-users-search-select>
+      </div>
     </form>
   </mat-dialog-content>
   <mat-dialog-actions>

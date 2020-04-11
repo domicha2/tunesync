@@ -1,15 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { Observable, Subscription } from 'rxjs';
-import { debounceTime, filter, startWith } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { AppState } from '../../../app.module';
 import { User } from '../../../auth/auth.models';
 import * as DashboardActions from '../../store/dashboard.actions';
-import {
-  selectActiveRoom,
-  selectAllUsers,
-} from '../../store/dashboard.selectors';
+import { selectActiveRoom } from '../../store/dashboard.selectors';
 
 @Component({
   selector: 'app-invite',
@@ -18,39 +13,17 @@ import {
 })
 export class InviteComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
-  usernameControl = new FormControl('');
-  users = new FormControl();
   activeRoomId: number;
-  allUsers$: Observable<User[]>;
+
+  selectedUsers: User[] = [];
 
   constructor(private store: Store<AppState>) {}
 
   ngOnInit(): void {
     this.subscription.add(
-      this.usernameControl.valueChanges
-        .pipe(
-          startWith(''),
-          debounceTime(250),
-        )
-        .subscribe((username: string) => {
-          this.store.dispatch(
-            DashboardActions.getUsersByUsername({
-              username,
-              filterByActiveRoom: true,
-            }),
-          );
-        }),
-    );
-
-    this.subscription.add(
       this.store
         .select(selectActiveRoom)
         .subscribe(roomId => (this.activeRoomId = roomId)),
-    );
-
-    this.allUsers$ = this.store.select(selectAllUsers).pipe(
-      filter(users => users !== undefined),
-      startWith([]),
     );
   }
 
@@ -62,7 +35,7 @@ export class InviteComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       DashboardActions.createInviteUsersEvent({
         roomId: this.activeRoomId,
-        users: this.users.value,
+        users: this.selectedUsers.map(user => user.userId),
       }),
     );
   }
