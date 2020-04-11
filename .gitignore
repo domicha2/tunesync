@@ -11,7 +11,9 @@ migrations/
 test.py
 *.mp3
 tunes/
+dump.rdb
 # Jason's files
 donotcommit
 event.md
 jason_dev.py
+TODO.md

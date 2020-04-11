@@ -28,6 +28,16 @@ class IndexPage(TemplateView):
     template_name = "index.html"
 
 
+class PollViewSet(viewsets.ViewSet):
+
+    permission_classes = [inRoomOnlyPolls]
+
+    def retrieve(self, request, pk=None):
+        poll = Poll.objects.get(event_id=pk)
+        status = poll.get_state()
+        return Response(status)
+
+
 class UserViewSet(viewsets.ViewSet):
     """
     Example empty viewset demonstrating the standard
@@ -135,8 +145,9 @@ class EventViewSet(viewsets.ViewSet):
                     {"details": "invalid parent event"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-        handle_event = getattr(Handler, "handle_" + event.event_type)
-        result = handle_event(request.data["args"], event, user=request.user)
+        handler = Handler(event, request.user)
+        handle_event = getattr(handler, "handle_" + event.event_type)
+        result = handle_event()
         return result
 
     # DELETE
@@ -255,7 +266,9 @@ class TuneViewSet(viewsets.ViewSet):
 
     def list(self, request):
         paginator = PageNumberPagination()
-        filtered_set = TuneFilter(request.GET, queryset=Tune.objects.all()).qs
+        filtered_set = TuneFilter(request.GET, queryset=Tune.objects.all()).qs.order_by(
+            "name"
+        )
         context = paginator.paginate_queryset(filtered_set, request)
         serializer = TuneSerializer(context, many=True)
         return paginator.get_paginated_response(serializer.data)
@@ -277,10 +290,15 @@ class TuneViewSet(viewsets.ViewSet):
 
     # post
     def create(self, request):
-        result = []
+        tunes = []
         for song in request.FILES:
             file = request.FILES[song]
             audio = mutagen.File(file, easy=True)
+            if audio is None:
+                return Response(
+                    {"details": "{} is not an audio file".format(song)},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             file.seek(0)
             hash_object = sha256()
             for chunk in file.chunks():
@@ -303,6 +321,9 @@ class TuneViewSet(viewsets.ViewSet):
                 audio_file=audio_file,
                 hash_value=hash_value,
             )
+            tunes.append(tune)
+        result = []
+        for tune in tunes:
             tune.save()
             serializer = TuneSerializer(tune)
             result.append(serializer.data)
@@ -329,19 +350,23 @@ class TuneViewSet(viewsets.ViewSet):
                 {"details": "invalid tune id"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-    # READ
-    def destroy(self, request, pk=None):
-        tune = Tune.objects.filter(id=pk)
-        if tune:
-            tune = tune[0]
-            colliding_tunes = Tune.objects.filter(hash_value=tune.hash_value).exclude(
-                pk=pk
-            )
-            if not colliding_tunes:
-                os.remove(tune.audio_file.path)
-            tune.delete()
-            return Response(status=status.HTTP_202_ACCEPTED)
-        else:
-            return Response(
-                {"details": "invalid event id"}, status=status.HTTP_400_BAD_REQUEST
-            )
+    # DELETE
+    # we aren't ready for this end point to be exposed right now.
+    # deleting could cause issues to other functions so we may need to consider how we'll do this
+    # also spotify doesn't let people delete so i think its fine
+
+    # def destroy(self, request, pk=None):
+    #     tune = Tune.objects.filter(id=pk)
+    #     if tune:
+    #         tune = tune[0]
+    #         colliding_tunes = Tune.objects.filter(hash_value=tune.hash_value).exclude(
+    #             pk=pk
+    #         )
+    #         if not colliding_tunes:
+    #             os.remove(tune.audio_file.path)
+    #         tune.delete()
+    #         return Response(status=status.HTTP_202_ACCEPTED)
+    #     else:
+    #         return Response(
+    #             {"details": "invalid event id"}, status=status.HTTP_400_BAD_REQUEST
+    #         )

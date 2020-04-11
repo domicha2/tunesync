@@ -1,0 +1,28 @@
+<div id="available-song-filter-wrapper" class="row">
+  <mat-form-field appearance="fill">
+    <mat-label>Name</mat-label>
+    <mat-icon matPrefix>search</mat-icon>
+    <input type="search" matInput [formControl]="name" />
+    <button mat-icon-button matSuffix (click)="clearFormControl(name)">
+      <mat-icon>clear</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Artist</mat-label>
+    <mat-icon matPrefix>search</mat-icon>
+    <input type="search" matInput [formControl]="artist" />
+    <button mat-icon-button matSuffix (click)="clearFormControl(artist)">
+      <mat-icon>clear</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Album</mat-label>
+    <mat-icon matPrefix>search</mat-icon>
+    <input type="search" matInput [formControl]="album" />
+    <button mat-icon-button matSuffix (click)="clearFormControl(album)">
+      <mat-icon>clear</mat-icon>
+    </button>
+  </mat-form-field>
+</div>

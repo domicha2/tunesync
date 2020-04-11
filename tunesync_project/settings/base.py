@@ -146,7 +146,16 @@ class BaseSettings(DjangoDefaults):
             },
         }
     ]
-    CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+
+    #CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": ["redis://127.0.0.1:6379/0"],
+            },
+        },
+    }
 
     CORS_ORIGIN_ALLOW_ALL = True
 

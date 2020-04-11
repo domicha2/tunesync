@@ -1,10 +1,15 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { HttpWrapperService } from '../../http-wrapper.service';
 import { EventType, UserChangeAction } from '../dashboard.models';
 
 @Injectable({ providedIn: 'root' })
 export class UsersService {
+  usersPrevNextSubject = new BehaviorSubject<{
+    prev: string;
+    next: string;
+  }>({ prev: null, next: null });
+
   constructor(private httpWrapperService: HttpWrapperService) {}
 
   createRoleChangeEvent(
@@ -23,9 +28,10 @@ export class UsersService {
     });
   }
 
-  getUsersByUsername(username: string): Observable<any> {
+  getUsersByUsername(username: string, page: string): Observable<any> {
     return this.httpWrapperService.get('/users/', {
       username__icontains: username,
+      page,
     });
   }
 

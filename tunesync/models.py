@@ -101,6 +101,7 @@ class TuneSync(models.Model):
         result["last_play"] = tunesync
         result["play_time"] = play_time
         result["room_id"] = pk
+        result["event_type"] = "T"
         return result
 
 
@@ -130,7 +131,7 @@ class Poll(models.Model):
 
     @property
     def vote_percentage(self):
-        users = Membership.objects.filter(room=self.room)
+        users = Membership.objects.filter(room=self.room, state="A")
         if users:
             return len(self.votes_agreed) / len(users)
         else:
@@ -141,14 +142,15 @@ class Poll(models.Model):
 
     def get_state(self):
         result = {
-            "poll": self.event.id,
+            "poll_id": self.event.id,
             "args": self.args,
             "vote_percentage": self.vote_percentage,
             "agrees": len(self.votes_agreed),
             "disagrees": len(self.votes_disagreed),
-            "is_actve": self.is_active,
+            "is_active": self.is_active,
             "is_successful": self.is_successful,
             "room_id": self.event.room.id,
+            "event_type": "PO",
         }
         return result
 
@@ -238,20 +240,21 @@ def update_event_listeners(sender, instance, **kwargs):
     """
     Alerts consumer of new events
     """
-    if instance.event_type == "T":
+    if instance.event_type in ["T", "PO", "V"]:
         return
-    message = {
-        "room_id": instance.room.id,
-        "event_id": instance.id,
-        "event_type": instance.event_type,
-        "user_id": instance.author.id,
-        "parent_event_id": instance.parent_event_id,
-        "creation_time": instance.creation_time.isoformat(),
-        "args": instance.args,
-        "username": instance.author.username,
-    }
-    room = instance.room
-    send_update(room, message)
+    else:
+        message = {
+            "room_id": instance.room.id,
+            "event_id": instance.id,
+            "event_type": instance.event_type,
+            "user_id": instance.author.id,
+            "parent_event_id": instance.parent_event_id,
+            "creation_time": instance.creation_time.isoformat(),
+            "args": instance.args,
+            "username": instance.author.username,
+        }
+        room = instance.room
+        send_update(room, message)
 
 
 @receiver(post_save, sender=TuneSync, dispatch_uid="update_tunesync_listeners")
@@ -263,15 +266,13 @@ def update_tunesync_listeners(sender, instance, **kwargs):
     send_update(room, tunesync)
 
 
-@receiver(post_save, sender=Poll, dispatch_uid="update_poll_listeners")
+@receiver(post_save, dispatch_uid="update_poll_listeners")
 def update_poll_listeners(sender, instance, **kwargs):
-    room = instance.event.room
-    status = instance.get_state()
-    send_update(room, status)
-
-
-@receiver(post_save, sender=Vote, dispatch_uid="update_vote_listeners")
-def update_vote_listeners(sender, instance, **kwargs):
-    room = instance.event.room
-    status = instance.poll.get_state()
-    send_update(room, status)
+    list_of_models = ("Poll", "Vote")
+    if sender.__name__ in list_of_models:
+        room = instance.event.room
+        if type(instance) == Poll:
+            status = instance.get_state()
+        else:
+            status = instance.poll.get_state()
+        send_update(room, status)

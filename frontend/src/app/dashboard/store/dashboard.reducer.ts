@@ -1,6 +1,7 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import { User as AuthUser } from '../../auth/auth.models';
 import { AppEvent, Role, Room, Song, User } from '../dashboard.models';
+import { Poll } from '../poll/poll.models';
 import * as DashboardActions from './dashboard.actions';
 
 export interface DashboardState {
@@ -23,6 +24,7 @@ export interface DashboardState {
   userRole: Role;
   // whether to show load more events
   loadMore: boolean;
+  polls: Poll[];
 }
 
 export const initialState: DashboardState = undefined;
@@ -32,6 +34,9 @@ const reducer = createReducer(
   on(DashboardActions.resetState, (state, action) => ({
     rooms: state.rooms,
   })),
+  on(DashboardActions.setPolls, (state, action: any) => {
+    return { ...state, polls: action.polls };
+  }),
   on(DashboardActions.storeQueue, (state, action: any) => {
     return { ...state, queuedSongs: action.queue };
   }),

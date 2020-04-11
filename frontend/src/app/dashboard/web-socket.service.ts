@@ -1,11 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { AppEvent, EventType, TuneSyncEvent } from './dashboard.models';
+import { Poll } from './poll/poll.models';
 
 @Injectable({ providedIn: 'root' })
 export class WebSocketService {
   private webSocket: WebSocket;
-  messageSubject: Subject<any> = new Subject();
+  messageSubject = new Subject<AppEvent>();
+  pollsSubject = new Subject<Poll>();
+  finishedPollsSubject = new Subject<Poll>();
+  tuneSyncSubject = new Subject<TuneSyncEvent>();
 
   /**
    * Set up the web socket connection using the token as authentication
@@ -28,8 +33,26 @@ export class WebSocketService {
     };
 
     this.webSocket.onmessage = (event: MessageEvent) => {
-      // alert subscribers that a new message was received
-      this.messageSubject.next(event.data);
+      // parse the payload
+      const payload: AppEvent | Poll | TuneSyncEvent = JSON.parse(event.data);
+      console.log('websocket payload', payload);
+
+      // look at the event type to determine which subject to emit to
+      switch (payload.event_type) {
+        case EventType.CreatePoll:
+          this.pollsSubject.next(payload as Poll);
+          if (!(payload as Poll).is_active) {
+            // if the poll is no longer active
+            this.finishedPollsSubject.next(payload as Poll);
+          }
+          return;
+        case EventType.TuneSync:
+          this.tuneSyncSubject.next(payload as TuneSyncEvent);
+          return;
+        default:
+          // alert subscribers that a new message was received
+          this.messageSubject.next(payload as AppEvent);
+      }
     };
   }
 
