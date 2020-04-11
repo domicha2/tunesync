@@ -54,23 +54,24 @@ export class MainScreenComponent implements OnInit, OnDestroy {
         }),
     );
 
-    // ! wrap this inside a subscription and check any other instances of this
-    this.webSocketService.messageSubject.subscribe((event: AppEvent) => {
-      const updateView: boolean = this.eventsService.processWebSocketMessage(
-        event,
-        this.activeRoomId,
-        this.activeRoomName,
-        this.events,
-      );
-      if (updateView === true) {
-        setTimeout(() => {
-          const item = document.querySelector('mat-list-item:last-child');
-          if (item) {
-            item.scrollIntoView();
-          }
-        }, 500);
-      }
-    });
+    this.subscription.add(
+      this.webSocketService.messageSubject.subscribe((event: AppEvent) => {
+        const updateView: boolean = this.eventsService.processWebSocketMessage(
+          event,
+          this.activeRoomId,
+          this.activeRoomName,
+          this.events,
+        );
+        if (updateView === true) {
+          setTimeout(() => {
+            const item = document.querySelector('mat-list-item:last-child');
+            if (item) {
+              item.scrollIntoView();
+            }
+          }, 500);
+        }
+      }),
+    );
 
     this.subscription.add(
       this.store
