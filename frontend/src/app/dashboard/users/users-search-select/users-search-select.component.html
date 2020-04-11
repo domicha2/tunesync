@@ -1,3 +1,35 @@
-<div id="users-search-select-component-wrapper" class="column">
-  <p>it works</p>
+<div id="users-search-select-wrapper" class="column">
+  <mat-form-field appearance="fill">
+    <mat-label>Search users</mat-label>
+    <mat-icon matPrefix>search</mat-icon>
+    <input type="search" matInput [formControl]="username" />
+    <button mat-icon-button matSuffix (click)="username.setValue('')">
+      <mat-icon>clear</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <div class="row">
+    <h2>Invite Users</h2>
+    <mat-chip-list>
+      <mat-chip
+        *ngFor="let user of selectedUsers; index as i"
+        [removable]="true"
+        (removed)="removeUser(i)"
+      >
+        {{ user.username }}
+        <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+    </mat-chip-list>
+  </div>
+
+  <p *ngIf="(users$ | async).length === 0">No users found.</p>
+
+  <mat-selection-list
+    #selectionList
+    (selectionChange)="onSelectedUsersChange($event)"
+  >
+    <mat-list-option *ngFor="let user of users$ | async" [value]="user">
+      {{ user.username }}
+    </mat-list-option>
+  </mat-selection-list>
 </div>
