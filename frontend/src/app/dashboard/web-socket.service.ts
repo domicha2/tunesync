@@ -75,7 +75,7 @@ export class WebSocketService {
             // remove the room from the rooms list
             this.store.dispatch(getRooms());
             this.matSnackBar.open(
-              'You got kicked from: ' + appEvent.args.room_name,
+              'You got kicked out of ' + appEvent.args.room_name,
               undefined,
               {
                 duration: 5000,

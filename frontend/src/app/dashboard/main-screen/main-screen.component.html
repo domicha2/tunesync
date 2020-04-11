@@ -51,7 +51,7 @@
             </div>
           </ng-container>
           <ng-container *ngSwitchCase="'K'">
-            <p>Got kicked out of the room ID {{ event.args.room }}</p>
+            <p>Got kicked out of {{ event.args.room_name }}</p>
           </ng-container>
           <ng-container *ngSwitchDefault>
             Something went wrong.
