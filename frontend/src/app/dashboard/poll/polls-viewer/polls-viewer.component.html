@@ -1,0 +1,26 @@
+<div id="polls-viewer-wrapper" class="column">
+  <h1>Polls Viewer</h1>
+  <h4>You can only vote once, but you may change your vote.</h4>
+  <mat-list id="polls" class="row" *ngIf="pollIds.length > 0; else noPolls">
+    <mat-list-item *ngFor="let pollId of pollIds; trackBy: trackByPollId">
+      <app-poll
+        [isActive]="pollState[pollId].is_active"
+        [pollId]="pollId"
+        [pollType]="pollState[pollId].args.action"
+        [name]="
+          pollState[pollId].args.action === 'U'
+            ? pollState[pollId].args['username']
+            : pollState[pollId].args['song_name']
+        "
+      ></app-poll>
+      <mat-divider></mat-divider>
+      <app-poll-results
+        [agree]="pollState[pollId].agrees"
+        [disagree]="pollState[pollId].disagrees"
+      ></app-poll-results>
+    </mat-list-item>
+  </mat-list>
+  <ng-template #noPolls>
+    <p>No polls to view.</p>
+  </ng-template>
+</div>

@@ -15,9 +15,16 @@ import { AppState } from '../../app.module';
 import { selectUserAndRoom } from '../../app.selectors';
 import { selectUserId } from '../../auth/auth.selectors';
 import { ControlsService } from '../controls/controls.service';
-import { AppEvent, Room, SYSTEM_USER_ID, User, PERSONAL_ROOM_NAME } from '../dashboard.models';
+import {
+  AppEvent,
+  Room,
+  SYSTEM_USER_ID,
+  User,
+  PERSONAL_ROOM_NAME,
+} from '../dashboard.models';
 import { MainScreenService } from '../main-screen/main-screen.service';
 import { MessagingService } from '../messaging/messaging.service';
+import { PollService } from '../poll/poll.service';
 import { QueueService } from '../queue/queue.service';
 import { RoomsService } from '../rooms/rooms.service';
 import { UsersService } from '../users/users.service';
@@ -27,6 +34,8 @@ import {
   selectQueueIndexAndRoom,
   selectUsers,
 } from './dashboard.selectors';
+import { Poll } from '../poll/poll.models';
+import { getPageFromURL } from '../../utility';
 
 @Injectable()
 export class DashboardEffects {
@@ -52,7 +61,13 @@ export class DashboardEffects {
     this.actions$.pipe(
       ofType(DashboardActions.getAvailableSongs),
       switchMap(action =>
-        this.queueService.getAvailableSongs(action.filters).pipe(
+        this.queueService.getAvailableSongs(action.filters, action.page).pipe(
+          tap(response => {
+            this.queueService.availSongsPrevNextSubject.next({
+              prev: getPageFromURL(response.previous),
+              next: getPageFromURL(response.next),
+            });
+          }),
           map(response => ({
             type: DashboardActions.storeAvailableSongs.type,
             availableSongs: response.results,
@@ -110,6 +125,22 @@ export class DashboardEffects {
     ),
   );
 
+  getPollsByRoom$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(DashboardActions.getPollsByRoom),
+      withLatestFrom(this.store.select(selectActiveRoom)),
+      switchMap(([action, roomId]) =>
+        this.pollService.getPollsByRoom(roomId).pipe(
+          map(response => ({
+            type: DashboardActions.setPolls.type,
+            polls: response.results as Poll[],
+          })),
+          catchError(() => EMPTY),
+        ),
+      ),
+    ),
+  );
+
   getTuneSyncEvent$ = createEffect(() =>
     this.actions$.pipe(
       ofType(DashboardActions.getTuneSyncEvent),
@@ -158,24 +189,49 @@ export class DashboardEffects {
     { dispatch: false },
   );
 
-  removeUserFromRoom$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(DashboardActions.removeUserFromRoom),
-      concatMap(action =>
-        of(action).pipe(
-          withLatestFrom(this.store.pipe(select(selectActiveRoom))),
+  removeUserFromRoom$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(DashboardActions.removeUserFromRoom),
+        concatMap(action =>
+          of(action).pipe(
+            withLatestFrom(this.store.pipe(select(selectActiveRoom))),
+          ),
+        ),
+        switchMap(([action, room]) =>
+          this.usersService.removeUserFromRoom(room, action.userId),
         ),
       ),
-      switchMap(([action, room]) =>
-        this.usersService.removeUserFromRoom(room, action.userId).pipe(
-          map(() => ({
-            type: DashboardActions.getUsersByRoom.type,
-            roomId: room,
-          })),
-          catchError(() => EMPTY),
+    { dispatch: false },
+  );
+
+  createPoll$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(DashboardActions.createPoll),
+        withLatestFrom(this.store.select(selectActiveRoom)),
+        switchMap(([action, room]) =>
+          this.pollService
+            .createPoll(room, action.pollArgs)
+            .pipe(catchError(() => EMPTY)),
         ),
       ),
-    ),
+    { dispatch: false },
+  );
+
+  createVote$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(DashboardActions.createVote),
+        withLatestFrom(this.store.select(selectActiveRoom)),
+        switchMap(([action, room]) =>
+          this.pollService.createVote(room, action.pollId, action.agree).pipe(
+            tap(response => console.log('create vote response:' + response)),
+            catchError(() => EMPTY),
+          ),
+        ),
+      ),
+    { dispatch: false },
   );
 
   createMessage$ = createEffect(
@@ -211,7 +267,13 @@ export class DashboardEffects {
         this.store.select(selectUsers),
       ),
       switchMap(([action, userId, roomUsers]) =>
-        this.usersService.getUsersByUsername(action.username).pipe(
+        this.usersService.getUsersByUsername(action.username, action.page).pipe(
+          tap(response => {
+            this.usersService.usersPrevNextSubject.next({
+              prev: getPageFromURL(response.previous),
+              next: getPageFromURL(response.next),
+            });
+          }),
           map(response => ({
             type: DashboardActions.storeAllUsers.type,
             allUsers: response.results
@@ -405,5 +467,6 @@ export class DashboardEffects {
     private messagingService: MessagingService,
     private mainScreenService: MainScreenService,
     private controlsService: ControlsService,
+    private pollService: PollService,
   ) {}
 }

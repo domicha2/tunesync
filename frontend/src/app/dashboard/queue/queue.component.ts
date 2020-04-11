@@ -4,26 +4,19 @@ import {
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { isArray } from 'lodash';
-import { combineLatest, Observable, Subscription } from 'rxjs';
-import {
-  debounceTime,
-  filter,
-  map,
-  startWith,
-  distinctUntilChanged,
-} from 'rxjs/operators';
+import { Observable, Subscription } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 import { AppState } from '../../app.module';
-import { Filters, Role, Song } from '../dashboard.models';
+import { Role, Song } from '../dashboard.models';
 import * as DashboardActions from '../store/dashboard.actions';
 import {
   selectAvailableSongs,
   selectQueueIndexAndSongs,
   selectUserRole,
 } from '../store/dashboard.selectors';
-import { isEqual } from 'lodash';
+import { QueueService } from './queue.service';
 
 @Component({
   selector: 'app-queue',
@@ -40,31 +33,22 @@ export class QueueComponent implements OnInit, OnDestroy {
 
   userRole$: Observable<Role>;
 
-  nameControl = new FormControl();
-  albumControl = new FormControl();
-  artistControl = new FormControl();
+  prevPage: string | null;
+  nextPage: string | null;
 
-  constructor(private store: Store<AppState>) {}
+  constructor(
+    private queueService: QueueService,
+    private store: Store<AppState>,
+  ) {}
 
   ngOnInit(): void {
     this.subscription.add(
-      combineLatest([
-        this.nameControl.valueChanges.pipe(startWith('')),
-        this.albumControl.valueChanges.pipe(startWith('')),
-        this.artistControl.valueChanges.pipe(startWith('')),
-      ])
-        .pipe(
-          debounceTime(250),
-          distinctUntilChanged(isEqual),
-          map(([name, album, artist]) => ({
-            name,
-            album,
-            artist,
-          })),
-        )
-        .subscribe((filters: Filters) => {
-          this.store.dispatch(DashboardActions.getAvailableSongs({ filters }));
-        }),
+      this.queueService.availSongsPrevNextSubject.subscribe(
+        ({ prev, next }) => {
+          this.prevPage = prev;
+          this.nextPage = next;
+        },
+      ),
     );
 
     this.userRole$ = this.store.select(selectUserRole);
@@ -73,11 +57,9 @@ export class QueueComponent implements OnInit, OnDestroy {
       this.store
         .select(selectQueueIndexAndSongs)
         .pipe(
-          filter(
-            (data) => data.index !== undefined && data.songs !== undefined,
-          ),
+          filter(data => data.index !== undefined && data.songs !== undefined),
         )
-        .subscribe((data) => {
+        .subscribe(data => {
           this.songIndex = data.index;
           // have two queues, one visible and one in the background
           if (data.songs) {
@@ -95,7 +77,7 @@ export class QueueComponent implements OnInit, OnDestroy {
         .select(selectAvailableSongs)
         .pipe(
           filter(isArray),
-          map((songs) => songs.slice()),
+          map(songs => songs.slice()),
         )
         .subscribe((availableSongs: Song[]) => {
           this.availableSongs = availableSongs;
@@ -105,10 +87,6 @@ export class QueueComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
-  }
-
-  clearFormControl(formControl: FormControl): void {
-    formControl.setValue('');
   }
 
   drop(event: CdkDragDrop<string[]>, container: 'queue' | 'available'): void {
@@ -130,7 +108,7 @@ export class QueueComponent implements OnInit, OnDestroy {
               queue: this.masterQueue
                 .slice(0, this.songIndex + 1)
                 .concat(this.queuedSongs)
-                .map((el) => el.id),
+                .map(el => el.id),
             }),
           );
         }
@@ -149,7 +127,7 @@ export class QueueComponent implements OnInit, OnDestroy {
           queue: this.masterQueue
             .slice(0, this.songIndex + 1)
             .concat(this.queuedSongs)
-            .map((el) => el.id),
+            .map(el => el.id),
         }),
       );
     }

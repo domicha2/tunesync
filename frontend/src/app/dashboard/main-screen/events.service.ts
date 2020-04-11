@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import * as moment from 'moment';
 import { AppState } from '../../app.module';
@@ -20,6 +21,7 @@ import * as DashboardActions from '../store/dashboard.actions';
 })
 export class EventsService {
   constructor(
+    private matSnackBar: MatSnackBar,
     private store: Store<AppState>,
     private notificationsService: NotificationsService,
   ) {}
@@ -148,7 +150,7 @@ export class EventsService {
           : -1,
       );
 
-    result = result.filter((event) => {
+    result = result.filter(event => {
       // ? revisit user change events (join/kick/role change to be displayed)
       if (
         roomName !== PERSONAL_ROOM_NAME &&
@@ -164,13 +166,13 @@ export class EventsService {
     // iterate through all events looking for join events (event type: 'M" and args : {is_accepted: boolean})
     // if found event remove invitation event with a meaningful message about the join event
     const eventsToDelete = [];
-    result = result.map((outerEvent) => {
+    result = result.map(outerEvent => {
       if (
         outerEvent.event_type === EventType.Messaging &&
         typeof outerEvent.args.is_accepted === 'boolean'
       ) {
         // look back for the join event
-        const inviteEvent = result.find((innerEvent) => {
+        const inviteEvent = result.find(innerEvent => {
           return (
             innerEvent.event_type === EventType.UserChange &&
             innerEvent.args.type === UserChangeAction.Invite &&
@@ -197,18 +199,39 @@ export class EventsService {
     });
 
     // filter events
-    result = result.filter((event) => !eventsToDelete.includes(event.event_id));
+    result = result.filter(event => !eventsToDelete.includes(event.event_id));
     return result;
   }
 
   processWebSocketMessage(
-    data,
+    event: AppEvent,
     roomId: number,
     roomName: string,
     events: AppEvent[],
   ): boolean {
-    const event: AppEvent = JSON.parse(data);
-    console.log('payload from websocket: ', event);
+    if (
+      event.event_type === EventType.UserChange &&
+      event.args.type === UserChangeAction.Kick &&
+      typeof event.args.room === 'number'
+    ) {
+      // user got kicked need to update their rooms list
+      // remove the room from the rooms list
+      this.store.dispatch(DashboardActions.getRooms());
+      // ! add the room name
+      this.matSnackBar.open(
+        'You got kicked from room ID: ' + event.args.room,
+        undefined,
+        {
+          duration: 5000,
+        },
+      );
+
+      // check if the user is also inside that room
+      if (roomId === event.args.room) {
+        this.store.dispatch(DashboardActions.resetState());
+      }
+    }
+
     if (event.room_id !== roomId) {
       // the associated room does not match the active room add a notification
       // TODO: consider what events should trigger a notification
@@ -218,13 +241,10 @@ export class EventsService {
       });
       return false;
     }
-    if (event.event_id || event['last_modify_queue']) {
+
+    if (event.event_id) {
       // the associated room matches the active room continue
       switch (event.event_type) {
-        // ? this is a TUNESYNC EVENT
-        case undefined:
-          this.processWSTuneSyncEvent(event);
-          break;
         case EventType.UserChange:
           this.processWSUserChangeEvent(event, events, roomName, roomId);
           break;
@@ -246,10 +266,13 @@ export class EventsService {
     roomId: number,
   ): void {
     if (roomName === PERSONAL_ROOM_NAME) {
-      if (event.args.type === UserChangeAction.Invite) {
-        events.push(event);
-      } else {
-        console.error('user change action from ws not supported yet');
+      switch (event.args.type) {
+        case UserChangeAction.Invite:
+        case UserChangeAction.Kick:
+          events.push(event);
+          break;
+        default:
+          console.error('user change action from ws not supported yet');
       }
     } else if (event.args['type'] === UserChangeAction.RoleChange) {
       this.store.dispatch(DashboardActions.getUsersByRoom({ roomId }));
@@ -263,6 +286,9 @@ export class EventsService {
         event.args.content = 'joined the room';
         events.push(event);
       }
+    } else if (event.args['type'] === UserChangeAction.Kick) {
+      // everyone needs to update their users list
+      this.store.dispatch(DashboardActions.getUsersByRoom({ roomId }));
     }
   }
 
@@ -274,7 +300,7 @@ export class EventsService {
     ) {
       // need to look for the invite event to delete and change the contents of the message
       const inviteEventIndex = events.findIndex(
-        (innerEvent) => event.args.room === innerEvent.args.room_id,
+        innerEvent => event.args.room === innerEvent.args.room_id,
       );
       const inviteEvent = events[inviteEventIndex];
       const message = `You have ${
@@ -294,45 +320,6 @@ export class EventsService {
       events.splice(inviteEventIndex, 1);
     } else {
       events.push(event);
-    }
-  }
-
-  /**
-   * Handle a TuneSync event from the WebSocket
-   */
-  private processWSTuneSyncEvent(event: AppEvent): void {
-    // determine what type of event it was
-    // if it is playing the dispatch set song stat
-    // if it is modifying the queue, need to dispatch a new queue
-    const tuneSyncEvent = {
-      last_modify_queue: event['last_modify_queue'],
-      last_play: event['last_play'],
-      play_time: event['play_time'],
-    } as TuneSyncEvent;
-    if (
-      tuneSyncEvent.last_play === null ||
-      tuneSyncEvent.last_modify_queue.event_id >
-        tuneSyncEvent.last_play.event_id
-    ) {
-      // the  DJ made a modify queue event
-      // need to dispatch new queue into my store
-      this.store.dispatch(
-        DashboardActions.storeQueue({
-          queue: tuneSyncEvent.last_modify_queue.queue.map(
-            ([id, length, name]) => ({ id, length, name }),
-          ),
-        }),
-      );
-    } else {
-      // the DJ made a play event
-      // ! could have race condition but handleTuneSync function has the same design
-      this.store.dispatch(
-        DashboardActions.setSongStatus({
-          isPlaying: tuneSyncEvent.last_play.is_playing,
-          seekTime: tuneSyncEvent.last_play.timestamp,
-          queueIndex: tuneSyncEvent.last_play.queue_index,
-        }),
-      );
     }
   }
 }

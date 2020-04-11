@@ -1,16 +1,36 @@
 import { createAction, props } from '@ngrx/store';
 import {
   AppEvent,
+  FileList2,
+  Filters,
   Role,
   Room,
   Song,
   User as AuthUser,
   User,
-  Filters,
-  FileList2,
 } from '../dashboard.models';
+import { Poll } from '../poll/poll.models';
 
 export const resetState = createAction('[Rooms Component] Reset State');
+
+/* Poll/Vote */
+export const createPoll = createAction(
+  '[Create Poll Component] Create Poll',
+  props<{ pollArgs: any }>(),
+);
+
+export const createVote = createAction(
+  '[Poll Component] Create Vote',
+  props<{ pollId: number; agree: boolean }>(),
+);
+
+export const getPollsByRoom = createAction(
+  '[Rooms Component] Get Polls By Room',
+);
+export const setPolls = createAction(
+  '[Polls API] Set Polls',
+  props<{ polls: Poll[] }>(),
+);
 
 /* Tunes */
 export const getTuneSyncEvent = createAction(
@@ -80,6 +100,7 @@ export const getAvailableSongs = createAction(
   '[Queue Component] Get Available Songs',
   props<{
     filters: Filters;
+    page: string;
   }>(),
 );
 
@@ -143,7 +164,7 @@ export const storeEvents = createAction(
 /* Users */
 export const getUsersByUsername = createAction(
   '[Add Room Component] Get Users By Username',
-  props<{ username: string; filterByActiveRoom: boolean }>(),
+  props<{ username: string; filterByActiveRoom: boolean; page: string }>(),
 );
 export const storeAllUsers = createAction(
   '[Users API] Store All Users',

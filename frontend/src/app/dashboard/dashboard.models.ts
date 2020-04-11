@@ -34,6 +34,8 @@ export enum EventType {
   UserChange = 'U',
   Play = 'PL',
   TuneSync = 'T',
+  CreatePoll = 'PO',
+  Vote = 'V',
 }
 
 export enum Role {
@@ -101,6 +103,7 @@ export interface TuneSyncEvent {
   last_play: PlayState | null;
   play_time: string;
   room: number;
+  event_type: EventType.TuneSync;
 }
 
 export interface PlayState {

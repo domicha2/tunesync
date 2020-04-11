@@ -6,9 +6,9 @@ import { filter } from 'rxjs/operators';
 import { AppState } from '../../app.module';
 import { Role, Room } from '../dashboard.models';
 import { NotificationsService } from '../notifications.service';
-import * as DashboardActions from '../store/dashboard.actions';
 import { selectRooms } from '../store/dashboard.selectors';
 import { AddRoomComponent } from './add-room/add-room.component';
+import { RoomsService } from './rooms.service';
 
 @Component({
   selector: 'app-rooms',
@@ -30,12 +30,13 @@ export class RoomsComponent implements OnInit, OnDestroy {
 
   constructor(
     private notificationsService: NotificationsService,
+    private roomsService: RoomsService,
     private store: Store<AppState>,
     private dialog: MatDialog,
   ) {}
 
   ngOnInit(): void {
-    this.notificationsService.notificationsSubject.subscribe((payload) => {
+    this.notificationsService.notificationsSubject.subscribe(payload => {
       if (payload.action === 'reset') {
         // undefined makes it so that it does not render
         this.notifications[payload.roomId] = undefined;
@@ -50,12 +51,12 @@ export class RoomsComponent implements OnInit, OnDestroy {
 
     this.store
       .select(selectRooms)
-      .pipe(filter((rooms) => rooms !== undefined))
+      .pipe(filter(rooms => rooms !== undefined))
       .subscribe((rooms: Room[]) => {
         // clear existing value
         this.rooms = { admin: [], dj: [], regular: [] };
 
-        rooms.forEach((room) => {
+        rooms.forEach(room => {
           switch (room.role) {
             case Role.Admin:
               this.rooms.admin.push(room);
@@ -81,30 +82,12 @@ export class RoomsComponent implements OnInit, OnDestroy {
     if (this.activeRoom && room.id === this.activeRoom.id) return;
 
     this.activeRoom = room;
-    this.store.dispatch(DashboardActions.resetState());
-    this.store.dispatch(
-      DashboardActions.setActiveRoom({
-        activeRoomId: room.id,
-        activeRoomName: room.title,
-      }),
-    );
-    this.notificationsService.notificationsSubject.next({
-      roomId: room.id,
-      action: 'reset',
-    });
-    this.store.dispatch(DashboardActions.getUsersByRoom({ roomId: room.id }));
-    this.store.dispatch(
-      DashboardActions.getEventsByRoom({
-        roomId: room.id,
-        creationTime: new Date(),
-      }),
-    );
-    this.store.dispatch(DashboardActions.getTuneSyncEvent({ roomId: room.id }));
+    this.roomsService.enterRoom(room.id, room.title);
   }
 
   onAddRoom(): void {
     // open modal
-    this.dialog.open(AddRoomComponent);
+    this.dialog.open(AddRoomComponent, { width: '30%' });
   }
 
   /**
