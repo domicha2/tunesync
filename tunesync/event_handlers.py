@@ -19,8 +19,7 @@ class PollTask:
         self.args = Poll.objects.get(pk=self.poll_id).args
 
     @staticmethod
-    # ! change this back later to 60 seconds
-    @background(schedule=15)
+    @background(schedule=30)
     def initiate_poll(poll_id):
         print("initiating poll")
         self = PollTask(poll_id)
@@ -56,7 +55,6 @@ class PollTask:
             current_queue.append(self.args["song"])
         else:
             current_queue = [self.args["song"]]
-        print(current_queue)
         event.args = {"modify_queue": {"queue": current_queue}}
         handler = Handler(event, event.author)
         # the following is janky, not proud at all.
@@ -345,7 +343,11 @@ class Handler:
             author=self.user,
             room=system_room,
             event_type="U",
-            args={"type": "K", "room": self.event.room.id},
+            args={
+                "type": "K",
+                "room": self.event.room.id,
+                "room_name": self.event.room.title,
+            },
         )
         # let them know they've been kicked lol
         kick_event.save()

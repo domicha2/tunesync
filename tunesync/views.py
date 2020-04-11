@@ -55,6 +55,7 @@ class UserViewSet(viewsets.ViewSet):
 
         paginator = PageNumberPagination()
         filtered_set = UserFilter(request.GET, queryset=User.objects.all()).qs
+        filtered_set = filtered_set.order_by("username").exclude(pk=1)
         context = paginator.paginate_queryset(filtered_set, request)
         serializer = UserSerializer(context, many=True)
         return paginator.get_paginated_response(serializer.data)
