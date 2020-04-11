@@ -57,11 +57,9 @@ export class QueueComponent implements OnInit, OnDestroy {
       this.store
         .select(selectQueueIndexAndSongs)
         .pipe(
-          filter(
-            (data) => data.index !== undefined && data.songs !== undefined,
-          ),
+          filter(data => data.index !== undefined && data.songs !== undefined),
         )
-        .subscribe((data) => {
+        .subscribe(data => {
           this.songIndex = data.index;
           // have two queues, one visible and one in the background
           if (data.songs) {
@@ -79,7 +77,7 @@ export class QueueComponent implements OnInit, OnDestroy {
         .select(selectAvailableSongs)
         .pipe(
           filter(isArray),
-          map((songs) => songs.slice()),
+          map(songs => songs.slice()),
         )
         .subscribe((availableSongs: Song[]) => {
           this.availableSongs = availableSongs;
@@ -110,7 +108,7 @@ export class QueueComponent implements OnInit, OnDestroy {
               queue: this.masterQueue
                 .slice(0, this.songIndex + 1)
                 .concat(this.queuedSongs)
-                .map((el) => el.id),
+                .map(el => el.id),
             }),
           );
         }
@@ -129,7 +127,7 @@ export class QueueComponent implements OnInit, OnDestroy {
           queue: this.masterQueue
             .slice(0, this.songIndex + 1)
             .concat(this.queuedSongs)
-            .map((el) => el.id),
+            .map(el => el.id),
         }),
       );
     }

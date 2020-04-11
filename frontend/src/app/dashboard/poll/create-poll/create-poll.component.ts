@@ -44,14 +44,12 @@ export class CreatePollComponent implements OnInit, OnDestroy {
     // get a list of filtered songs
     this.availableSongs$ = this.store
       .select(selectAvailableSongs)
-      .pipe(tap((songs) => console.log(songs)));
+      .pipe(tap(songs => console.log(songs)));
 
     // get a list of users in the current room
     this.regularUsers$ = this.store.select(selectUsers).pipe(
-      map((users: User[]) =>
-        users.filter((user) => user.role === Role.Regular),
-      ),
-      tap((users) => console.log('users', users)),
+      map((users: User[]) => users.filter(user => user.role === Role.Regular)),
+      tap(users => console.log('users', users)),
     );
   }
 
