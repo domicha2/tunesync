@@ -13,7 +13,6 @@
       <div id="bottom-bar" class="row">
         <app-messaging id="messaging"></app-messaging>
         <button
-          *ngIf="(userRole$ | async) === 'A'"
           mat-icon-button
           (click)="openCreatePollDialog()"
           matTooltip="Create poll"
