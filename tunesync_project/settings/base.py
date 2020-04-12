@@ -148,20 +148,20 @@ class BaseSettings(DjangoDefaults):
         }
     ]
 
-    #CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+    # CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
     CHANNEL_LAYERS = {
         "default": {
             "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": ["redis://127.0.0.1:6379/0"],
-            },
-        },
+            "CONFIG": {"hosts": ["redis://127.0.0.1:6379/0"]},
+        }
     }
 
-    CORS_ORIGIN_WHITELIST = [
-        "http://localhost:4200",
-        "https://www.tunesync.ecd.space",
-    ]
+    CORS_ORIGIN_REGEX_WHITELIST = [r"(.*)tunesync.ecd.space(.*)", r"(.*)localhost(.*)"]
+
+    # CORS_ORIGIN_WHITELIST = [
+    #     "http://localhost:4200",
+    #     "https://www.tunesync.ecd.space",
+    # ]
 
     REST_FRAMEWORK = {
         "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
