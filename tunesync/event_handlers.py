@@ -19,7 +19,7 @@ class PollTask:
         self.args = Poll.objects.get(pk=self.poll_id).args
 
     @staticmethod
-    @background(schedule=30)
+    @background(schedule=60)
     def initiate_poll(poll_id):
         self = PollTask(poll_id)
         poll = Poll.objects.get(pk=self.poll_id)
