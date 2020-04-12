@@ -99,6 +99,9 @@
 	"username": "Bob",
 	"password": "Saget"
 }'`
+- Response Status Codes:
+  - 200: User successfully created
+  - 400: Username already exists
 
 2. Retrieve authentication token for a user (for signin)
 - Method: `POST`
@@ -111,7 +114,10 @@
 	"username": "Bob",
 	"password": "Saget"
 }'`
-
+- Response Status Codes:
+  - 200: User successfully authenticated and logged in
+  - 401: Invalid credentials, i.e. wrong password for given username
+  
 3. Create a room
 - Method: `POST`
 - Url: `/users/rooms/`
@@ -129,6 +135,9 @@
 	"subtitle": "something random",
 	"title": "Best Room"
 }'`
+- Response Status Codes:
+  - 200: Room successfully created
+  - 400: Title is empty, or Title is 'Personal Room'
 
 4. Create a tune
 - Method: `POST`
@@ -145,6 +154,9 @@
 --header 'Content-Type: application/json' \
 --header 'Authorization: Token d43250ff938a9b909fff6109783759aa0047233e' \
 --form 'file=@/D:/song1.mp3'`
+- Response Status Codes:
+  - 200: Tune successfully added to database
+  - 400: Given file is not a valid audio file
 
 5. Create a TuneSync Event
 - Method: `POST`
@@ -184,6 +196,11 @@
   	}
   }
 }'`
+- Response Status Codes:
+  - 200: Event successfully created in given room
+  - 400:
+    - Given room does not exist or provided parent event is invalid
+    - OR Given song file/details do not exist
 
 6. Create a Message Event
 - Method: `POST`
@@ -213,6 +230,11 @@
 		"content": "this is a message"
 	}
 }'`
+- Response Status Codes:
+  - 200: Event successfully created in given room
+  - 400:
+    - Given room does not exist or provided parent event is invalid
+    - OR Incorrect content provided in args
 
 7. a) Create a User Change (Kick) Event
 - Method: `POST`
@@ -244,6 +266,12 @@
     "user": 9
 	}
 }'`
+- Response Status Codes:
+  - 200: Event successfully created in given room
+  - 400:
+    - Given room does not exist or provided parent event is invalid
+    - OR User to kick not provided (bad args)
+    - OR User to kick is not in the room
 
 7. b) Create a User Change (Join) Event
 - Method: `POST`
@@ -275,6 +303,12 @@
     "is_accepted": true
 	}
 }'`
+- Response Status Codes:
+  - 200: Event successfully created in given room
+  - 400:
+    - Given room does not exist or provided parent event is invalid
+    - OR Choice to join not provided (bad args)
+
 7. c) Create a User Change (Leave) Event
 - Method: `POST`
 - Url: `/events/`
@@ -303,6 +337,9 @@
 		"type": "L"
 	}
 }'`
+- Response Status Codes:
+  - 200: Event successfully created in given room
+  - 400: Given room does not exist or provided parent event is invalid
 
 7. d) Create a User Change (Invite) Event
 - Method: `POST`
@@ -334,6 +371,13 @@
     "users": [4, 6, 8]
 	}
 }'`
+- Response Status Codes:
+  - 200: Event successfully created in given room
+  - 400:
+    - Given room does not exist or provided parent event is invalid
+    - OR Users to invite not provided (bad args)
+    - OR User does not exist
+    - OR User has already been invited
 
 7. e) Create a User Change (Change Role) Event
 - Method: `POST`
@@ -367,6 +411,12 @@
     "role": "A"
 	}
 }'`
+- Response Status Codes:
+  - 200: Event successfully created in given room
+  - 400:
+    - Given room does not exist or provided parent event is invalid
+    - OR Missing one or more of "type", "user", "role" fields in request (bad args)
+    - OR User to change role for is not in the room
 
 8. a) Create a Poll (Play) Event
 - Method: `POST`
@@ -403,6 +453,14 @@
 		"is_playing": true
 	}
 }'`
+- Response Status Codes:
+  - 200: Poll successfully created in given room
+  - 400:
+    - Given room does not exist or provided parent event is invalid
+    - OR Missing one or more of "queue_index", "is_playing", "timestamp" fields in request (bad args)
+    - OR Given arguments have wrong type
+    - OR Invalid song index for queue
+    - OR There are no songs in the queue to play
 
 8. b) Create a Poll (Kick) Event
 - Method: `POST`
@@ -437,6 +495,12 @@
     "user": 2
 	}
 }'`
+- Response Status Codes:
+  - 200: Poll successfully created in given room
+  - 400:
+    - Given room does not exist or provided parent event is invalid
+    - OR User to kick not provided (bad args)
+    - OR User to kick is not in the room
 
 
 8. c) Create a Poll (Modify Queue) Event -- check this one over, might be wrong (i think request body should include the tune somehow?)
@@ -470,6 +534,13 @@
     "queue": [1]
   }
 }'`
+- Response Status Codes:
+  - 200: Poll successfully created in given room
+  - 400:
+    - Given room does not exist or provided parent event is invalid
+    - OR Given song id is not valid
+    - OR Invalid song index for queue
+    - OR There are no songs in the queue to play
 
 9. Create a Vote Event
 - Method: `POST`
@@ -501,6 +572,12 @@
     "agree": true
   }
 }'`
+- Response Status Codes:
+  - 200: Vote successfully added to given poll
+  - 400:
+    - Given poll does not exist or provided parent event is invalid
+    - OR Vote is not given (bad args)
+    - OR Vote has completed, can't modify anymore
 
 ## GET Endpoints
 1. Return all the rooms a User is in
@@ -591,6 +668,9 @@ RESPONSE:
   "tune_name": "Swoogity",
   "tune_artist": "Swooty"
 }'`
+- Response Status Codes:
+  - 200: Poll successfully created in given room
+  - 400: Given tune id doesn't exist in the database
 
 ## DELETE Endpoints
 
@@ -609,3 +689,6 @@ RESPONSE:
 - Query example: `curl --location --request DELETE 'http://localhost:8000/events/1/' \
 --header 'Content-Type: application/json' \
 --header 'Authorization: Token fee1c2377bc8fb26cbee1fa4c2786aaa989b2a42'`
+- Response Status Codes:
+  - 200: Poll successfully created in given room
+  - 400: Invalid event id
