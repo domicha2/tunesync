@@ -157,7 +157,10 @@ class BaseSettings(DjangoDefaults):
         },
     }
 
-    CORS_ORIGIN_ALLOW_ALL = True
+    CORS_ORIGIN_WHITELIST = [
+        "http://localhost:4200",
+        "https://www.tunesync.ecd.space",
+    ]
 
     REST_FRAMEWORK = {
         "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
