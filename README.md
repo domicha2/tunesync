@@ -12,11 +12,11 @@ https://www.youtube.com/watch?v=qwiRjMfX6m0&feature=youtu.be
 
 ## Application URL
 
-For browser
-www.tunesync.ecd.space
+For browser:
+https://www.tunesync.ecd.space
 
-For using our api
-api.tunesync.ecd.space
+web api:
+https://api.tunesync.ecd.space
 
 The above url will not be used by most users. However if you do want to use our api it can be accessed with api.tunesync.ecd.space
 

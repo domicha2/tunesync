@@ -220,13 +220,6 @@ https://api.tunesync.ecd.space
 3.
 
 - Method: `GET`
-- Url: `/rooms/:room_id/events/`
-- Response:
-  see paginated response and standard event response combined. does not print PO/VO/T responses. use seperate endpoint
-
-4.
-
-- Method: `GET`
 - Url: `/rooms/:room_id/polls/`
 - Response
   see paginated response and poll event response. This returns a status of all active polls.
@@ -240,28 +233,45 @@ When querying a set of data responses will typically be paginated with a respons
 
 count is number of files. enxt is url for the next page. results is the array of results of rthe page they requested
 
-5.
+4.
 
 - Method: `GET`
-- Url: `/users/?page=1&username__icontainss=o/`
+- Url: `/users/?page=1&username__icontains=o/`
 
-above is an example query you can make with the users end point and below is the response
+above is an example query you can make with the users end point and below is the response. The query params can get very complicated. They look very similar to sql queries and can be changed with "&". Alot of our endpoints will follow this same syntax. If you put invalid query params it will return the entire set (paginated).
+
+The basic syntax is "field\_\_operator=value" below are some more examples. The equal operator is never explicit. If you want to use the exact field this is the syntax: "field=value"
+
+`/users/?username__iexact=goku`
+`/users/?username=goku&page=2`
+
+These are the valid fields with the valid operators:
+username: ["icontains", "exact"]
+page: exact
+
+example results:
 
 {'count': 1,
 'next': None,
 'previous': None,
 'results': [{'id': 2, 'username': 'goku'}]}
 
-If you put invalid query params it will return the entire set. Please read my filters.py file to see what params you can users.
-seperate attribute from operator with "\_\_". reach out to me if you need more examples. This kind of syntax will be true for all get methosd
-that return a list. also review the filters.py file to see their available operators
+count: number of results returned
+next: url for next page
+previous: url for previous page
+results: array of results for the page queried
 
-example results:
-
-6.
+5.
 
 - Method: `GET`
 - Url: `/tunes/?name__icontains=urban`
+
+This follows the same syntax above with more operators.
+
+album: ["icontains", "contains", "exact", "iexact"],
+artist: ["icontains", "contains", "exact", "iexact"],
+name: ["icontains", "contains", "exact", "iexact"],
+length: ["gt", "gte", "lt", "lte", "exact"],
 
 RESPONSE:
 {'count': 1,
@@ -274,6 +284,17 @@ RESPONSE:
 'album': 'TunePocket Unlimited Royalty Free Music Library',
 'mime': 'audio/mp3',
 'length': 23.412125}]}
+
+6.
+
+- Method: `GET`
+- Url: `/rooms/:room_id/events/`
+- Response:
+  see paginated response and standard event response combined. does not print PO/VO/T responses. use seperate endpoint
+
+  this end point also allows you to filter with query params.
+  creation_time: ["lt"]
+  event_type: ["exact"]}
 
 ## PATCH Endpoints
 
