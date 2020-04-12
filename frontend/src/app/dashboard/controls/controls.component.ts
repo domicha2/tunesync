@@ -194,7 +194,13 @@ export class ControlsComponent
   ): void {
     if (songStatus.isPlaying === true) {
       this.pauseOnLoaded = false;
-      if (this.currentSong && this.queueIndex === songStatus.queueIndex) {
+      this.queueIndex = songStatus.queueIndex;
+      if (
+        this.currentSong &&
+        this.currentSong.id === this.queue[songStatus.queueIndex].id
+      ) {
+        // ? no song change, in fact we are playing and seeking a song that's already loaded
+
         // i believe this is executed when the websocket broadcast play on a paused song
         const song = this.getAudioElement();
         if (songStatus.seekTime !== undefined) {
@@ -202,53 +208,30 @@ export class ControlsComponent
         }
         song.play();
       } else {
-        const prevSongIndex = this.queueIndex;
-        this.queueIndex = songStatus.queueIndex;
         if (queue.length > 0) {
           if (songStatus.seekTime !== undefined) {
             this.seekTime = songStatus.seekTime;
           }
 
-          if (
-            queue[prevSongIndex] &&
-            queue[prevSongIndex].id === queue[this.queueIndex].id
-          ) {
-            // same song so just rewind the current time to 0
-            const song = this.getAudioElement();
-            song.currentTime = 0;
-            if (song.paused) {
-              // the song will be paused automatically when the previous song finished
-              // need to manually play it
-              // normally we don't have to manually play the song since we have the autoplay flag
-              // which will play the song for us
-              // however in this special case we are playing the same song so it will not trigger autoplay
-              song.play();
-            }
-          }
           // after this gets executed the onloadeddata event should trigger which would seek the song
           this.currentSong = queue[this.queueIndex];
         }
       }
     } else if (songStatus.isPlaying === false) {
       this.pauseOnLoaded = true;
+      this.queueIndex = songStatus.queueIndex;
       if (
         this.currentSong === undefined ||
-        this.queueIndex !== songStatus.queueIndex
+        songStatus.queueIndex === -1 ||
+        this.currentSong.id !== this.queue[songStatus.queueIndex].id
       ) {
-        const prevSongIndex = this.queueIndex;
-        this.queueIndex = songStatus.queueIndex;
+        // if current song is undefined, then we are 100% getting a new song or keeping it as undefined
+        // if songstatus is -1 then we are clearing the song
+        // in the 3rd case there is a song change so we have to get new binaries
+
         // need to set the current song, pause, then seek to the given time
         if (songStatus.seekTime !== undefined) {
           this.seekTime = songStatus.seekTime;
-        }
-
-        if (
-          queue[prevSongIndex] &&
-          queue[prevSongIndex].id === queue[this.queueIndex].id
-        ) {
-          // same song so just rewind the current time to 0
-          const song = this.getAudioElement();
-          song.currentTime = 0;
         }
 
         // this line can also clear out a song because queue index can be -1
@@ -256,6 +239,9 @@ export class ControlsComponent
         // have to manually set the pause flag since clearing the song doesn't modify it
         this.isPaused = true;
       } else {
+        // the song does not change so we already have the song in the dom
+        // simply pause and adjust the current time as needed
+
         const song = this.getAudioElement();
         song.pause();
         song.currentTime = songStatus.seekTime;
