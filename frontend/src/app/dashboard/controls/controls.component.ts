@@ -55,6 +55,8 @@ export class ControlsComponent
 
   queueDialogRef: MatDialogRef<QueueComponent>;
 
+  activeRoomId: number;
+
   constructor(
     private webSocketService: WebSocketService,
     private matSnackBar: MatSnackBar,
@@ -68,7 +70,10 @@ export class ControlsComponent
     this.subscription.add(
       this.store
         .select(selectActiveRoom)
-        .pipe(filter(isUndefined))
+        .pipe(
+          tap(activeRoomId => (this.activeRoomId = activeRoomId)),
+          filter(isUndefined),
+        )
         .subscribe(() => {
           // whenever the active room is cleared (user got kicked)
           if (
@@ -155,6 +160,9 @@ export class ControlsComponent
    * Handle a TuneSync event from the WebSocket
    */
   private processWSTuneSyncEvent(tuneSyncEvent: TuneSyncEvent): void {
+    // ? first check if the event came from the active room
+    if (tuneSyncEvent.room_id !== this.activeRoomId) return;
+
     // determine what type of event it was
     // if it is playing the dispatch set song stat
     // if it is modifying the queue, need to dispatch a new queue
