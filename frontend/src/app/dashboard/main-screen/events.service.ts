@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import * as moment from 'moment';
 import { AppState } from '../../app.module';
@@ -12,7 +11,6 @@ import {
   TuneSyncEvent,
   UserChangeAction,
 } from '../dashboard.models';
-import { NotificationsService } from '../notifications.service';
 import * as DashboardActions from '../store/dashboard.actions';
 
 @Injectable({
@@ -20,11 +18,7 @@ import * as DashboardActions from '../store/dashboard.actions';
   providedIn: 'root',
 })
 export class EventsService {
-  constructor(
-    private matSnackBar: MatSnackBar,
-    private store: Store<AppState>,
-    private notificationsService: NotificationsService,
-  ) {}
+  constructor(private store: Store<AppState>) {}
 
   processTuneSyncEvent(tuneSyncEvent: TuneSyncEvent): void {
     let queue;
