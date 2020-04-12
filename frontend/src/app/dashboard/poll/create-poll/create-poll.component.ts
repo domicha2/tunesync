@@ -55,15 +55,16 @@ export class CreatePollComponent implements OnInit, OnDestroy {
     );
 
     // get a list of filtered songs
-    this.availableSongs$ = this.store
-      .select(selectAvailableSongs)
-      .pipe(tap(songs => console.log(songs)));
+    this.availableSongs$ = this.store.select(selectAvailableSongs);
 
     // get a list of users in the current room
-    this.regularUsers$ = this.store.select(selectUsers).pipe(
-      map((users: User[]) => users.filter(user => user.role === Role.Regular)),
-      tap(users => console.log('users', users)),
-    );
+    this.regularUsers$ = this.store
+      .select(selectUsers)
+      .pipe(
+        map((users: User[]) =>
+          users.filter(user => user.role === Role.Regular),
+        ),
+      );
   }
 
   ngOnDestroy(): void {

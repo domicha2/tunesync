@@ -51,7 +51,6 @@ export class DashboardEffects {
         switchMap(([action, roomId]) =>
           this.queueService
             .createModifyQueueEvent(action.queue, roomId)
-            .pipe(tap(response => console.log(response))),
         ),
       ),
     { dispatch: false },
@@ -230,7 +229,6 @@ export class DashboardEffects {
         withLatestFrom(this.store.select(selectActiveRoom)),
         switchMap(([action, room]) =>
           this.pollService.createVote(room, action.pollId, action.agree).pipe(
-            tap(response => console.log('create vote response:' + response)),
             catchError(() => EMPTY),
           ),
         ),
@@ -255,7 +253,6 @@ export class DashboardEffects {
               roomId: userAndRoom.roomId,
             })
             .pipe(
-              tap(response => console.log('message response:' + response)),
               catchError(() => EMPTY),
             ),
         ),
@@ -338,7 +335,6 @@ export class DashboardEffects {
         switchMap(action =>
           this.usersService
             .createInviteUsersEvent(action.users, action.roomId)
-            .pipe(tap(response => console.log(response))),
         ),
       ),
     { dispatch: false },
@@ -365,7 +361,6 @@ export class DashboardEffects {
               action.timestamp,
               action.isPlaying,
             )
-            .pipe(tap(response => console.log('change song res: ', response))),
         ),
       ),
     { dispatch: false },
@@ -391,7 +386,6 @@ export class DashboardEffects {
               action.timestamp,
               action.isPlaying,
             )
-            .pipe(tap(response => console.log('seek song: ', response))),
         ),
       ),
     { dispatch: false },
@@ -409,7 +403,6 @@ export class DashboardEffects {
         switchMap(([action, data]) =>
           this.controlsService
             .createPlaySongEvent(data.room, data.index, action.timestamp)
-            .pipe(tap(response => console.log(response))),
         ),
       ),
     { dispatch: false },
@@ -427,7 +420,6 @@ export class DashboardEffects {
         switchMap(([action, data]) =>
           this.controlsService
             .createPauseSongEvent(data.room, data.index, action.timestamp)
-            .pipe(tap(response => console.log(response))),
         ),
       ),
     { dispatch: false },
