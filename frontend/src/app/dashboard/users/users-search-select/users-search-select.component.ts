@@ -66,7 +66,10 @@ export class UsersSearchSelectComponent implements OnInit, OnDestroy {
 
     this.subscription.add(
       this.username.valueChanges
-        .pipe(debounceTime(250), startWith(''))
+        .pipe(
+          debounceTime(250),
+          startWith(''),
+        )
         .subscribe(username => {
           this.store.dispatch(
             getUsersByUsername({
