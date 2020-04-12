@@ -210,6 +210,8 @@ https://api.tunesync.ecd.space
 - Method: `GET`
 - Url: `/users/:id/rooms/`
 
+Response:"
+
 2.
 
 - Method: `GET`
