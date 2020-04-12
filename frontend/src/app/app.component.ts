@@ -16,9 +16,6 @@ export class AppComponent implements OnInit {
     init({
       dsn: 'https://6d0eb4af612f4c62918ee814218dee0a@sentry.io/5173931',
     });
-    if (!environment.production) {
-      LogRocket.init('squad/tunesync');
-    }
   }
 
   onCreditsPage(): boolean {
