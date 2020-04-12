@@ -102,7 +102,7 @@ export interface TuneSyncEvent {
   last_modify_queue: QueueState | null;
   last_play: PlayState | null;
   play_time: string;
-  room: number;
+  room_id: number;
   event_type: EventType.TuneSync;
 }
 
