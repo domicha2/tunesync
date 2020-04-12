@@ -36,14 +36,6 @@
             "scripts": []
           },
           "configurations": {
-            "host": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.host.ts"
-                }
-              ]
-            },
             "production": {
               "fileReplacements": [
                 {
@@ -82,9 +74,6 @@
             "browserTarget": "frontend:build"
           },
           "configurations": {
-            "host": {
-              "browserTarget": "frontend:build:host"
-            },
             "production": {
               "browserTarget": "frontend:build:production"
             }
