@@ -84,6 +84,7 @@ The above url will not be used by most users. However if you do want to use our 
 - Django (backend server)
 - Mutagen (handles music metadata tagging)
 - PostgreSQL
+- Redis
 
 ## Top 5 Technical Challenges
 
