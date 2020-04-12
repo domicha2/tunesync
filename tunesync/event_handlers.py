@@ -21,7 +21,6 @@ class PollTask:
     @staticmethod
     @background(schedule=30)
     def initiate_poll(poll_id):
-        print("initiating poll")
         self = PollTask(poll_id)
         poll = Poll.objects.get(pk=self.poll_id)
         if poll.is_majority():
@@ -353,7 +352,6 @@ class Handler:
         kick_event.save()
         # delete user from room
         kicked_user.delete()
-        print("kicked user")
         return (None, status.HTTP_200_OK)
 
     def handle_U_C(self):
