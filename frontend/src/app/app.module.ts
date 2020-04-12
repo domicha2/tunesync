@@ -52,9 +52,9 @@ export function getMetaReducers(): MetaReducer<any>[] {
     AppRoutingModule,
     BrowserAnimationsModule,
     StoreModule.forRoot({ auth: authReducer, dashboard: dashboardReducer }),
-    StoreDevtoolsModule.instrument({
-      maxAge: 50,
-    }),
+    // StoreDevtoolsModule.instrument({
+    //   maxAge: 50,
+    // }),
     EffectsModule.forRoot([AuthEffects, DashboardEffects]),
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,

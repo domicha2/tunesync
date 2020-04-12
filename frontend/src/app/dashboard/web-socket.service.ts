@@ -35,22 +35,15 @@ export class WebSocketService {
       `${environment.webSocketUrl}?token=${token}`,
     );
 
-    this.webSocket.onopen = (event: Event) => {
-      console.log('connected to web socket');
-    };
+    this.webSocket.onopen = (event: Event) => {};
 
-    this.webSocket.onerror = (event: Event) => {
-      console.log('there was an error with the websocket');
-    };
+    this.webSocket.onerror = (event: Event) => {};
 
-    this.webSocket.onclose = (event: CloseEvent) => {
-      console.log('disconnected from web socket');
-    };
+    this.webSocket.onclose = (event: CloseEvent) => {};
 
     this.webSocket.onmessage = (event: MessageEvent) => {
       // parse the payload
       const payload: AppEvent | Poll | TuneSyncEvent = JSON.parse(event.data);
-      console.log('websocket payload', payload);
 
       // look at the event type to determine which subject to emit to
       switch (payload.event_type) {

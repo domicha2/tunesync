@@ -70,24 +70,18 @@ export class EventsService {
         // queue exists and something played before
         const playTimeStamp = moment(tuneSyncEvent.play_time);
         let difference = moment().diff(playTimeStamp, 'seconds', true);
-        console.log('time since last play action', difference);
 
         let songIndex: number;
         for (let i = playEvent.queue_index; i < queue.length; i++) {
           if (i === playEvent.queue_index) {
             // first iteration only
-            console.log('init differe', queue[i].length - playEvent.timestamp);
             if (queue[i].length - playEvent.timestamp < difference) {
               // remaining time in the first song can be subtracted
               difference -= queue[i].length - playEvent.timestamp;
             } else {
-              console.log(
-                'exiting after initial loop dispatch new queue index and dispatch new song status',
-              );
               // stop here
 
               const seekTime = playEvent.timestamp + difference;
-              console.log('finished in the first loop; seek at: ', seekTime);
               this.store.dispatch(
                 DashboardActions.setSongStatus({
                   isPlaying: playEvent.is_playing,
@@ -107,7 +101,6 @@ export class EventsService {
             songIndex = i;
             // use this time to seek to the current song
             const seekTime = difference;
-            console.log('seek time: ', seekTime);
 
             this.store.dispatch(
               DashboardActions.setSongStatus({
@@ -117,7 +110,6 @@ export class EventsService {
               }),
             );
             // use this difference at that song index
-            console.log('time remaining', difference, 'index', songIndex);
             return;
           }
         }
@@ -228,9 +220,9 @@ export class EventsService {
         case EventType.Messaging:
           this.processWSMessagingEvent(event, events);
           break;
-        default:
-          console.error('bad event type');
-          break;
+        // default:
+        // console.error('bad event type');
+        //   break;
       }
       return true;
     }
@@ -248,8 +240,8 @@ export class EventsService {
         case UserChangeAction.Kick:
           events.push(event);
           break;
-        default:
-          console.error('user change action from ws not supported yet');
+        // default:
+        //   console.error('user change action from ws not supported yet');
       }
     } else if (event.args['type'] === UserChangeAction.RoleChange) {
       this.store.dispatch(DashboardActions.getUsersByRoom({ roomId }));
