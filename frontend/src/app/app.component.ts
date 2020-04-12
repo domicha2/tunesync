@@ -12,11 +12,7 @@ import { environment } from '../environments/environment';
 export class AppComponent implements OnInit {
   constructor(private router: Router) {}
 
-  ngOnInit(): void {
-    init({
-      dsn: 'https://6d0eb4af612f4c62918ee814218dee0a@sentry.io/5173931',
-    });
-  }
+  ngOnInit(): void {}
 
   onCreditsPage(): boolean {
     return this.router.url === '/credits';
