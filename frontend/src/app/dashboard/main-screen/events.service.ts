@@ -220,9 +220,9 @@ export class EventsService {
         case EventType.Messaging:
           this.processWSMessagingEvent(event, events);
           break;
-        default:
-          console.error('bad event type');
-          break;
+        // default:
+        // console.error('bad event type');
+        //   break;
       }
       return true;
     }
@@ -240,8 +240,8 @@ export class EventsService {
         case UserChangeAction.Kick:
           events.push(event);
           break;
-        default:
-          console.error('user change action from ws not supported yet');
+        // default:
+        //   console.error('user change action from ws not supported yet');
       }
     } else if (event.args['type'] === UserChangeAction.RoleChange) {
       this.store.dispatch(DashboardActions.getUsersByRoom({ roomId }));

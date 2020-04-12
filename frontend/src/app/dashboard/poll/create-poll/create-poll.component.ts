@@ -103,8 +103,8 @@ export class CreatePollComponent implements OnInit, OnDestroy {
           }),
         );
         break;
-      default:
-        console.error('bad poll type');
+      // default:
+      // console.error('bad poll type');
     }
   }
 }
