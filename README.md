@@ -1,4 +1,4 @@
-# TuneSync
+# TuneSync <https://www.tunesync.ecd.space/>
 
 ## Team Members
 
@@ -70,6 +70,7 @@
 - Django (backend server)
 - Mutagen (handles music metadata tagging)
 - PostgreSQL
+- Redis
 
 ## Top 5 Technical Challenges
 

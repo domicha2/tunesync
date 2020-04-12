@@ -57,6 +57,7 @@
         class="song-list"
         role="list"
         cdkDropList
+        cdkDropListSortingDisabled
         [cdkDropListData]="availableSongs"
         (cdkDropListDropped)="drop($event, 'available')"
       >
