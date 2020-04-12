@@ -10,7 +10,23 @@
       <div id="main-screen">
         <app-main-screen></app-main-screen>
       </div>
-      <div id="bottom-bar"><app-messaging></app-messaging></div>
+      <div id="bottom-bar" class="row">
+        <app-messaging id="messaging"></app-messaging>
+        <button
+          mat-icon-button
+          (click)="openCreatePollDialog()"
+          matTooltip="Create poll"
+        >
+          <mat-icon>add_circle</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          (click)="openPollsViewerDialog()"
+          matTooltip="View Polls"
+        >
+          <mat-icon>poll</mat-icon>
+        </button>
+      </div>
     </div>
     <div id="users">
       <app-users></app-users>

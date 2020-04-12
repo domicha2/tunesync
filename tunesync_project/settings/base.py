@@ -110,9 +110,9 @@ class BaseSettings(DjangoDefaults):
         "channels",
         "rest_framework.authtoken",
         "django.contrib.sites",
+        "django_filters",
         "rest_framework_filters",
         "background_task",
-        # "captcha",
     ]
 
     PROJECT_APPS = ["tunesync_project", "tunesync"]
@@ -147,13 +147,25 @@ class BaseSettings(DjangoDefaults):
             },
         }
     ]
-    CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 
-    CORS_ORIGIN_ALLOW_ALL = True
+    #CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": ["redis://127.0.0.1:6379/0"],
+            },
+        },
+    }
+
+    CORS_ORIGIN_WHITELIST = [
+        "http://localhost:4200",
+        "https://www.tunesync.ecd.space",
+    ]
 
     REST_FRAMEWORK = {
         "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-        "PAGE_SIZE": 20,
+        "PAGE_SIZE": 50,
         "DEFAULT_FILTER_BACKENDS": (
             "django_filters.rest_framework.DjangoFilterBackend"
         ),

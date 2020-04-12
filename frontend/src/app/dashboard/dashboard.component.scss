@@ -38,6 +38,10 @@ div#dashboard {
 
     div#bottom-bar {
       height: 10%;
+
+      #messaging {
+        flex-grow: 1;
+      }
     }
   }
 }

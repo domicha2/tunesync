@@ -1,13 +1,14 @@
 import {
   CdkDragDrop,
+  copyArrayItem,
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { isArray } from 'lodash';
 import { Observable, Subscription } from 'rxjs';
-import { debounceTime, filter } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import { AppState } from '../../app.module';
 import { Role, Song } from '../dashboard.models';
 import * as DashboardActions from '../store/dashboard.actions';
@@ -16,6 +17,7 @@ import {
   selectQueueIndexAndSongs,
   selectUserRole,
 } from '../store/dashboard.selectors';
+import { QueueService } from './queue.service';
 
 @Component({
   selector: 'app-queue',
@@ -32,24 +34,25 @@ export class QueueComponent implements OnInit, OnDestroy {
 
   userRole$: Observable<Role>;
 
-  filterControl = new FormControl();
+  prevPage: string | null;
+  nextPage: string | null;
 
-  constructor(private store: Store<AppState>) {}
+  constructor(
+    private queueService: QueueService,
+    private store: Store<AppState>,
+  ) {}
 
   ngOnInit(): void {
     this.subscription.add(
-      this.filterControl.valueChanges
-        .pipe(debounceTime(250))
-        .subscribe((payload: string) => {
-          this.store.dispatch(
-            DashboardActions.getAvailableSongs({ filter: payload }),
-          );
-        }),
+      this.queueService.availSongsPrevNextSubject.subscribe(
+        ({ prev, next }) => {
+          this.prevPage = prev;
+          this.nextPage = next;
+        },
+      ),
     );
 
     this.userRole$ = this.store.select(selectUserRole);
-
-    this.store.dispatch(DashboardActions.getAvailableSongs({ filter: '' }));
 
     this.subscription.add(
       this.store
@@ -73,6 +76,10 @@ export class QueueComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.store
         .select(selectAvailableSongs)
+        .pipe(
+          filter(isArray),
+          map(songs => songs.slice()),
+        )
         .subscribe((availableSongs: Song[]) => {
           this.availableSongs = availableSongs;
         }),
@@ -108,12 +115,18 @@ export class QueueComponent implements OnInit, OnDestroy {
         }
       }
     } else {
-      transferArrayItem(
-        event.previousContainer.data,
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex,
-      );
+      if (container === 'queue') {
+        copyArrayItem(
+          event.previousContainer.data,
+          event.container.data,
+          event.previousIndex,
+          event.currentIndex,
+        );
+      } else if (container === 'available') {
+        // remove the song from the queue
+        // don't add it to the available songs
+        event.previousContainer.data.splice(event.previousIndex, 1);
+      }
 
       // queue lost or gained an item, need to update websocket
       this.store.dispatch(
@@ -133,5 +146,9 @@ export class QueueComponent implements OnInit, OnDestroy {
     //     availableSongs: this.availableSongs,
     //   }),
     // );
+  }
+
+  trackBySongId(index: number, item: Song): number {
+    return item.id;
   }
 }

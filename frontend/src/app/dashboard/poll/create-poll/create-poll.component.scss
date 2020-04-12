@@ -1,0 +1,38 @@
+mat-radio-button.mat-radio-button {
+  margin-left: 1rem;
+}
+
+.column > * {
+  margin-bottom: 0 !important;
+}
+
+div#create-poll-wrapper {
+  height: 100%;
+
+  mat-dialog-content {
+    flex-grow: 1;
+
+    mat-selection-list#songs {
+      height: 15rem;
+      overflow-y: scroll;
+      border: 1px solid white;
+      border-radius: 0.5rem;
+    }
+
+    div.header {
+      justify-content: space-between;
+    }
+
+    div#poll-type {
+      margin-top: 0.5rem;
+    }
+
+    div.stepper-buttons {
+      margin-top: 1rem;
+
+      button {
+        margin-right: 1rem;
+      }
+    }
+  }
+}

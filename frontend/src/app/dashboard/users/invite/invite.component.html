@@ -1,22 +1,20 @@
 <div id="invite-wrapper">
   <h1 mat-dialog-title>Invite Users</h1>
-  <mat-dialog-content>
-    <mat-form-field appearance="outline">
-      <mat-label>Invite Users</mat-label>
-      <mat-select multiple [formControl]="users">
-        <mat-option
-          *ngFor="let user of allUsers$ | async"
-          [value]="user.userId"
-        >
-          {{ user.username }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
+  <mat-dialog-content class="column">
+    <app-users-search-select
+      [filterByActiveRoom]="true"
+      [(selectedUsers)]="selectedUsers"
+    ></app-users-search-select>
   </mat-dialog-content>
   <mat-dialog-actions>
-    <button mat-raised-button mat-dialog-close (click)="onInvite()">
+    <button
+      color="accent"
+      mat-raised-button
+      mat-dialog-close
+      (click)="onInvite()"
+    >
       Invite
     </button>
-    <button mat-raised-button mat-dialog-close>Close</button>
+    <button color="warn" mat-raised-button mat-dialog-close>Close</button>
   </mat-dialog-actions>
 </div>

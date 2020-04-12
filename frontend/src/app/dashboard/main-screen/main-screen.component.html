@@ -1,43 +1,61 @@
-<div id="main-screen-wrapper">
+<div id="main-screen-wrapper" class="column">
+  <button
+    id="load-more"
+    *ngIf="loadMore$ | async"
+    mat-raised-button
+    color="accent"
+    (click)="onLoadMore()"
+  >
+    Load more
+  </button>
   <mat-list class="column">
     <mat-list-item
-      *ngFor="let event of events"
+      *ngFor="let event of events; index as i"
       [ngClass]="{ 'current-user': userId === event.user_id }"
+      [matTooltip]="event.creation_time | date: 'short'"
+      [matTooltipPosition]="userId === event.user_id ? 'right' : 'left'"
+      [matTooltipShowDelay]="500"
     >
       <div class="list-el" [ngSwitch]="event.event_type">
-        <ng-container *ngSwitchCase="'MQ'">
-          {{ event.username + ' modified the queue' }}
-        </ng-container>
         <ng-container *ngSwitchCase="'M'">
           {{ event.username + ': ' + event.args.content }}
         </ng-container>
-        <ng-container *ngSwitchCase="'PL'">
-          {{ event.username + ' played a song' }}
+        <ng-container *ngSwitchCase="'PO'">
+          <p>A poll got created</p>
         </ng-container>
-        <ng-container *ngSwitchCase="'U'">
-          <div class="user-invite-form">
-            <h3>
-              {{
-                'You have been invited to ' +
-                  event.args.room_name +
-                  ' by ' +
-                  event.username
-              }}
-            </h3>
-            <button
-              mat-raised-button
-              (click)="onInviteResponse('A', event.args.room_id)"
-            >
-              Accept
-            </button>
-            <button
-              mat-raised-button
-              color="warn"
-              (click)="onInviteResponse('R', event.args.room_id)"
-            >
-              Reject
-            </button>
-          </div>
+        <ng-container *ngSwitchCase="'U'" [ngSwitch]="event.args.type">
+          <ng-container *ngSwitchCase="'I'">
+            <div class="user-invite-form">
+              <h3>
+                {{
+                  'You have been invited to ' +
+                    event.args.room_name +
+                    ' by ' +
+                    event.username
+                }}
+              </h3>
+              <button
+                mat-raised-button
+                color="accent"
+                (click)="onInviteResponse('A', event.args.room_id, i)"
+              >
+                Accept
+              </button>
+              <button
+                mat-raised-button
+                color="warn"
+                (click)="onInviteResponse('R', event.args.room_id, i)"
+              >
+                Reject
+              </button>
+            </div>
+          </ng-container>
+          <ng-container *ngSwitchCase="'K'">
+            <p>Got kicked out of {{ event.args.room_name }}</p>
+          </ng-container>
+          <ng-container *ngSwitchDefault>
+            Something went wrong.
+          </ng-container>
         </ng-container>
         <ng-container *ngSwitchDefault>
           {{ 'Music got adjusted' }}

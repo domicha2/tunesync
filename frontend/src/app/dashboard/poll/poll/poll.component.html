@@ -1,0 +1,27 @@
+<div id="poll-wrapper" class="column">
+  <p class="poll-question" [ngSwitch]="pollType">
+    <ng-container *ngSwitchCase="'U'"> Kick {{ name }}? </ng-container>
+    <ng-container *ngSwitchCase="'MQ'">
+      Add {{ name }} to the queue?
+    </ng-container>
+  </p>
+  <p *ngIf="!isActive">The poll has ended.</p>
+  <div id="vote-buttons" class="row">
+    <button
+      [disabled]="!isActive"
+      mat-raised-button
+      color="accent"
+      (click)="onVote(true)"
+    >
+      Yes
+    </button>
+    <button
+      [disabled]="!isActive"
+      mat-raised-button
+      color="warn"
+      (click)="onVote(false)"
+    >
+      No
+    </button>
+  </div>
+</div>

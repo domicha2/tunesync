@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
@@ -15,22 +16,28 @@ import { selectErrorMessage, selectToken } from './auth.selectors';
   styleUrls: ['./auth.component.scss'],
 })
 export class AuthComponent implements OnInit, OnDestroy {
-  authForm = new FormGroup({
-    username: new FormControl(),
-    password: new FormControl(),
-  });
+  authForm = new FormGroup(
+    {
+      username: new FormControl(),
+      password: new FormControl(),
+    },
+    Validators.required,
+  );
 
   subscription = new Subscription();
 
   errorMessage: string;
 
   constructor(
+    private title: Title,
     private webSocketService: WebSocketService,
     private router: Router,
     private store: Store<AppState>,
   ) {}
 
   ngOnInit(): void {
+    this.title.setTitle('TuneSync | Auth');
+
     this.subscription.add(
       this.store
         .select(selectErrorMessage)
@@ -68,6 +75,8 @@ export class AuthComponent implements OnInit, OnDestroy {
    * Attempts to authenticate the user
    */
   onSignIn(): void {
+    if (this.authForm.invalid) return;
+
     this.store.dispatch(AuthActions.signIn(this.authForm.value));
   }
 }

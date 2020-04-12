@@ -1,14 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { Subscription, Observable } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { AppState } from '../../../app.module';
 import { User } from '../../../auth/auth.models';
 import * as DashboardActions from '../../store/dashboard.actions';
-import {
-  selectActiveRoom,
-  selectAllUsers,
-} from '../../store/dashboard.selectors';
+import { selectActiveRoom } from '../../store/dashboard.selectors';
 
 @Component({
   selector: 'app-invite',
@@ -17,9 +13,9 @@ import {
 })
 export class InviteComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
-  users = new FormControl();
   activeRoomId: number;
-  allUsers$: Observable<User[]>;
+
+  selectedUsers: User[] = [];
 
   constructor(private store: Store<AppState>) {}
 
@@ -29,8 +25,6 @@ export class InviteComponent implements OnInit, OnDestroy {
         .select(selectActiveRoom)
         .subscribe(roomId => (this.activeRoomId = roomId)),
     );
-
-    this.allUsers$ = this.store.select(selectAllUsers);
   }
 
   ngOnDestroy(): void {
@@ -41,7 +35,7 @@ export class InviteComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       DashboardActions.createInviteUsersEvent({
         roomId: this.activeRoomId,
-        users: this.users.value,
+        users: this.selectedUsers.map(user => user.userId),
       }),
     );
   }

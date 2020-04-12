@@ -1,16 +1,23 @@
 div#users-wrapper {
   height: 100%;
 
-  div#top-bar {
-    justify-content: space-between;
-    height: 5%;
+  mat-expansion-panel-header {
+    mat-icon {
+      margin-left: 0.5rem;
+      align-self: center;
+    }
+  }
 
-    h1 {
-      margin-right: 0.5rem !important;
+  div.top-bar {
+    button#settings {
+      margin-left: auto;
     }
   }
 
   mat-accordion {
+    flex-grow: 1;
+    margin-bottom: 0 !important;
+
     mat-expansion-panel div.list-container {
       min-height: 7.5rem;
       border: 1px solid white;

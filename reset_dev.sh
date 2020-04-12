@@ -29,5 +29,6 @@ M makemigrations tunesync
 M migrate auth
 M migrate
 M shell -c "from django.contrib.auth.models import User; User.objects.create_superuser('system', 'admin@example.com', '.')"
-M shell -c "from django.contrib.auth.models import User; User.objects.create_user('bbb', 'test@example.com', '.')"
 rm -rf tunes/
+clear
+M runserver

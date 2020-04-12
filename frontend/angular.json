@@ -30,19 +30,12 @@
             ],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css",
-              "src/styles.scss"
+              "src/styles.scss",
+              "src/light-theme.scss"
             ],
             "scripts": []
           },
           "configurations": {
-            "host": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.host.ts"
-                }
-              ]
-            },
             "production": {
               "fileReplacements": [
                 {
@@ -81,9 +74,6 @@
             "browserTarget": "frontend:build"
           },
           "configurations": {
-            "host": {
-              "browserTarget": "frontend:build:host"
-            },
             "production": {
               "browserTarget": "frontend:build:production"
             }

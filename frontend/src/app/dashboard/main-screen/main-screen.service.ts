@@ -6,7 +6,9 @@ import { HttpWrapperService } from '../../http-wrapper.service';
 export class MainScreenService {
   constructor(private httpWrapperService: HttpWrapperService) {}
 
-  getEventsByRoom(roomId: number): Observable<any> {
-    return this.httpWrapperService.get(`/rooms/${roomId}/events/`);
+  getEventsByRoom(roomId: number, creationTime: Date): Observable<any> {
+    return this.httpWrapperService.get(`/rooms/${roomId}/events/`, {
+      creation_time__lt: creationTime.toISOString(),
+    });
   }
 }

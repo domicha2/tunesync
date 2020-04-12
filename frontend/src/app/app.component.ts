@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { init } from '@sentry/browser';
-import { environment } from '../environments/environment';
+import * as LogRocket from 'logrocket';
 
 @Component({
   selector: 'app-root',
@@ -13,8 +13,9 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     init({
-      dsn: environment.sentryUrl,
+      dsn: 'https://6d0eb4af612f4c62918ee814218dee0a@sentry.io/5173931',
     });
+    LogRocket.init('squad/tunesync');
   }
 
   onCreditsPage(): boolean {

@@ -1,13 +1,15 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { HttpWrapperService } from '../../http-wrapper.service';
-import { EventType } from '../dashboard.models';
+import { EventType, FileList2 } from '../dashboard.models';
 
 @Injectable({ providedIn: 'root' })
 export class ControlsService {
+  songsUploaded = new Subject<number>();
+
   constructor(private httpWrapperService: HttpWrapperService) {}
 
-  createTunes(tunes: FileList): Observable<any> {
+  createTunes(tunes: FileList2): Observable<any> {
     const formData: FormData = new FormData();
     for (let i = 0; i < tunes.length; i++) {
       formData.append(i.toString(), tunes[i], tunes[i].name);

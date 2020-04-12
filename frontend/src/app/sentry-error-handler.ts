@@ -1,10 +1,14 @@
 import { ErrorHandler, Injectable } from '@angular/core';
-import { captureException, showReportDialog } from '@sentry/browser';
+import { captureException } from '@sentry/browser';
+import { environment } from '../environments/environment';
 
 @Injectable()
 export class SentryErrorHandler implements ErrorHandler {
   handleError(error: any): void {
-    const eventId = captureException(error.originalError || error);
-    showReportDialog({ eventId });
+    if (!environment.production) {
+      console.error(error);
+    }
+
+    captureException(error.originalError || error);
   }
 }

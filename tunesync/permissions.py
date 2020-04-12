@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission
-from .models import Membership
+from .models import Membership, Poll
 
 # https://stackoverflow.com/questions/47122471/how-to-set-a-method-in-django-rest-frameworks-viewset-to-not-require-authentica
 # Can only set permissions for the entire viewset
@@ -29,6 +29,16 @@ class AnonCreateAndUpdateOwnerOnly(BasePermission):
             and obj.id == request.user.id
             or request.user.is_staff
         )
+
+
+class inRoomOnlyPolls(BasePermission):
+    def has_permission(self, request, view):
+        poll_id = view.kwargs["pk"]
+        poll = Poll.objects.filter(event_id=poll_id)
+        if poll:
+            return Membership.is_in_room(poll[0].event.room.id, request.user)
+        else:
+            return False
 
 
 class InRoomOnlyEvents(BasePermission):
@@ -62,7 +72,7 @@ def is_event_type(request, view, event):
 
 class InRoomOnly(BasePermission):
     def has_permission(self, request, view):
-        if view.action in {"tunesync", "events"}:
+        if view.action in {"tunesync", "events", "polls"}:
             room_id = view.kwargs["pk"]
             return Membership.is_in_room(room_id, request.user)
         return True
