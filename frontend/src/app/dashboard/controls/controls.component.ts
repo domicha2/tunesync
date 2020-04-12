@@ -202,12 +202,29 @@ export class ControlsComponent
         }
         song.play();
       } else {
+        const prevSongIndex = this.queueIndex;
         this.queueIndex = songStatus.queueIndex;
         if (queue.length > 0) {
           if (songStatus.seekTime !== undefined) {
             this.seekTime = songStatus.seekTime;
           }
 
+          if (
+            queue[prevSongIndex] &&
+            queue[prevSongIndex].id === queue[this.queueIndex].id
+          ) {
+            // same song so just rewind the current time to 0
+            const song = this.getAudioElement();
+            song.currentTime = 0;
+            if (song.paused) {
+              // the song will be paused automatically when the previous song finished
+              // need to manually play it
+              // normally we don't have to manually play the song since we have the autoplay flag
+              // which will play the song for us
+              // however in this special case we are playing the same song so it will not trigger autoplay
+              song.play();
+            }
+          }
           // after this gets executed the onloadeddata event should trigger which would seek the song
           this.currentSong = queue[this.queueIndex];
         }
@@ -218,11 +235,22 @@ export class ControlsComponent
         this.currentSong === undefined ||
         this.queueIndex !== songStatus.queueIndex
       ) {
+        const prevSongIndex = this.queueIndex;
         this.queueIndex = songStatus.queueIndex;
         // need to set the current song, pause, then seek to the given time
         if (songStatus.seekTime !== undefined) {
           this.seekTime = songStatus.seekTime;
         }
+
+        if (
+          queue[prevSongIndex] &&
+          queue[prevSongIndex].id === queue[this.queueIndex].id
+        ) {
+          // same song so just rewind the current time to 0
+          const song = this.getAudioElement();
+          song.currentTime = 0;
+        }
+
         // this line can also clear out a song because queue index can be -1
         this.currentSong = this.queue[this.queueIndex];
         // have to manually set the pause flag since clearing the song doesn't modify it
