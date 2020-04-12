@@ -385,18 +385,6 @@ export class ControlsComponent
     this.onNext(false);
   }
 
-  onUploadChange(event: Event): void {
-    // tslint:disable-next-line: no-string-literal
-    const files: FileList = event.target['files'];
-    const tunes: FileList2 = {
-      length: files.length,
-    };
-    for (let i = 0; i < tunes.length; i++) {
-      tunes[i] = files.item(i);
-    }
-    this.store.dispatch(DashboardActions.createTunes({ tunes }));
-  }
-
   onQueueClick(): void {
     this.queueDialogRef = this.matDialog.open(QueueComponent, {
       height: 'fit-content',
@@ -423,5 +411,36 @@ export class ControlsComponent
       }
       this.seekTime = 0;
     }, 1000);
+  }
+
+  onUploadChange(event: Event): void {
+    // tslint:disable-next-line: no-string-literal
+    const files: FileList = event.target['files'];
+    const tunes: FileList2 = {
+      length: files.length,
+    };
+
+    let totalUploadSizeBytes = 0;
+    for (let i = 0; i < tunes.length; i++) {
+      tunes[i] = files.item(i);
+      totalUploadSizeBytes += tunes[i].size;
+    }
+
+    const NUMBER_OF_BYTES_IN_A_MB = 1048576;
+    const totalUploadSizeMB = totalUploadSizeBytes / NUMBER_OF_BYTES_IN_A_MB;
+    if (totalUploadSizeMB > 50) {
+      this.matSnackBar.open(
+        `File upload size of ${totalUploadSizeMB.toFixed(
+          0,
+        )}MB exceeded 50MB limit!`,
+        undefined,
+        {
+          duration: 5000,
+        },
+      );
+      return;
+    }
+
+    this.store.dispatch(DashboardActions.createTunes({ tunes }));
   }
 }
