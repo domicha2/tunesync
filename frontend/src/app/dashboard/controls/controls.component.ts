@@ -341,7 +341,7 @@ export class ControlsComponent
     if (song.duration - song.currentTime >= 10) {
       timestamp = song.currentTime + 10;
     } else {
-      timestamp = song.duration;
+      timestamp = song.duration - 0.01;
     }
     this.store.dispatch(
       DashboardActions.createForwardSongEvent({
