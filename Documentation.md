@@ -205,12 +205,12 @@ https://api.tunesync.ecd.space
 
 ## GET Endpoints
 
-1. Return all the rooms a User is in
+1. Get all the rooms a user is in
 
 - Method: `GET`
-- Url: `/users/:id/rooms/`
-
-Response:"
+- URL: `/users/:id/rooms/`
+- Response: list of JSON obj (200)
+  - `{"role": "A" | "D" | "R", "state": "A" | "P" | "R", title: string, subtitle: string; id: number}`
 
 2.
 
