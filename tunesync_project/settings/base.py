@@ -30,7 +30,8 @@ class BaseSettings(DjangoDefaults):
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
 
-    DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600
+    DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800
+
     FILE_UPLOAD_HANDLERS = [
         "django.core.files.uploadhandler.TemporaryFileUploadHandler"
     ]
@@ -147,17 +148,20 @@ class BaseSettings(DjangoDefaults):
         }
     ]
 
-    #CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
+    # CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
     CHANNEL_LAYERS = {
         "default": {
             "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": ["redis://127.0.0.1:6379/0"],
-            },
-        },
+            "CONFIG": {"hosts": ["redis://127.0.0.1:6379/0"]},
+        }
     }
 
-    CORS_ORIGIN_ALLOW_ALL = True
+    CORS_ORIGIN_REGEX_WHITELIST = [r"(.*)tunesync.ecd.space(.*)", r"(.*)localhost(.*)"]
+
+    # CORS_ORIGIN_WHITELIST = [
+    #     "http://localhost:4200",
+    #     "https://www.tunesync.ecd.space",
+    # ]
 
     REST_FRAMEWORK = {
         "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",

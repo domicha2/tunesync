@@ -8,8 +8,11 @@
   <app-available-song-filter #availableSongFilter></app-available-song-filter>
 
   <div id="song-lists" class="row" cdkDropListGroup>
-    <div id="queued-songs">
-      <h2>Queued Songs</h2>
+    <div id="queued-songs" class="column">
+      <div class="header row">
+        <h2>Queued Songs</h2>
+      </div>
+
       <mat-list
         role="list"
         class="song-list"
@@ -54,6 +57,7 @@
         class="song-list"
         role="list"
         cdkDropList
+        cdkDropListSortingDisabled
         [cdkDropListData]="availableSongs"
         (cdkDropListDropped)="drop($event, 'available')"
       >

@@ -7,7 +7,12 @@
   </p>
   <p *ngIf="!isActive">The poll has ended.</p>
   <div id="vote-buttons" class="row">
-    <button [disabled]="!isActive" mat-raised-button (click)="onVote(true)">
+    <button
+      [disabled]="!isActive"
+      mat-raised-button
+      color="accent"
+      (click)="onVote(true)"
+    >
       Yes
     </button>
     <button

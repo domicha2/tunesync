@@ -6,6 +6,20 @@
 - Jason Yuan
 - Michael Do
 
+## Video Demonstration url
+
+https://www.youtube.com/watch?v=qwiRjMfX6m0&feature=youtu.be
+
+## Application URL
+
+For browser:
+https://www.tunesync.ecd.space
+
+web api:
+https://api.tunesync.ecd.space
+
+The above url will not be used by most users. However if you do want to use our api it can be accessed with api.tunesync.ecd.space
+
 ## What is TuneSync?
 
 ### Frontend
@@ -70,6 +84,7 @@
 - Django (backend server)
 - Mutagen (handles music metadata tagging)
 - PostgreSQL
+- Redis
 
 ## Top 5 Technical Challenges
 
@@ -83,3 +98,7 @@
 
 4. music metadata search
 5. queueing music
+
+# Documentation
+
+Documentation can be found in [Documentation.md](./Documentation.md)

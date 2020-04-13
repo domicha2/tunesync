@@ -1,5 +1,6 @@
 import {
   CdkDragDrop,
+  copyArrayItem,
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
@@ -114,12 +115,18 @@ export class QueueComponent implements OnInit, OnDestroy {
         }
       }
     } else {
-      transferArrayItem(
-        event.previousContainer.data,
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex,
-      );
+      if (container === 'queue') {
+        copyArrayItem(
+          event.previousContainer.data,
+          event.container.data,
+          event.previousIndex,
+          event.currentIndex,
+        );
+      } else if (container === 'available') {
+        // remove the song from the queue
+        // don't add it to the available songs
+        event.previousContainer.data.splice(event.previousIndex, 1);
+      }
 
       // queue lost or gained an item, need to update websocket
       this.store.dispatch(

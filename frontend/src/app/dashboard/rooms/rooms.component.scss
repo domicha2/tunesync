@@ -14,8 +14,12 @@ div#rooms-wrapper {
     flex-grow: 1;
     margin-bottom: 0 !important;
 
+    ::ng-deep .mat-expansion-panel-body {
+      padding-top: 1rem;
+    }
+
     .list-el {
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.5rem;
     }
   }
 }

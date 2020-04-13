@@ -3,6 +3,7 @@
     id="load-more"
     *ngIf="loadMore$ | async"
     mat-raised-button
+    color="accent"
     (click)="onLoadMore()"
   >
     Load more
@@ -35,6 +36,7 @@
               </h3>
               <button
                 mat-raised-button
+                color="accent"
                 (click)="onInviteResponse('A', event.args.room_id, i)"
               >
                 Accept
@@ -49,7 +51,7 @@
             </div>
           </ng-container>
           <ng-container *ngSwitchCase="'K'">
-            <p>Got kicked out of the room ID {{ event.args.room }}</p>
+            <p>Got kicked out of {{ event.args.room_name }}</p>
           </ng-container>
           <ng-container *ngSwitchDefault>
             Something went wrong.

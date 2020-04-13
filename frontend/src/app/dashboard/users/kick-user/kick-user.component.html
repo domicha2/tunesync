@@ -4,7 +4,14 @@
     {{ user.name }} will be removed from the room and cannot be undone.
   </mat-dialog-content>
   <mat-dialog-actions>
-    <button mat-raised-button mat-dialog-close (click)="onKick()">Kick</button>
-    <button mat-raised-button mat-dialog-close>Change Mind</button>
+    <button
+      mat-raised-button
+      mat-dialog-close
+      (click)="onKick()"
+      color="accent"
+    >
+      Kick
+    </button>
+    <button mat-raised-button mat-dialog-close color="warn">Change Mind</button>
   </mat-dialog-actions>
 </div>

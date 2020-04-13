@@ -12,12 +12,7 @@ import { environment } from '../environments/environment';
 export class AppComponent implements OnInit {
   constructor(private router: Router) {}
 
-  ngOnInit(): void {
-    init({
-      dsn: environment.sentryUrl,
-    });
-    LogRocket.init('squad/tunesync');
-  }
+  ngOnInit(): void {}
 
   onCreditsPage(): boolean {
     return this.router.url === '/credits';

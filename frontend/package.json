@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "scripts": {
     "pwa": "clear; ng build --prod; http-server -p 8080 -c-1 dist/frontend",
-    "start-host": "clear; ng serve --host 0.0.0.0 -c host",
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
