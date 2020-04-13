@@ -9,7 +9,7 @@ https://api.tunesync.ecd.space
 1. Create a new user (for signup)
 
 - Method: `POST`
-- Url: `/users/`
+- URL: `/users/`
 - Request body (JSON object): `{"username": string, "password": string}`
 - Response body (JSON object): `{'token': 'd43250ff938a9b909fff6109783759aa0047233e', 'user_id': 3}`
 - Query example: `curl --location --request POST 'http://localhost:8000/users/' \ --header 'Content-Type: application/json' \ --data-raw '{ "username": "Bob", "password": "Saget" }'`
@@ -20,7 +20,7 @@ https://api.tunesync.ecd.space
 2. Retrieve authentication token for a user (for signin)
 
 - Method: `POST`
-- Url: `/users/auth/`
+- URL: `/users/auth/`
 - Request body (JSON object): `{"username": string, "password": string}`
 - Response body (JSON object): `{'token': 'd43250ff938a9b909fff6109783759aa0047233e', 'user_id': 3}`
 - Query example: `curl --location --request POST 'http://localhost:8000/users/auth/' \ --header 'Content-Type: application/json' \ --data-raw '{ "username": "Bob", "password": "Saget" }'`
@@ -32,7 +32,7 @@ https://api.tunesync.ecd.space
 3. Create a room
 
 - Method: `POST`
-- Url: `/users/rooms/`
+- URL: `/users/rooms/`
 - Request body (JSON object): `{ headers={"Authorization": "Token " + token}, data={"subtitle": subtitle, "title": title} }` -- subtitle is optional
 - Response body (JSON object): `{'id': 3, 'title': 'Best Room', 'subtitle': something random, 'creator': 2, 'members': [2], 'system_user': None}`
 - Query example: `curl --location --request POST 'http://localhost:8000/users/rooms/' \ --header 'Content-Type: application/json' \ --header 'Authorization: Token d43250ff938a9b909fff6109783759aa0047233e' \ --data-raw '{ "subtitle": "something random", "title": "Best Room" }'`
@@ -43,7 +43,7 @@ https://api.tunesync.ecd.space
 4. Create a tune
 
 - Method: `POST`
-- Url: `/tunes/`
+- URL: `/tunes/`
 - Request body (JSON object): `{ headers={"Authorization": "Token " + token}, files={'file': fobj} }` -- can upload multiple files at once
 - Response body (JSON object): `[{'id': 6, 'uploader': 2, 'name': 'Drums Urban Percussion Intro 2 (Music For Video)', 'artist': 'TunePocket.com Music Library', 'album': 'TunePocket Unlimited Royalty Free Music Library', 'mime': 'audio/mp3', 'length': 23.412125}]`
 - Query example: `curl --location --request POST 'http://localhost:8000/tunes/' \ --header 'Content-Type: application/json' \ --header 'Authorization: Token d43250ff938a9b909fff6109783759aa0047233e' \ --form 'file=@/D:/song1.mp3'`
@@ -54,7 +54,7 @@ https://api.tunesync.ecd.space
 5. Create a TuneSync Event
 
 - Method: `POST`
-- Url: `/events/`
+- URL: `/events/`
 - Request body (JSON object): `{ headers={"Authorization": "Token " + token}, data={ "room": 4, "event_type": "T", "args": { "play":{ "timestamp":0.0, "is_playing": True, "queue_index": 0} }} }` -- can either be "play" or "modify_queue" action inside "args" (only one of the two)
 - Response body (JSON object): `{'last_modify_queue': {'queue': [[1, 23.412125, "['Drums Urban Percussion Intro 2 (Music For Video)']"]], 'event_id': 45}, 'last_play': {'timestamp': 0.0, 'is_playing': True, 'queue_index': 0, 'event_id': 50}, 'play_time': '2020-04-09T21:26:54.479062Z', 'room_id': 4, 'event_type': 'T'}`
 - Query example: `curl --location --request POST 'http://localhost:8000/events/' \ --header 'Content-Type: application/json' \ --header 'Authorization: Token fee1c2377bc8fb26cbee1fa4c2786aaa989b2a42' \ --data-raw '{ "room": 4, "event_type": "T", "args": { "play": { "timestamp":0.0, "is_playing": true, "queue_index": 0 } } }'`
@@ -67,7 +67,7 @@ https://api.tunesync.ecd.space
 6. Create a Message Event
 
 - Method: `POST`
-- Url: `/events/`
+- URL: `/events/`
 - Request body (JSON object): `{ headers={"Authorization": "Token " + token}, data={ "room": 1, "event_type": "M", "args": { "content": "this is a message" }} }`
 - Response body (JSON object): `{'id': 9, 'room': 1, 'creation_time': '2020-03-16T12:40:21.851273Z', 'event_type': 'M', 'author': 2, 'parent_event_id': None, 'args': {'content': 'this is a message'}, 'isDeleted': False}`
 - Query example: `curl --location --request POST 'http://localhost:8000/events/' \ --header 'Content-Type: application/json' \ --header 'Authorization: Token fee1c2377bc8fb26cbee1fa4c2786aaa989b2a42' \ --data-raw '{ "room": 1, "event_type": "M", "args": { "content": "this is a message" } }'`
@@ -80,7 +80,7 @@ https://api.tunesync.ecd.space
 7. a) Create a User Change (Kick) Event
 
 - Method: `POST`
-- Url: `/events/`
+- URL: `/events/`
 - Request body (JSON object): `{ headers={"Authorization": "Token " + token}, data={ "room": 1, "event_type": "U", "args": { "type": "K", "user": kicked_user_id }} }`
 - Response body (JSON object): `{'id': 9, 'room': 1, 'creation_time': '2020-03-16T12:40:21.851273Z', 'event_type': 'U', 'author': 2, 'parent_event_id': None, 'args': {'type': 'K', 'user': 9}, 'isDeleted': False}`
 - Query example: `curl --location --request POST 'http://localhost:8000/events/' \ --header 'Content-Type: application/json' \ --header 'Authorization: Token fee1c2377bc8fb26cbee1fa4c2786aaa989b2a42' \ --data-raw '{ "room": 1, "event_type": "U", "args": { "type": "K", "user": 9 } }'`
@@ -94,7 +94,7 @@ https://api.tunesync.ecd.space
 7. b) Create a User Change (Join) Event
 
 - Method: `POST`
-- Url: `/events/`
+- URL: `/events/`
 - Request body (JSON object): `{ headers={"Authorization": "Token " + token}, data={ "room": 1, "event_type": "U", "args": { "type": "J", "is_accepted": true/false }} }`
 - Response body (JSON object): `{'id': 9, 'room': 1, 'creation_time': '2020-03-16T12:40:21.851273Z', 'event_type': 'U', 'author': 2, 'parent_event_id': None, 'args': {'type': 'J', 'is_accepted': true}, 'isDeleted': False}`
 - Query example: `curl --location --request POST 'http://localhost:8000/events/' \ --header 'Content-Type: application/json' \ --header 'Authorization: Token fee1c2377bc8fb26cbee1fa4c2786aaa989b2a42' \ --data-raw '{ "room": 1, "event_type": "U", "args": { "type": "J", "is_accepted": true } }'`
@@ -107,7 +107,7 @@ https://api.tunesync.ecd.space
 7. c) Create a User Change (Leave) Event
 
 - Method: `POST`
-- Url: `/events/`
+- URL: `/events/`
 - Request body (JSON object): `{ headers={"Authorization": "Token " + token}, data={ "room": 1, "event_type": "U", "args": { "type": "L" }} }`
 - Response body (JSON object): `{'id': 9, 'room': 1, 'creation_time': '2020-03-16T12:40:21.851273Z', 'event_type': 'U', 'author': 2, 'parent_event_id': None, 'args': {'type': 'L'}, 'isDeleted': False}`
 - Query example: `curl --location --request POST 'http://localhost:8000/events/' \ --header 'Content-Type: application/json' \ --header 'Authorization: Token fee1c2377bc8fb26cbee1fa4c2786aaa989b2a42' \ --data-raw '{ "room": 1, "event_type": "U", "args": { "type": "L" } }'`
@@ -118,7 +118,7 @@ https://api.tunesync.ecd.space
 7. d) Create a User Change (Invite) Event
 
 - Method: `POST`
-- Url: `/events/`
+- URL: `/events/`
 - Request body (JSON object): `{ headers={"Authorization": "Token " + token}, data={ "room": 1, "event_type": "U", "args": { "type": "I", "users": [ids of users to invite] }} }`
 - Response body (JSON object): `{'id': 9, 'room': 1, 'creation_time': '2020-03-16T12:40:21.851273Z', 'event_type': 'U', 'author': 2, 'parent_event_id': None, 'args': {'type': 'I', 'users': [4, 6, 8]}, 'isDeleted': False}`
 - Query example: `curl --location --request POST 'http://localhost:8000/events/' \ --header 'Content-Type: application/json' \ --header 'Authorization: Token fee1c2377bc8fb26cbee1fa4c2786aaa989b2a42' \ --data-raw '{ "room": 1, "event_type": "U", "args": { "type": "I", "users": [4, 6, 8] } }'`
@@ -133,7 +133,7 @@ https://api.tunesync.ecd.space
 7. e) Create a User Change (Change Role) Event
 
 - Method: `POST`
-- Url: `/events/`
+- URL: `/events/`
 - Request body (JSON object): `{ headers={"Authorization": "Token " + token}, data={ "room": 1, "event_type": "U", "args": { "type": "C", "user": user_id, "role": new role to assign (admin-"A", dj="D", regular="R") }} }`
 - Response body (JSON object): `{'id': 9, 'room': 1, 'creation_time': '2020-03-16T12:40:21.851273Z', 'event_type': 'U', 'author': 2, 'parent_event_id': None, 'args': {'type': 'K', 'user': 9, 'role': 'A'}, 'isDeleted': False}`
 - Query example: `curl --location --request POST 'http://localhost:8000/events/' \ --header 'Content-Type: application/json' \ --header 'Authorization: Token fee1c2377bc8fb26cbee1fa4c2786aaa989b2a42' \ --data-raw '{ "room": 1, "event_type": "U", "args": { "type": "C", "user": 9, "role": "A" } }'`
@@ -147,7 +147,7 @@ https://api.tunesync.ecd.space
 8. a) Create a Poll (Play) Event
 
 - Method: `POST`
-- Url: `/events/`
+- URL: `/events/`
 - Request body (JSON object): `{ headers={"Authorization": "Token " + token}, data={ "room": 1, "event_type": "PO", "args": { "action": "PL", "timestamp": 11.5 (postion to start song at), "queue_index": 1 (where to place in queue), "is_playing": true } } }`
 - Response body (JSON object): `{'poll_id': 16, 'args': {'action': 'PL', 'timestamp': 11.5, 'queue_index': 1, 'is_playing': true}, 'vote_percentage': 0.0, 'agrees': 0, 'disagrees': 0, 'is_active': True, 'is_successful': False, 'room_id': 3, 'event_type': 'PO'}`
 - Query example: `curl --location --request POST 'http://localhost:8000/events/' \ --header 'Content-Type: application/json' \ --header 'Authorization: Token fee1c2377bc8fb26cbee1fa4c2786aaa989b2a42' \ --data-raw '{ "room": 1, "event_type": "PO", "args": { "action": "PL", "timestamp": 11.5, "queue_index": 1, "is_playing": true } }'`
@@ -163,7 +163,7 @@ https://api.tunesync.ecd.space
 8. b) Create a Poll (Kick) Event
 
 - Method: `POST`
-- Url: `/events/`
+- URL: `/events/`
 - Request body (JSON object): `{ headers={"Authorization": "Token " + token}, data={ "room": 1, "event_type": "PO", "args": { "action": "U", "type": "K", "user": 2 } } }`
 - Response body (JSON object): `{'poll_id': 16, 'args': {'action': 'U', 'type': 'K', 'user': 2}, 'vote_percentage': 0.0, 'agrees': 0, 'disagrees': 0, 'is_active': True, 'is_successful': False, 'room_id': 3, 'event_type': 'PO'}`
 - Query example: `curl --location --request POST 'http://localhost:8000/events/' \ --header 'Content-Type: application/json' \ --header 'Authorization: Token fee1c2377bc8fb26cbee1fa4c2786aaa989b2a42' \ --data-raw '{ "room": 1, "event_type": "PO", "args": { "action": "U", "type": "K", "user": 2 } }'`
@@ -177,7 +177,7 @@ https://api.tunesync.ecd.space
 8. c) Create a Poll (Modify Queue) Event -- check this one over, might be wrong (i think request body should include the tune somehow?)
 
 - Method: `POST`
-- Url: `/events/`
+- URL: `/events/`
 - Request body (JSON object): `{ headers={"Authorization": "Token " + token}, data={ "room":1, "event_type": "PO", "args": { "action": "MQ", "queue": [1] (place in queue) } } }`
 - Response body (JSON object): `{'poll_id': 16, 'args': {'song': 1, 'action': 'MQ', 'song_name': 'Ace Attorney ~ Prologue'}, 'vote_percentage': 0.0, 'agrees': 0, 'disagrees': 0, 'is_active': True, 'is_successful': False, 'room_id': 3, 'event_type': 'PO'}`
 - Query example: `curl --location --request POST 'http://localhost:8000/events/' \ --header 'Content-Type: application/json' \ --header 'Authorization: Token fee1c2377bc8fb26cbee1fa4c2786aaa989b2a42' \ --data-raw '{ "room":1, "event_type": "PO", "args": { "action": "MQ", "queue": [1] } }'`
@@ -192,7 +192,7 @@ https://api.tunesync.ecd.space
 9. Create a Vote Event
 
 - Method: `POST`
-- Url: `/events/`
+- URL: `/events/`
 - Request body (JSON object): `{ headers={"Authorization": "Token " + token}, data={ "room":1, "event_type": "V", "parent_event": 16 (id of the poll event you're voting on), "args": { "agree": true } } }`
 - Response body (JSON object): `{'poll_id': 16, 'args': {'agree': true}, 'vote_percentage': 1.0, 'agrees': 1, 'disagrees': 0, 'is_active': True, 'is_successful': False, 'room_id': 3, 'event_type': 'V'}`
 - Query example: `curl --location --request POST 'http://localhost:8000/events/' \ --header 'Content-Type: application/json' \ --header 'Authorization: Token fee1c2377bc8fb26cbee1fa4c2786aaa989b2a42' \ --data-raw '{ "room":1, "event_type": "V", "args": { "agree": true } }'`
@@ -215,14 +215,14 @@ https://api.tunesync.ecd.space
 2.
 
 - Method: `GET`
-- Url: `/rooms/:room_id/tunesync/`
+- URL: `/rooms/:room_id/tunesync/`
 - Response:
   the same as a tunesync response for an event
 
 3.
 
 - Method: `GET`
-- Url: `/rooms/:room_id/polls/`
+- URL: `/rooms/:room_id/polls/`
 - Response
   see paginated response and poll event response. This returns a status of all active polls.
 
@@ -238,7 +238,7 @@ count is the number of results. next and previous is the URL for the previous/ne
 4.
 
 - Method: `GET`
-- Url: `/users/?page=1&username__icontains=o`
+- URL: `/users/?page=1&username__icontains=o`
 
 above is an example query you can make with the users endpoint and below is the response. The query params can get very complicated. They look very similar to SQL queries and can be changed with "&". A lot of our endpoints will follow this same syntax. If you put invalid query params it will return the entire set (paginated).
 
@@ -266,7 +266,7 @@ results: array of results for the page queried
 5.
 
 - Method: `GET`
-- Url: `/tunes/?name__icontains=urban`
+- URL: `/tunes/?name__icontains=urban`
 
 This follows the same syntax above with more operators.
 
@@ -290,7 +290,7 @@ RESPONSE:
 6.
 
 - Method: `GET`
-- Url: `/rooms/:room_id/events/`
+- URL: `/rooms/:room_id/events/`
 - Response:
   see paginated response and standard event response combined. does not print PO/VO/T responses. use seperate endpoint
 
@@ -303,7 +303,7 @@ RESPONSE:
 1. Update metadata/info about an existing Tune
 
 - Method: `PATCH`
-- Url: `/tunes/:id/`
+- URL: `/tunes/:id/`
 - Request body (JSON object): `{ headers={"Authorization": "Token " + token}, data={ "tune_name": str, "tune_artist": str, "tune_album": str } }` (can have any combination of these params, even none)
 - Response body (JSON object): `[{'id': 6, 'uploader': 2, 'name': 'Drums Urban Percussion Intro 2 (Music For Video)', 'artist': 'TunePocket.com Music Library', 'album': 'TunePocket Unlimited Royalty Free Music Library', 'mime': 'audio/mp3', 'length': 23.412125}]` (name, artist, album fields will be shown updated as wanted)
 - Query example: `curl --location --request PATCH 'http://localhost:8000/tunes/6/' \ --header 'Content-Type: application/json' \ --header 'Authorization: Token fee1c2377bc8fb26cbee1fa4c2786aaa989b2a42' \ --data-raw '{ "tune_name": "Swoogity", "tune_artist": "Swooty" }'`
@@ -316,7 +316,7 @@ RESPONSE:
 1. Delete an existing Event
 
 - Method: `DELETE`
-- Url: `/events/:id/`
+- URL: `/events/:id/`
 - Request body (JSON object): `None`
 - Response body (JSON object): `{'id': 9, 'room': 1, 'creation_time': '2020-03-16T12:40:21.851273Z', 'event_type': 'M', 'author': 2, 'parent_event_id': None, 'args': {'content': 'this is a message'}, 'isDeleted': True}` (just an example event - only the isDeleted field changes to True)
 - Query example: `curl --location --request DELETE 'http://localhost:8000/events/1/' \ --header 'Content-Type: application/json' \ --header 'Authorization: Token fee1c2377bc8fb26cbee1fa4c2786aaa989b2a42'`
