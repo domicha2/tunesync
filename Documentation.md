@@ -215,7 +215,7 @@ Response:"
 2.
 
 - Method: `GET`
-- Url: `/rooms/:room_id/TuneSync/`
+- Url: `/rooms/:room_id/tunesync/`
 - Response:
   the same as a tunesync response for an event
 
@@ -233,14 +233,14 @@ When querying a set of data responses will typically be paginated with a respons
 'previous': None,
 'results': [{'id': 2, 'username': 'goku'}]}
 
-count is number of files. enxt is url for the next page. results is the array of results of rthe page they requested
+count is the number of results. next and previous is the URL for the previous/next page. results are the array of results of the page they requested
 
 4.
 
 - Method: `GET`
-- Url: `/users/?page=1&username__icontains=o/`
+- Url: `/users/?page=1&username__icontains=o`
 
-above is an example query you can make with the users end point and below is the response. The query params can get very complicated. They look very similar to sql queries and can be changed with "&". Alot of our endpoints will follow this same syntax. If you put invalid query params it will return the entire set (paginated).
+above is an example query you can make with the users endpoint and below is the response. The query params can get very complicated. They look very similar to SQL queries and can be changed with "&". A lot of our endpoints will follow this same syntax. If you put invalid query params it will return the entire set (paginated).
 
 The basic syntax is "field\_\_operator=value" below are some more examples. The equal operator is never explicit. If you want to use the exact field this is the syntax: "field=value"
 
