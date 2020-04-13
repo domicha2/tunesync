@@ -211,8 +211,7 @@ https://api.tunesync.ecd.space
 - URL: `/users/:id/rooms/`
 - Response: list of JSON obj (200)
   - `{"role": "A" | "D" | "R", "state": "A" | "P" | "R", title: string, subtitle: string; id: number}`
-- curl example: `curl --location --request GET 'https://api.tunesync.ecd.space/users/3/rooms/' \
---header 'Authorization: Token token'`
+- curl example: `curl --location --request GET 'https://api.tunesync.ecd.space/users/3/rooms/' \ --header 'Authorization: Token token'`
 
 2.
 
@@ -220,8 +219,7 @@ https://api.tunesync.ecd.space
 - URL: `/rooms/:room_id/tunesync/`
 - Response:
   the same as a tunesync response for an event
-- curl example: `curl --location --request GET 'https://api.tunesync.ecd.space/rooms/3/tunesync/' \
---header 'Authorization: Token token'`
+- curl example: `curl --location --request GET 'https://api.tunesync.ecd.space/rooms/3/tunesync/' \ --header 'Authorization: Token token'`
 
 3.
 
@@ -229,8 +227,7 @@ https://api.tunesync.ecd.space
 - URL: `/rooms/:room_id/polls/`
 - Response
   see paginated response and poll event response. This returns a status of all active polls.
-- curl example: `curl --location --request GET 'https://api.tunesync.ecd.space/rooms/3/polls/' \
---header 'Authorization: Token token'`
+- curl example: `curl --location --request GET 'https://api.tunesync.ecd.space/rooms/3/polls/' \ --header 'Authorization: Token token'`
 
 When querying a set of data responses will typically be paginated with a response similar to this:
 
@@ -245,8 +242,8 @@ count is the number of results. next and previous is the URL for the previous/ne
 
 - Method: `GET`
 - URL: `/users/?page=1&username__icontains=o`
-- curl example: `curl --location --request GET 'https://api.tunesync.ecd.space/users/?page=1`&username__icontains=o' \
---header 'Authorization: Token token'`
+- curl example: `curl --location --request GET 'https://api.tunesync.ecd.space/users/?page=1`&username\_\_icontains=o' \
+  --header 'Authorization: Token token'`
 
 above is an example query you can make with the users endpoint and below is the response. The query params can get very complicated. They look very similar to SQL queries and can be changed with "&". A lot of our endpoints will follow this same syntax. If you put invalid query params it will return the entire set (paginated).
 
@@ -275,8 +272,7 @@ results: array of results for the page queried
 
 - Method: `GET`
 - URL: `/tunes/?name__icontains=urban`
-- curl example: `curl --location --request GET 'https://api.tunesync.ecd.space/tunes/?name__icontains=urban' \
---header 'Authorization: Token token'`
+- curl example: `curl --location --request GET 'https://api.tunesync.ecd.space/tunes/?name__icontains=urban' \ --header 'Authorization: Token token'`
 
 This follows the same syntax above with more operators.
 
@@ -307,8 +303,8 @@ RESPONSE:
   this end point also allows you to filter with query params.
   creation_time: ["lt"]
   event_type: ["exact"]}
-- curl example: `curl --location --request GET 'https://api.tunesync.ecd.space/rooms/1/events/' \
---header 'Authorization: Token token'`
+
+- curl example: `curl --location --request GET 'https://api.tunesync.ecd.space/rooms/1/events/' \ --header 'Authorization: Token token'`
 
 ## PATCH Endpoints
 
