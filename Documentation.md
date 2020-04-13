@@ -292,7 +292,7 @@ RESPONSE:
 - Method: `GET`
 - URL: `/rooms/:room_id/events/`
 - Response:
-  see paginated response and standard event response combined. does not print PO/VO/T responses. use seperate endpoint
+  see paginated response and standard event response combined. does not print PO/VO/T responses. use separate endpoint
 
   this end point also allows you to filter with query params.
   creation_time: ["lt"]
