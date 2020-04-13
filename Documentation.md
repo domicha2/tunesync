@@ -4,6 +4,29 @@
 
 https://api.tunesync.ecd.space
 
+## WebSockets `wss://api.tunesync.ecd.space/events/`
+
+- WebSockets power all realtime interactions between users such as controlling music, sending messages, and the poll feature.
+- The communication of our web sockets are one-directional (server to client).
+- Below are example payloads from the web socket.
+
+1. Events - JSON object
+
+- `{"room_id": number, "event_id": number, "event_type": EventType, "user_id": number, "parent_event_id": number, "creation_time": Date, "args": any, "username": string}`
+- `EventType = 'MQ' | 'M' | 'U' | 'PL' | 'T' | 'PO' | 'V'`
+
+2. TuneSync - JSON object
+
+- `{last_modify_queue: QueueState | null; last_play: PlayState | null; play_time: string; room_id: number; event_type: 'T';}`
+- `QueueState = { event_id: number; // [song id, length, name] queue: [number, number, string][]; }`
+- `PlayState = { event_id: number; queue_index: number; is_playing: boolean; timestamp: number; }`
+
+3. Poll - JSON object
+
+- `{ poll_id: number; args: KickPollArgs | AddToQueueArgs; vote_percentage: number; agrees: number; disagrees: number; is_active: boolean; is_successful: boolean; room_id: number; event_type: 'PO'; }`
+- `KickPollArgs = { action: PollType.Kick; user: number; username: string; type: UserChangeAction.Kick; }`
+- `AddToQueueArgs = { action: PollType.AddToQueue; song: number; song_name: string; }`
+
 ## POST Endpoints
 
 1. Create a new user (for signup)
