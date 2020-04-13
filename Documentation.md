@@ -63,7 +63,7 @@ https://api.tunesync.ecd.space
   - 200: Room successfully created
   - 400: Title is empty, or Title is 'Personal Room'
 
-4. Create a tune
+4. Upload song files
 
 - Method: `POST`
 - URL: `/tunes/`
@@ -236,7 +236,8 @@ https://api.tunesync.ecd.space
   - `{"role": "A" | "D" | "R", "state": "A" | "P" | "R", title: string, subtitle: string; id: number}`
 - curl example: `curl --location --request GET 'https://api.tunesync.ecd.space/users/3/rooms/' \ --header 'Authorization: Token token'`
 
-2.
+2. Get the latest `TuneSync` object within a room
+- `TuneSync` object holds data about the latest song play state and queue state
 
 - Method: `GET`
 - URL: `/rooms/:room_id/tunesync/`
@@ -244,7 +245,7 @@ https://api.tunesync.ecd.space
   the same as a tunesync response for an event
 - curl example: `curl --location --request GET 'https://api.tunesync.ecd.space/rooms/3/tunesync/' \ --header 'Authorization: Token token'`
 
-3.
+3. Get all active polls in the given room
 
 - Method: `GET`
 - URL: `/rooms/:room_id/polls/`
@@ -261,7 +262,7 @@ When querying a set of data responses will typically be paginated with a respons
 
 count is the number of results. next and previous is the URL for the previous/next page. results are the array of results of the page they requested
 
-4.
+4. Get all users filtered by query parameters
 
 - Method: `GET`
 - URL: `/users/?page=1&username__icontains=o`
@@ -291,7 +292,7 @@ next: url for next page
 previous: url for previous page
 results: array of results for the page queried
 
-5.
+5. Get all songs filtered by query parameters
 
 - Method: `GET`
 - URL: `/tunes/?name__icontains=urban`
@@ -316,7 +317,7 @@ RESPONSE:
 'mime': 'audio/mp3',
 'length': 23.412125}]}
 
-6.
+6. Get all events from a room
 
 - Method: `GET`
 - URL: `/rooms/:room_id/events/`
