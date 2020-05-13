@@ -14,16 +14,17 @@ import {
 import { AppState } from '../../app.module';
 import { selectUserAndRoom } from '../../app.selectors';
 import { selectUserId } from '../../auth/auth.selectors';
+import { getPageFromURL } from '../../utility';
 import { ControlsService } from '../controls/controls.service';
 import {
-  AppEvent,
+  PERSONAL_ROOM_NAME,
   Room,
   SYSTEM_USER_ID,
   User,
-  PERSONAL_ROOM_NAME,
 } from '../dashboard.models';
 import { MainScreenService } from '../main-screen/main-screen.service';
 import { MessagingService } from '../messaging/messaging.service';
+import { Poll } from '../poll/poll.models';
 import { PollService } from '../poll/poll.service';
 import { QueueService } from '../queue/queue.service';
 import { RoomsService } from '../rooms/rooms.service';
@@ -34,8 +35,6 @@ import {
   selectQueueIndexAndRoom,
   selectUsers,
 } from './dashboard.selectors';
-import { Poll } from '../poll/poll.models';
-import { getPageFromURL } from '../../utility';
 
 @Injectable()
 export class DashboardEffects {
@@ -49,8 +48,7 @@ export class DashboardEffects {
           ),
         ),
         switchMap(([action, roomId]) =>
-          this.queueService
-            .createModifyQueueEvent(action.queue, roomId)
+          this.queueService.createModifyQueueEvent(action.queue, roomId),
         ),
       ),
     { dispatch: false },
@@ -228,9 +226,9 @@ export class DashboardEffects {
         ofType(DashboardActions.createVote),
         withLatestFrom(this.store.select(selectActiveRoom)),
         switchMap(([action, room]) =>
-          this.pollService.createVote(room, action.pollId, action.agree).pipe(
-            catchError(() => EMPTY),
-          ),
+          this.pollService
+            .createVote(room, action.pollId, action.agree)
+            .pipe(catchError(() => EMPTY)),
         ),
       ),
     { dispatch: false },
@@ -252,9 +250,7 @@ export class DashboardEffects {
               userId: userAndRoom.userId,
               roomId: userAndRoom.roomId,
             })
-            .pipe(
-              catchError(() => EMPTY),
-            ),
+            .pipe(catchError(() => EMPTY)),
         ),
       ),
     { dispatch: false },
@@ -333,8 +329,7 @@ export class DashboardEffects {
       this.actions$.pipe(
         ofType(DashboardActions.createInviteUsersEvent),
         switchMap(action =>
-          this.usersService
-            .createInviteUsersEvent(action.users, action.roomId)
+          this.usersService.createInviteUsersEvent(action.users, action.roomId),
         ),
       ),
     { dispatch: false },
@@ -354,13 +349,12 @@ export class DashboardEffects {
           ),
         ),
         switchMap(([action, data]) =>
-          this.controlsService
-            .createSeekSongEvent(
-              data.room,
-              action.queueIndex,
-              action.timestamp,
-              action.isPlaying,
-            )
+          this.controlsService.createSeekSongEvent(
+            data.room,
+            action.queueIndex,
+            action.timestamp,
+            action.isPlaying,
+          ),
         ),
       ),
     { dispatch: false },
@@ -379,13 +373,12 @@ export class DashboardEffects {
           ),
         ),
         switchMap(([action, data]) =>
-          this.controlsService
-            .createSeekSongEvent(
-              data.room,
-              data.index,
-              action.timestamp,
-              action.isPlaying,
-            )
+          this.controlsService.createSeekSongEvent(
+            data.room,
+            data.index,
+            action.timestamp,
+            action.isPlaying,
+          ),
         ),
       ),
     { dispatch: false },
@@ -401,8 +394,11 @@ export class DashboardEffects {
           ),
         ),
         switchMap(([action, data]) =>
-          this.controlsService
-            .createPlaySongEvent(data.room, data.index, action.timestamp)
+          this.controlsService.createPlaySongEvent(
+            data.room,
+            data.index,
+            action.timestamp,
+          ),
         ),
       ),
     { dispatch: false },
@@ -418,8 +414,11 @@ export class DashboardEffects {
           ),
         ),
         switchMap(([action, data]) =>
-          this.controlsService
-            .createPauseSongEvent(data.room, data.index, action.timestamp)
+          this.controlsService.createPauseSongEvent(
+            data.room,
+            data.index,
+            action.timestamp,
+          ),
         ),
       ),
     { dispatch: false },
