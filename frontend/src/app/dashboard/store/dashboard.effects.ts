@@ -69,7 +69,6 @@ export class DashboardEffects {
             type: DashboardActions.storeAvailableSongs.type,
             availableSongs: response.results,
           })),
-          catchError(() => EMPTY),
         ),
       ),
     ),
@@ -95,7 +94,6 @@ export class DashboardEffects {
               }
             }),
           })),
-          catchError(() => EMPTY),
         ),
       ),
     ),
@@ -116,7 +114,6 @@ export class DashboardEffects {
               { type: DashboardActions.setUserRole.type, userRole },
             ];
           }),
-          catchError(() => EMPTY),
         ),
       ),
     ),
@@ -132,7 +129,6 @@ export class DashboardEffects {
             type: DashboardActions.setPolls.type,
             polls: response.results as Poll[],
           })),
-          catchError(() => EMPTY),
         ),
       ),
     ),
@@ -164,7 +160,6 @@ export class DashboardEffects {
               events: response.results,
               loadMore: response.next !== null,
             })),
-            catchError(() => EMPTY),
           ),
       ),
     ),
@@ -212,9 +207,7 @@ export class DashboardEffects {
         ofType(DashboardActions.createPoll),
         withLatestFrom(this.store.select(selectActiveRoom)),
         switchMap(([action, room]) =>
-          this.pollService
-            .createPoll(room, action.pollArgs)
-            .pipe(catchError(() => EMPTY)),
+          this.pollService.createPoll(room, action.pollArgs),
         ),
       ),
     { dispatch: false },
@@ -226,9 +219,7 @@ export class DashboardEffects {
         ofType(DashboardActions.createVote),
         withLatestFrom(this.store.select(selectActiveRoom)),
         switchMap(([action, room]) =>
-          this.pollService
-            .createVote(room, action.pollId, action.agree)
-            .pipe(catchError(() => EMPTY)),
+          this.pollService.createVote(room, action.pollId, action.agree),
         ),
       ),
     { dispatch: false },
@@ -244,13 +235,11 @@ export class DashboardEffects {
           ),
         ),
         switchMap(([action, userAndRoom]) =>
-          this.messagingService
-            .createMessage({
-              content: action.message,
-              userId: userAndRoom.userId,
-              roomId: userAndRoom.roomId,
-            })
-            .pipe(catchError(() => EMPTY)),
+          this.messagingService.createMessage({
+            content: action.message,
+            userId: userAndRoom.userId,
+            roomId: userAndRoom.roomId,
+          }),
         ),
       ),
     { dispatch: false },
