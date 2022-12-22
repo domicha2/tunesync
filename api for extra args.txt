@@ -1,5 +1,5 @@
 Message
-    - content "message content"
+    - content "message content":
 User Change
     - action: see appendix for actions
     - place all extra args in the same json level
